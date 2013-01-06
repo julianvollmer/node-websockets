@@ -1,6 +1,7 @@
 var http = require('http');
 var websockets = require('../lib/index');
 
+var Frame = websockets.Frame;
 var webSocketServer = websockets.server;
 
 var httpServer = http.createServer();
@@ -11,8 +12,9 @@ httpServer.on('request', function(req, res) {
 });
 
 webSocketServer.on('upgraded', function(socket, head) {
-    socket.on('data', function(data) {
-        console.log(data);
+    socket.on('data', function(buff) {
+        var frame = new Frame(buff);
+        console.log(frame.getOpcode());
     }); 
 });
 
