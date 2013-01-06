@@ -1,5 +1,5 @@
-var http        = require('http');
-var websockets  = require('../lib/index');
+var http     = require('http');
+var upgrade  = require('../lib/upgrade');
 
 var server = http.createServer();
 
@@ -8,6 +8,6 @@ server.on('request', function(req, res) {
     res.end('hello world');
 });
 
-websockets.server.listen(server);
+server.on('upgrade', upgrade);
 
 server.listen(3000);
