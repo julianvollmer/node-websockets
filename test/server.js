@@ -13,9 +13,7 @@ httpServer.on('request', function(req, res) {
 
 webSocketServer.on('upgraded', function(socket, head) {
     socket.on('data', function(buff) {
-        var frame = new Frame(buff);
-        frame.setOpcode(0xA);
-        console.log(frame.headers[0]);
+        
     }); 
 });
 
