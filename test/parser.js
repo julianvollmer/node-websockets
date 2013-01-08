@@ -22,6 +22,10 @@ httpServer.on('upgrade', function(req, socket) {
     Upgrade(req, socket);
 
     socket.pipe(reader);
+
+    var writer = new Writer(socket);
+    // why does this not work??
+    socket.write('hello back');
 });
 
 httpServer.listen(3000);
