@@ -8,6 +8,12 @@ server.on('request', function(req, res) {
     res.end('hello world');
 });
 
-server.on('upgrade', upgrade);
+server.on('upgrade', function(req, socket) {
+    upgrade(req, socket);
+
+    socket.on('data', function(rawFrane) {
+        console.log(rawFrame); 
+    });
+});
 
 server.listen(3000);
