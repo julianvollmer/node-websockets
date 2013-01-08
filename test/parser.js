@@ -2,6 +2,7 @@ var http    = require('http');
 
 var Index   = require('../lib/index');
 var Reader  = require('../lib/reader');
+var Writer  = require('../lib/writer');
 var Upgrade = require('../lib/upgrade');
 
 var httpServer = http.createServer();
