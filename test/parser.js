@@ -19,13 +19,28 @@ httpServer.on('request', function(req, res) {
 });
 
 httpServer.on('upgrade', function(req, socket) {
+    var writer = new Writer(socket);
+
     Upgrade(req, socket);
 
     socket.pipe(reader);
 
-    var writer = new Writer(socket);
-    // why does this not work??
-    socket.write('hello back');
+    setTimeout(function() {
+        var writer = new Writer(socket);
+
+        writer.write('hello world');
+
+        /*var head = new Buffer(2);
+        var data = new Buffer('hello world');
+
+        head[0] = 0x81;
+        head[1] = 0x01 | data.length;
+
+        frame = Buffer.concat([head, data]);
+
+        socket.write(frame);*/
+    }, 500);
+    
 });
 
 httpServer.listen(3000);
