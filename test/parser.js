@@ -11,7 +11,6 @@ reader.on('data', function(data) {
     console.log(data.toString());
 });
 
-
 var httpServer = http.createServer();
 
 httpServer.on('request', function(req, res) {
