@@ -1,17 +1,9 @@
 var http    = require('http');
 
-var Index   = require('../lib/index');
 var Reader  = require('../lib/reader');
 var Writer  = require('../lib/writer');
 var Upgrade = require('../lib/upgrade');
 
-var httpServer = http.createServer();
-var webSocketServer = Index.server;
-
-httpServer.on('request', function(req, res) {
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('hello world');
-});
 
 var reader = new Reader();
 
@@ -19,10 +11,18 @@ reader.on('data', function(data) {
     console.log(data.toString());
 });
 
-webSocketServer.on('upgraded', function(socket, head) {
-    socket.pipe(reader);
+
+var httpServer = http.createServer();
+
+httpServer.on('request', function(req, res) {
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('hello world');
 });
 
-webSocketServer.listen(httpServer);
+httpServer.on('upgrade', function(req, socket) {
+    Upgrade(req, socket);
+
+    socket.pipe(reader);
+});
 
 httpServer.listen(3000);
