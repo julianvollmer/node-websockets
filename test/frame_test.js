@@ -1,8 +1,7 @@
 var http    = require('http');
 
 var Upgrade = require('../lib/upgrade');
-var ReadFrame = require('../lib/read_frame');
-var WriteFrame = require('../lib/write_frame');
+var WebSocketFrame = require('../lib/frame');
 
 var httpServer = http.createServer();
 
@@ -14,27 +13,27 @@ httpServer.on('request', function(req, res) {
 httpServer.on('upgrade', function(req, socket) {
     Upgrade(req, socket);
 
-    socket.on('data', function(rawFrame) {
-        var frame = new ReadFrame(rawFrame);
+    socket.on('data', function(raw) {
+        var frame = new WebSocketFrame(raw);
 
-        console.log('raw :'. rawFrame);
+        console.log('raw :', raw);
         console.log('final: ', frame.isFinal());
         console.log('masked: ', frame.isMasked());
         console.log('opcode: ', frame.getOpcode());
         console.log('length: ', frame.getLength());
         console.log('masking: ', frame.getMasking());
         console.log('payload: ', frame.getPayload());
-        console.log('encoded: ', frame.getEncodedPayload());
+        console.log('encoded: ', frame.getEncoded());
     });
 
     setTimeout(function() {
-        var writeFrame = new WriteFrame();
+        var frame = new WebSocketFrame();
 
-        writeFrame.setFinal(true);
-        writeFrame.setOpcode(0x1);
-        writeFrame.setPayload(new Buffer('hi'));
+        frame.setFinal(true);
+        frame.setOpcode(0x1);
+        frame.setPayload(new Buffer('hi'));
 
-        socket.write(writeFrame.toBuffer());
+        socket.write(frame.toBuffer());
     }, 500);
     
 });
