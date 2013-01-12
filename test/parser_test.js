@@ -18,18 +18,19 @@ httpServer.on('request', function(req, res) {
     res.end('hello world');
 });
 
-httpServer.on('upgrade', function(req, socket) {
-    var writer = new Writer(socket);
+httpServer.on('upgrade', Upgrade.serverUpgrade);
 
-    Upgrade(req, socket);
+httpServer.on('upgrade', function(req, socket) {
+    if (!Upgrade.isWebSocketUpgrade) return;
+
+    var writer = new Writer(socket);
 
     socket.pipe(reader);
 
     setTimeout(function() {
         var writer = new Writer(socket);
 
-        // writer currently defekt
-        //writer.write('hello world');
+        writer.write('hello world');
     }, 500);
     
 });

@@ -10,8 +10,10 @@ httpServer.on('request', function(req, res) {
     res.end('hello world');
 });
 
+httpServer.on('upgrade', Upgrade.serverUpgrade);
+
 httpServer.on('upgrade', function(req, socket) {
-    Upgrade(req, socket);
+    if (!Upgrade.isWebSocketUpgrade) return;
 
     socket.on('data', function(raw) {
         var frame = new WebSocketFrame(raw);

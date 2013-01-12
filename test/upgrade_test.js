@@ -8,11 +8,13 @@ server.on('request', function(req, res) {
     res.end('hello world');
 });
 
-server.on('upgrade', function(req, socket) {
-    upgrade(req, socket);
+server.on('upgrade', upgrade.serverUpgrade);
 
-    socket.on('data', function(rawFrane) {
-        console.log(rawFrame); 
+server.on('upgrade', function(req, socket) {
+    if (!upgrade.isWebSocketUpgrade) return;
+
+    socket.on('data', function(data) {
+        console.log(data); 
     });
 });
 
