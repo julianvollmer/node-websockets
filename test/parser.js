@@ -28,6 +28,7 @@ httpServer.on('upgrade', function(req, socket) {
     setTimeout(function() {
         var writer = new Writer(socket);
 
+        // writer currently defekt
         //writer.write('hello world');
     }, 500);
     
