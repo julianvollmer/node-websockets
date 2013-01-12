@@ -28,17 +28,7 @@ httpServer.on('upgrade', function(req, socket) {
     setTimeout(function() {
         var writer = new Writer(socket);
 
-        writer.write('hello world');
-
-        /*var head = new Buffer(2);
-        var data = new Buffer('hello world');
-
-        head[0] = 0x81;
-        head[1] = 0x01 | data.length;
-
-        frame = Buffer.concat([head, data]);
-
-        socket.write(frame);*/
+        //writer.write('hello world');
     }, 500);
     
 });
