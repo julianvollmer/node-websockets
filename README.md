@@ -4,6 +4,7 @@ simple websocket server implementation for nodejs
 
 TODOs:
 
+* implement proper TransformStream2
 * allow (un)masking data directly in frame
 * implement client websocket
 * queue send calls if there is no connection
