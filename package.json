@@ -1,0 +1,24 @@
+{
+    "name": "websockets",
+
+    "main": "lib/index.js",
+
+    "author": "Bodo Kaiser <bodo.kaiser@enabre.com>",
+
+    "version": "0.0.1",
+
+    "license": "BSD",
+
+    "keywords": ["websockets", "network"],
+
+    "description": "easy to understand websocket implementation for nodejs",
+
+    "dependencies": {
+        "readable-stream": "0.2.0"  
+    },
+
+    "repository": {
+        "type": "git",
+        "url": "git://gitbub.com/bodokaiser/websockets"  
+    }  
+}
