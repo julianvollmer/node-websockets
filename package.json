@@ -13,10 +13,6 @@
 
     "description": "easy to understand websocket implementation for nodejs",
 
-    "dependencies": {
-        "readable-stream": "0.2.0"  
-    },
-
     "repository": {
         "type": "git",
         "url": "git://gitbub.com/bodokaiser/websockets"  

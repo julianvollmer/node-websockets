@@ -40,3 +40,7 @@ Thumbs.db
 # Nodejs packages #
 ###################
 node_modules
+
+# Cloud9 ide #
+##############
+.c9revisions
