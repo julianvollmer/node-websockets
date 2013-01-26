@@ -17,7 +17,7 @@ setTimeout(function() {
     var wsc = new WebSocketClient('ws://localhost:3000');
 
     wsc.onopen = function() {
-        wsc.send('hello I am the client');
+        //wsc.send('hello I am the client');
     };
 
     wsc.onmessage = function(message) {
