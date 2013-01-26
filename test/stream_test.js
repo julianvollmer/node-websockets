@@ -16,8 +16,8 @@ stream.on('data', function(data) {
     console.log(data);
 });
 
-httpServer.on('upgrade', function(req, socket) {
-    WebSocketUpgrade.serverUpgrade(req, socket, function(socket) {
+httpServer.on('upgrade', function(req, socket, head) {
+    WebSocketUpgrade.serverUpgrade(req, socket, head, function(socket) {
         stream.assignSocket(socket);
     });
 });
