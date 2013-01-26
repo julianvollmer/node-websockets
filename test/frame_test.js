@@ -19,14 +19,14 @@ httpServer.on('upgrade', function(req, socket) {
         var frame = new WebSocketFrame(raw);
 
         console.log('raw :', raw);
-        //console.log('final: ', frame.isFinal());
-        //console.log('masked: ', frame.isMasked());
-        //console.log('opcode: ', frame.getOpcode());
+        console.log('final: ', frame.isFinal());
+        console.log('masked: ', frame.isMasked());
+        console.log('opcode: ', frame.getOpcode());
         console.log('length: ', frame.getLength());
-        //console.log('masking: ', frame.getMasking());
-        //console.log('payload: ', frame.getPayload());
-        //console.log('decoded payload: ', frame.getDecodedPayload());
-        //console.log('decoded payload as string: ', frame.getDecodedPayload().toString());
+        console.log('masking: ', frame.getMasking());
+        console.log('payload: ', frame.getPayload());
+        console.log('decoded payload: ', frame.getDecodedPayload());
+        console.log('decoded payload as string: ', frame.getDecodedPayload().toString());
     });
 
     setTimeout(function() {
