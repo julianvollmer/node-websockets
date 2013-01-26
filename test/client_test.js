@@ -24,7 +24,7 @@ setTimeout(function() {
         console.log('client received: ', message);
     };
     
-    wsc.send('one');
-    wsc.send('two');
-    wsc.send('three');
+    //wsc.send('one');
+    //wsc.send('two');
+    //wsc.send('three');
 }, 600);
