@@ -26,6 +26,7 @@ httpServer.on('upgrade', function(req, socket) {
         console.log('masking: ', frame.getMasking());
         console.log('payload: ', frame.getPayload());
         console.log('decoded payload: ', frame.getDecodedPayload());
+        console.log('decoded payload as string: ', frame.getDecodedPayload().toString());
     });
 
     setTimeout(function() {
