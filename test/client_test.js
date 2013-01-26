@@ -13,12 +13,18 @@ wss.onmessage = function(data) {
     console.log('server received: ', data);
 };
 
-var wsc = new WebSocketClient('ws://localhost:3000');
+setTimeout(function() {
+    var wsc = new WebSocketClient('ws://localhost:3000');
 
-wsc.onopen = function() {
-    wsc.send('hello I am the client');
-};
+    wsc.onopen = function() {
+        wsc.send('hello I am the client');
+    };
 
-wsc.onmessage = function(message) {
-    console.log('client received: ', message);
-};
+    wsc.onmessage = function(message) {
+        console.log('client received: ', message);
+    };
+    
+    wsc.send('one');
+    wsc.send('two');
+    wsc.send('three');
+}, 600);
