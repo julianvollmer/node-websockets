@@ -1,6 +1,6 @@
-var http    = require('http');
+var http = require('http');
 
-var WebSocketParser = require('../lib/parser');
+var WebSocketStream = require('../lib/stream');
 var WebSocketUpgrade = require('../lib/upgrade');
 
 var httpServer = http.createServer();
@@ -10,17 +10,15 @@ httpServer.on('request', function(req, res) {
     res.end('hello world');
 });
 
-var parser = new WebSocketParser();
+var stream = new WebSocketStream();
 
-parser.on('data', function(data) {
+stream.on('data', function(data) {
     console.log(data);
 });
 
 httpServer.on('upgrade', function(req, socket) {
     WebSocketUpgrade.serverUpgrade(req, socket, function(socket) {
-        socket.pipe(parser);
-
-        //parser.write('hello');
+        stream.assignSocket(socket);
     });
 });
 
