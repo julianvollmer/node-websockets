@@ -1,6 +1,6 @@
 var http = require('http');
 
-var WebSocket = require('../lib/stream');
+var WebSocket = require('../lib/socket');
 var WebSocketUpgrade = require('../lib/upgrade');
 
 var httpServer = http.createServer();
