@@ -19,16 +19,12 @@ setTimeout(function() {
     var wsc = new WebSocketClient('ws://localhost:3000');
 
     wsc.onopen = function() {
-        //wsc.send('hello I am the client');
+        wsc.send('hello I am the client');
     };
 
     wsc.onmessage = function(message) {
         console.log('client received: ', message);
     };
-    
-    //wsc.send('one');
-    //wsc.send('two');
-    //wsc.send('three');
 }, 600);
 
 server.listen(3000);
