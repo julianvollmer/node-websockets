@@ -13,6 +13,7 @@ wss.onopen = function() {
 
 wss.onmessage = function(data) {
     console.log('server received: ', data);
+    wss.send('got your message client.');
 };
 
 setTimeout(function() {
