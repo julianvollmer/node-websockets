@@ -4,6 +4,7 @@ simple websocket server implementation for nodejs
 
 TODOs:
 
+* move parser methods from frame to extra file
 * official WebSocket status codes
 * buffer frames which get split by highWaterMark in socket stream
 * queue send calls if there is no connection
