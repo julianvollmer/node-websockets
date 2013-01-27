@@ -3,7 +3,9 @@ var http = require('http');
 var WebSocketServer = require('../lib/server');
 var WebSocketClient = require('../lib/client');
 
-var wss = new WebSocketServer('ws://localhost:3000').listen(http.createServer().listen(3000));
+var server = http.createServer();
+
+var wss = new WebSocketServer('ws://localhost:3000').listen(server);
 
 wss.onopen = function() {
     wss.send('hello I am the server');
@@ -28,3 +30,5 @@ setTimeout(function() {
     //wsc.send('two');
     //wsc.send('three');
 }, 600);
+
+server.listen(3000);
