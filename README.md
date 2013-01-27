@@ -4,7 +4,6 @@ simple websocket server implementation for nodejs
 
 TODOs:
 
-* move parser methods from frame to extra file
 * official WebSocket status codes
 * buffer frames which get split by highWaterMark in socket stream
 * queue send calls if there is no connection
@@ -15,7 +14,6 @@ TODOs:
 * allow sending data with continuation frames
 * implement secured version of protocol "wss"
 * add JsDocs to all modules
-* refactor WebSocketFrame object
-* add new abstraction layer which uses obj notation to define frames (similar to options in http.ClientRequest)
+* update docs
 
 by bodo kaiser
