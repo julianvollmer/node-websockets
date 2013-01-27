@@ -25,14 +25,15 @@ httpServer.on('upgrade', function(req, socket) {
         console.log('length: ', frame.getLength());
         console.log('masking: ', frame.getMasking());
         console.log('payload: ', frame.getPayload());
-        console.log('decoded payload: ', frame.getDecodedPayload());
-        console.log('decoded payload as string: ', frame.getDecodedPayload().toString());
+        console.log('decoded payload: ', frame.getData());
+        console.log('decoded payload as string: ', frame.getData().toString());
     });
 
     setTimeout(function() {
         var frame = new WebSocketFrame();
 
         frame.setFinal(true);
+        frame.setMasked(false);
         frame.setOpcode(0x1);
         frame.setPayload(new Buffer('hi'));
 
