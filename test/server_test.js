@@ -28,4 +28,4 @@ wss.onclose = function() {
 
 wss.listen(httpServer);
 
-httpServer.listen(3000);
+httpServer.listen(process.env.PORT || 3000);
