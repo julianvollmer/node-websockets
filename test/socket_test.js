@@ -25,7 +25,7 @@ ws.on('message', function(data) {
 });
 
 httpServer.on('upgrade', function(req, socket, head) {
-    WebSocketUpgrade.serverUpgrade(req, socket, head, function(socket) {
+    WebSocketUpgrade.serverUpgrade(req, socket, head, ws.extensions, function(socket) {
         ws.assignSocket(socket);
     });
 });

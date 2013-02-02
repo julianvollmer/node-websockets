@@ -7,6 +7,10 @@ var server = http.createServer();
 
 var wss = new WebSocketServer('ws://localhost:3000').listen(server);
 
+wss.addExtension('x-test-extension', function(data) {
+    return data; 
+});
+
 wss.on('open', function() {
     wss.send('hello I am the server');
 });
@@ -19,6 +23,11 @@ wss.on('message', function(data) {
 setTimeout(function() {
     var wsc = new WebSocketClient('ws://localhost:3000');
 
+    wsc.addExtension('x-test-extension', function(data) {
+
+        return data;
+    });
+
     wsc.on('open', function() {
         wsc.send('hello I am the client');
     });
@@ -26,6 +35,8 @@ setTimeout(function() {
     wsc.on('message', function(message) {
         console.log('client received: ', message);
     });
+
+    wsc.open();
 }, 600);
 
 server.listen(process.env.PORT || 3000);
