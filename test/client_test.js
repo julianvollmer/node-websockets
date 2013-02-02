@@ -8,7 +8,10 @@ var server = http.createServer();
 var wss = new WebSocketServer('ws://localhost:3000').listen(server);
 
 wss.addExtension('x-test-extension', function(data) {
-    return data; 
+    return data + ' extended'; 
+});
+wss.addExtension('x-another-test', function(data) {
+    return data + ' with some other data'; 
 });
 
 wss.on('open', function() {
@@ -24,8 +27,10 @@ setTimeout(function() {
     var wsc = new WebSocketClient('ws://localhost:3000');
 
     wsc.addExtension('x-test-extension', function(data) {
-
-        return data;
+        return data + ' extended';
+    });
+    wsc.addExtension('x-another-test', function(data) {
+        return data + ' with some other data'; 
     });
 
     wsc.on('open', function() {
