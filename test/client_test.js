@@ -7,25 +7,25 @@ var server = http.createServer();
 
 var wss = new WebSocketServer('ws://localhost:3000').listen(server);
 
-wss.onopen = function() {
+wss.on('open', function() {
     wss.send('hello I am the server');
-};
+});
 
-wss.onmessage = function(data) {
+wss.on('message', function(data) {
     console.log('server received: ', data);
     wss.send('got your message client.');
-};
+});
 
 setTimeout(function() {
     var wsc = new WebSocketClient('ws://localhost:3000');
 
-    wsc.onopen = function() {
+    wsc.on('open', function() {
         wsc.send('hello I am the client');
-    };
+    });
 
-    wsc.onmessage = function(message) {
+    wsc.on('message', function(message) {
         console.log('client received: ', message);
-    };
+    });
 }, 600);
 
 server.listen(process.env.PORT || 3000);

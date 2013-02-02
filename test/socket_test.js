@@ -12,17 +12,17 @@ httpServer.on('request', function(req, res) {
 
 var ws = new WebSocket({ isServer: true });
 
-ws.onopen = function() {
+ws.on('open', function() {
     console.log('connection established');    
-};
+});
 
-ws.onclose = function() {
+ws.on('close', function() {
     console.log('connection closed');
-};
+});
 
-ws.onmessage = function(data) {
+ws.on('message', function(data) {
     console.log('received data: ', data);
-};
+});
 
 httpServer.on('upgrade', function(req, socket, head) {
     WebSocketUpgrade.serverUpgrade(req, socket, head, function(socket) {

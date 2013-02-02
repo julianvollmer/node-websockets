@@ -10,21 +10,21 @@ httpServer.on('request', function(req, res) {
     res.end('hello world');
 });
 
-wss.onopen = function() {
+wss.on('open', function() {
     console.log('connection opened');  
 
     wss.send('hello');
-};
+});
 
-wss.onmessage = function(message) {
+wss.on('message', function(message) {
     console.log('receiving message: ', message);
     
     wss.send(message);
-};
+});
 
-wss.onclose = function() {
+wss.on('close', function() {
     console.log('connection closed');  
-};
+});
 
 wss.listen(httpServer);
 
