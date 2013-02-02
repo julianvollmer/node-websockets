@@ -2,6 +2,8 @@
 
 simple websocket server implementation for nodejs
 
+## ATTENTION: I will rewrite a big part of the project and restructure it because the current architecture is limiting!
+
 ## todos:
 
 * easy way to register extensions
