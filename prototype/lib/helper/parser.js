@@ -1,3 +1,5 @@
+var crypto = require('crypto');
+
 /**
  * Returns a unmasked buffer using the WebSocket masking algorithm.
  * 
@@ -140,6 +142,35 @@ function getPayload(frame) {
 }
 
 /**
+ * Returns a websocket frame masking key.
+ * 
+ * @return  {Buffer}
+ */
+function createMask() {
+    return crypto.randomBytes(4);
+}
+
+/**
+ * Returns a websocket frame header.
+ * 
+ * TODO: support lengths above of 125
+ * 
+ * @param   {Boolean}   fin
+ * @param   {Boolean}   mask
+ * @param   {Number}    opcode
+ * @param   {Number}    length
+ * @return  {Buffer}
+ */
+function createHead(fin, mask, opcode, length) {
+    var head = new Buffer(2);
+    
+    head[0] = opcode | ((fin) ? 0x80 : 0x00);
+    head[1] = length | ((mask) ? 0x80 : 0x00);
+    
+    return head;
+}
+
+/**
  * Reads the bytes of a buffer of variable length as integer from right to left.
  * 
  * @param   {Buffer}    buffer
@@ -172,3 +203,4 @@ exports.getOpcode = getOpcode;
 exports.getLength = getLength;
 exports.getMasking = getMasking;
 exports.getPayload = getPayload;
+exports.createMask = createMask;
