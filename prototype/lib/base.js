@@ -2,6 +2,8 @@ var url = require('url');
 var util = require('util');
 var events = require('events');
 
+var WebSocketFrame = require('./frame');
+
 /**
  * WebSocketBase class.
  * 
@@ -16,25 +18,26 @@ var events = require('events');
  * @parent  {EventEmitter} 
  */
 function WebSocketBase(options) {
+    // currently no options support
     
     // direct url fragments
-    this.protocol = options.protocol || 'ws:';
-    this.hostname = options.hostname || 'localhost:3000';
-    this.host = options.host || 'localhost';
-    this.port = options.port || '3000';
-    this.path = options.path || '/';
-    this.query = options.query || '?foo=bar';
+    //this.protocol = options.protocol || 'ws:';
+    //this.hostname = options.hostname || 'localhost:3000';
+    //this.host = options.host || 'localhost';
+    //this.port = options.port || '3000';
+    //this.path = options.path || '/';
+    //this.query = options.query || '?foo=bar';
     
     // or url encoded
-    this.url = options.url || 'ws://localhost:3000';
+    //this.url = options.url || 'ws://localhost:3000';
     
     // webosocket options
-    this.strict = options.strict || false;
-    this.masked = options.masked || false;
-    this.extensions = options.extensions || {};
-    this.maxClients = options.maxClients || 100;
-    this.maxTimeout = options.maxTimeout || 400;
-    this.maxPayloadSize = options.maxPayloadSize || 20000;
+    //this.strict = options.strict || false;
+    //this.masked = options.masked || false;
+    //this.extensions = options.extensions || {};
+    //this.maxClients = options.maxClients || 100;
+    //this.maxTimeout = options.maxTimeout || 400;
+    //this.maxPayloadSize = options.maxPayloadSize || 20000;
     
 }
 
@@ -47,11 +50,30 @@ util.inherits(WebSocketBase, events.EventEmitter);
  * This method sends some data as buffer to the other end of the WebSocket.
  * It returns true if sent and false if queued.
  * 
- * @param   {Buffer}    data
+ * @param   {String/Buffer}    data
  * @return  {Boolean}
  */
-WebSocketBase.prototype.send = function(data) {
+WebSocketBase.prototype.send = function(data) {    
+    var isStr = (typeof data === 'string');
     
+    var opcode = (isStr) ? 0x1 : 0x2;
+    var payload = (isStr) ? new Buffer(data) : data;
+    
+    return this._writeFrame(opcode, payload);    
+};
+
+/**
+ * Sends a ping frame.
+ * 
+ * This method will send a ping frame through the wire usually the endpoint
+ * should send back a pong frame which then should emit a 'pong' event.
+ * 
+ * @param   {Buffer}    data
+ * @event   'pong'  is emitted when pong frame is received
+ * @return  {Boolean}
+ */
+WebSocketBase.prototype.ping = function(data) {
+    return this._writeFrame(0x9, data);
 };
 
 /**
@@ -63,7 +85,9 @@ WebSocketBase.prototype.send = function(data) {
  * @param   {Buffer}    reason
  */
 WebSocketBase.prototype.close = function(reason) {
+    this.socket.end();
     
+    this.emit('close', reason);
 };
 
 /**
@@ -111,10 +135,13 @@ WebSocketBase.prototype.removeExtension = function(name) {
  * to the events with this method. It should be used at the upgrade process.
  * 
  * @param   {Socket}    socket
- * @return  {WebSocketBase}
  */
-WebSocketBase.prototype.assignSocket = function(socket) {
-
+WebSocketBase.prototype._assignSocket = function(socket) {
+    this.socket = socket;
+    this.socket.on('data', this._readFrame);
+    this.socket.on('end', this.close);
+    
+    this.emit('open');
 };
 
 /**
@@ -123,22 +150,67 @@ WebSocketBase.prototype.assignSocket = function(socket) {
  * This method is executed when the socket emits a data event.
  * It will decode the frames content and handle control frames.
  * 
- * @param   {Buffer}    frame
+ * @param   {Buffer}    data
  */
-WebSocketBase.prototype._readFrame = function(frame) {
+WebSocketBase.prototype._readFrame = function(data) {
+    var frame = new WebSocketFrame(data);
     
+    if (frame.hasOpcode(0x0)) {
+        // set a flag that we are in continuation mode
+        // save the first frame we found in the context
+        // add so much frame fragments until we have a 0x1 or 0x2
+    }
+    if (frame.hasOpcode(0x1)) {
+        this.emit('message', frame.getPayload());
+        
+        return;
+    }
+    if (frame.hasOpcode(0x2)) {
+        this.emit('message', frame.getPayload());
+        
+        return;
+    }
+    if (frame.hasOpcode(0x8)) {
+        this.close(frame.getPayload());
+        
+        return;
+    }
+    if (frame.hasOpcode(0x9)) {
+        this._writeFrame(0xA, frame.getPayload());
+        
+        return;
+    }
+    if (frame.hasOpcode(0xA)) {
+        this.emit('pong', frame.getPayload());
+        
+        return;
+    }
+    
+    console.log('reserved opcode. connection should actually now be closed');
+
 };
 
 /**
  * Handles outgoing websocket frames.
  * 
  * This method is executed when sending some data through the WebSocket.
- * It will built a frame around the provided payload of the send method.
+ * It will built a frame around the provided payload of the send method and
+ * return true if sent immediatly or false if buffered.
  * 
+ * @param   {Number}    opcode
  * @param   {Buffer}    payload
+ * @return  {Boolean}
  */ 
-WebSocketBase.prototype._writeFrame = function(payload) {
+WebSocketBase.prototype._writeFrame = function(opcode, payload) {
+    var mask = this.masked;
+    var frame = new WebSocketFrame();
     
+    frame.setFinal(true);
+    frame.setMasked(mask);
+    frame.setOpcode(opcode);
+    frame.setPayload(payload);
+    
+    return this.socket.write(frame.toBuffer());
 };
 
 // exports class as module

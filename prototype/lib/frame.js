@@ -70,6 +70,16 @@ WebSocketFrame.prototype.setMasked = function(bool) {
 };
 
 /**
+ * Shortcut for testing opcode against a number.
+ * 
+ * @param   {Number}    code
+ * @return  {Boolean}
+ */
+WebSocketFrame.prototype.hasOpcode = function(code) {
+    return this.getOpcode() === code;  
+};
+
+/**
  * Returns the opcode as number from the frame.
  * 
  * @return  {Number}
@@ -83,11 +93,11 @@ WebSocketFrame.prototype.getOpcode = function() {
  * 
  * TODO: check if hex is in valid range
  * 
- * @param   {Number}    hex
+ * @param   {Number}    code
  * @return  {WebSocketFrame}
  */
-WebSocketFrame.prototype.setOpcode = function(hex) {
-    this.opcode = hex;
+WebSocketFrame.prototype.setOpcode = function(code) {
+    this.opcode = code;
     
     return this;
 };
