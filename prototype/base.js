@@ -104,5 +104,42 @@ WebSocketBase.prototype.removeExtension = function(name) {
     
 };
 
+/**
+ * Assigns a tcp socket object to the WebSocket.
+ * 
+ * Because piping streams is only nice when reading data we will bind directly
+ * to the events with this method. It should be used at the upgrade process.
+ * 
+ * @param   {Socket}    socket
+ * @return  {WebSocketBase}
+ */
+WebSocketBase.prototype.assignSocket = function(socket) {
+
+};
+
+/**
+ * Handles incoming websocket frames.
+ * 
+ * This method is executed when the socket emits a data event.
+ * It will decode the frames content and handle control frames.
+ * 
+ * @param   {Buffer}    frame
+ */
+WebSocketBase.prototype._readFrame = function(frame) {
+    
+};
+
+/**
+ * Handles outgoing websocket frames.
+ * 
+ * This method is executed when sending some data through the WebSocket.
+ * It will built a frame around the provided payload of the send method.
+ * 
+ * @param   {Buffer}    payload
+ */ 
+WebSocketBase.prototype._writeFrame = function(payload) {
+    
+};
+
 // exports class as module
 module.exports = WebSocketBase;
