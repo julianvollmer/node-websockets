@@ -204,3 +204,4 @@ exports.getLength = getLength;
 exports.getMasking = getMasking;
 exports.getPayload = getPayload;
 exports.createMask = createMask;
+exports.createHead = createHead;
