@@ -13,28 +13,28 @@ function testSingleUnmaskedTextFrame() {
 
     var frame = new WebSocketFrame(unmaskedTextFrame);
     
-    if (frame.isFinal === false) {
-        console.log('final should be true');
+    if (frame.isFinal() === false) {
+        console.log('final should be true', frame.isFinal());
         
         return false;
     }
-    if (frame.isMasked === true) {
-        console.log('masked should be false');
+    if (frame.isMasked() === true) {
+        console.log('masked should be false', frame.isMasked());
         
         return false;
     }
-    if (frame.getOpcode !== 0x01) {
-        console.log('opcode should be 0x01');
+    if (frame.getOpcode() !== 0x1) {
+        console.log('opcode should be 0x01', frame.getOpcode());
         
         return false;
     }
-    if (frame.getLength !== 0x05) {
-        console.log('length should be 5');
+    if (frame.getLength() !== 0x05) {
+        console.log('length should be 0x5', frame.getLength());
         
         return false;
     }
-    if (frame.getPayload.toString !== 'Hello') {
-        console.log('payload should be Hello');
+    if (frame.getPayload().toString() !== 'Hello') {
+        console.log('payload should be Hello', frame.getPayload().toString());
         
         return false;
     }
@@ -59,28 +59,28 @@ function testSingleMaskedTextFrame() {
     
     var frame = new WebSocketFrame(maskedTextFrame);
     
-    if (frame.isFinal === false) {
-        console.log('final should be true');
+    if (frame.isFinal() === false) {
+        console.log('final should be true', frame.isFinal());
         
         return false;
     }
-    if (frame.isMasked === false) {
-        console.log('masked should be true');
+    if (frame.isMasked() === false) {
+        console.log('masked should be true', frame.isMasked());
         
         return false;
     }
-    if (frame.getOpcode !== 0x1) {
-        console.log('opcode should be 0x1');
+    if (frame.getOpcode() !== 0x1) {
+        console.log('opcode should be 0x1', frame.getOpcode());
         
         return false;
     }
-    if (frame.getLength !== 0x5) {
-        console.log('length should be 0x5');
+    if (frame.getLength() !== 0x5) {
+        console.log('length should be 0x5', frame.getLength());
         
         return false;
     }
-    if (frame.getPayload.toString !== 'Hello') {
-        console.log('payload should be Hello');
+    if (frame.getPayload().toString() !== 'Hello') {
+        console.log('payload should be Hello', frame.getPayload().toString(), frame.toString());
         
         return false;
     }
@@ -101,28 +101,28 @@ function testSingleUnmaskedPingFrame() {
     
     var frame = new WebSocketFrame(unmaskedPingFrame);
     
-    if (frame.isFinal === false) {
-        console.log('final should be true');
+    if (frame.isFinal() === false) {
+        console.log('final should be true', frame.isFinal());
         
         return false;
     }
-    if (frame.isMasked === true) {
-        console.log('masked should be false');
+    if (frame.isMasked() === true) {
+        console.log('masked should be false', frame.isMasked());
         
         return false;
     }
-    if (frame.getOpcode !== 0x9) {
-        console.log('opcode should be 0x9');
+    if (frame.getOpcode() !== 0x9) {
+        console.log('opcode should be 0x9', frame.getOpcode());
         
         return false;
     }
-    if (frame.getLength !== 0x5) {
-        console.log('length should be 5');
+    if (frame.getLength() !== 0x5) {
+        console.log('length should be 5', frame.getLength());
         
         return false;
     }
-    if (frame.getPayload.toString !== 'Hello') {
-        console.log('payload should be Hello');
+    if (frame.getPayload().toString() !== 'Hello') {
+        console.log('payload should be Hello', frame.getPayload().toString());
         
         return false;
     }
@@ -147,28 +147,28 @@ function testSingleMaskedPongFrame() {
     
     var frame = new WebSocketFrame(maskedPongFrame);
     
-    if (frame.isFinal === false) {
-        console.log('final should be true');
+    if (frame.isFinal() === false) {
+        console.log('final should be true', frame.isFinal());
         
         return false;
     }
-    if (frame.isMasked === false) {
-        console.log('masked should be true');
+    if (frame.isMasked() === false) {
+        console.log('masked should be true', frame.isMasked());
         
         return false;
     }
-    if (frame.getOpcode !== 0xA) {
-        console.log('opcode should be 0xA');
+    if (frame.getOpcode() !== 0xA) {
+        console.log('opcode should be 0xA', frame.getOpcode());
         
         return false;
     }
-    if (frame.getLength !== 0x5) {
-        console.log('length should be 0x5');
+    if (frame.getLength() !== 0x5) {
+        console.log('length should be 0x5', frame.getLength());
         
         return false;
     }
-    if (frame.getPayload.toString !== 'Hello') {
-        console.log('payload should be Hello');
+    if (frame.getPayload().toString() !== 'Hello') {
+        console.log('payload should be Hello', frame.getPayload().toString());
         
         return false;
     }

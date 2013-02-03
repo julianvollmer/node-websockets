@@ -101,7 +101,7 @@ WebSocketFrame.prototype.getMasking = function() {
  */
 WebSocketFrame.prototype.getPayload = function() {
     if (this.isMasked()) {
-        return prsr.unmask(this.getMasking, this.payload);
+        return prsr.unmask(this.getMasking(), this.payload);
     }  
     
     return this.payload;
