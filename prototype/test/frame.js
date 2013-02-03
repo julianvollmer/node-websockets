@@ -1,6 +1,6 @@
 var WebSocketFrame = require('../lib/frame');
 
-// a single-frame unmasked text message ("Hello")
+// a single-frame unmasked text message
 function testSingleUnmaskedTextFrame() {
     var unmaskedTextFrame = new Buffer(7);
     unmaskedTextFrame[0] = 0x81;
@@ -176,7 +176,85 @@ function testSingleMaskedPongFrame() {
     return true;
 }
 
+// a modeled single-frame unmasked text message
+function testModeledSingleUnmaskedTextFrame() {    
+    var frame = new WebSocketFrame();
+    frame.setFinal(true);
+    frame.setMasked(false);
+    frame.setOpcode(0x01);
+    frame.setPayload(new Buffer('Hello'));
+    
+    var controlFrame = new WebSocketFrame(frame.toBuffer());
+    if (controlFrame.isFinal() === false) {
+        console.log('final should be true', controlFrame.isFinal());
+        
+        return false;
+    }
+    if (controlFrame.isMasked() === true) {
+        console.log('masked should be true', controlFrame.isMasked());
+        
+        return false;
+    }
+    if (controlFrame.getOpcode() !== 0x1) {
+        console.log('opcode should be 0x1', controlFrame.getOpcode());
+        
+        return false;
+    }
+    if (controlFrame.getLength() !== 0x5) {
+        console.log('length should be 0x5', controlFrame.getLength());
+        
+        return false;
+    }
+    if (controlFrame.getPayload().toString() !== 'Hello') {
+        console.log('payload should be Hello', controlFrame.getPayload().toString());
+        
+        return false;
+    }
+    
+    return true;
+}
+
+// a modeled single-frame masked ping request
+function testModeledSingleMaskedPingFrame() {    
+    var frame = new WebSocketFrame();
+    frame.setFinal(true);
+    frame.setMasked(true);
+    frame.setOpcode(0x09);
+    frame.setPayload(new Buffer('Hello'));
+    
+    var controlFrame = new WebSocketFrame(frame.toBuffer());
+    if (controlFrame.isFinal() === false) {
+        console.log('final should be true', controlFrame.isFinal());
+        
+        return false;
+    }
+    if (controlFrame.isMasked() === false) {
+        console.log('masked should be true', controlFrame.isMasked());
+        
+        return false;
+    }
+    if (controlFrame.getOpcode() !== 0x9) {
+        console.log('opcode should be 0x9', controlFrame.getOpcode());
+        
+        return false;
+    }
+    if (controlFrame.getLength() !== 0x5) {
+        console.log('length should be 0x5', controlFrame.getLength());
+        
+        return false;
+    }
+    if (controlFrame.getPayload().toString() !== 'Hello') {
+        console.log('payload should be Hello', controlFrame.getPayload().toString());
+        
+        return false;
+    }
+    
+    return true;
+}
+
 console.log('test single-frame unmasked text message: ', testSingleUnmaskedTextFrame());
 console.log('test single-frame masked text message: ', testSingleMaskedTextFrame());
 console.log('test single-frame unmasked ping request: ', testSingleUnmaskedPingFrame());
 console.log('test single-frame masked pong response: ', testSingleMaskedPongFrame());
+console.log('test modeled single-frame unmasked text message: ', testModeledSingleUnmaskedTextFrame());
+console.log('test modeled single-frame masked ping request: ', testModeledSingleMaskedPingFrame());

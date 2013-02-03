@@ -23,7 +23,7 @@ function WebSocketFrame(frame) {
     this.length = prsr.getLength(frame) || 0x00;
     
     // other bytes containing data
-    this.masking = prsr.getMasking(frame) || new Buffer(0);
+    this.masking = prsr.getMasking(frame) || null;
     this.payload = prsr.getPayload(frame) || new Buffer(0);
 }
 
@@ -37,12 +37,36 @@ WebSocketFrame.prototype.isFinal = function() {
 };
 
 /**
+ * Sets the fin flag of a frame to bool.
+ * 
+ * @param   {Boolean}   bool
+ * @return  {WebSocketFrame}
+ */
+WebSocketFrame.prototype.setFinal = function(bool) {
+    this.fin = Boolean(bool);
+    
+    return this;
+};
+
+/**
  * Returns true if frame has set mask flag.
  * 
  * @return  {Boolean}
  */
 WebSocketFrame.prototype.isMasked = function() {
     return this.mask;
+};
+
+/**
+ * Sets the mask flag of a frame to bool.
+ * 
+ * @param   {Boolean}   bool
+ * @return  {WebSocketFrame}
+ */
+WebSocketFrame.prototype.setMasked = function(bool) {
+    this.mask = Boolean(bool);
+    
+    return this;
 };
 
 /**
@@ -87,7 +111,7 @@ WebSocketFrame.prototype.getLength = function() {
 WebSocketFrame.prototype.getMasking = function() {
     if (!this.masking) {
         this.masking = prsr.createMask();
-    }  
+    }
     
     return this.masking;
 };
@@ -117,7 +141,7 @@ WebSocketFrame.prototype.getPayload = function() {
  */
 WebSocketFrame.prototype.setPayload = function(payload) {
     if (this.isMasked()) {
-        payload = prsr.mask(this.getMasking, payload);
+        payload = prsr.mask(this.getMasking(), payload);
     }
     
     this.length = payload.length;
@@ -143,7 +167,8 @@ WebSocketFrame.prototype.toBuffer = function() {
         frameBuffers.push(this.getMasking());
     }
     if (this.getPayload()) {
-        frameBuffers.push(this.getPayload());
+        // using getPayload() would return a unmasked buffer
+        frameBuffers.push(this.payload);
     }
 
     return Buffer.concat(frameBuffers);    
