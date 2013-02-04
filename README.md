@@ -2,8 +2,6 @@
 
 simple websocket server implementation for nodejs
 
-## ATTENTION: I will rewrite a big part of the project and restructure it because the current architecture is limiting!
-
 ## todos:
 
 * easy way to register extensions
@@ -14,7 +12,7 @@ simple websocket server implementation for nodejs
 * queue send calls if there is no connection
 * validate websocket frames
 * update docs
-* add some better tests
+* use mocha for tests
 * add JsDocs to all modules
 
 
