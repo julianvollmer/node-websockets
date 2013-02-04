@@ -26,8 +26,6 @@ function testEvents() {
     setTimeout(function() {
         socket.beginTest();
     }, 500);
-    
-    return true;
 }
 
-console.log('event test:', testEvents());
+testEvents();

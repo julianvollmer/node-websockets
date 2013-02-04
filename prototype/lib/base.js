@@ -59,7 +59,7 @@ WebSocketBase.prototype.send = function(data) {
     var opcode = (isStr) ? 0x1 : 0x2;
     var payload = (isStr) ? new Buffer(data) : data;
     
-    return this._writeFrame(opcode, payload);    
+    return writeFrame.call(this, opcode, payload);    
 };
 
 /**
@@ -73,7 +73,7 @@ WebSocketBase.prototype.send = function(data) {
  * @return  {Boolean}
  */
 WebSocketBase.prototype.ping = function(data) {
-    return this._writeFrame(0x9, data);
+    return writeFrame.call(this, 0x9, data);
 };
 
 /**
@@ -141,7 +141,7 @@ WebSocketBase.prototype.assignSocket = function(socket) {
     
     this.socket = socket;
     this.socket.on('data', function(data) {
-        self._readFrame(data);
+        readFrame.call(self, data);
     });
     this.socket.on('end', function(reas) {
         self.close(reas);
@@ -158,7 +158,7 @@ WebSocketBase.prototype.assignSocket = function(socket) {
  * 
  * @param   {Buffer}    data
  */
-WebSocketBase.prototype._readFrame = function(data) {
+function readFrame(data) {
     var frame = new WebSocketFrame(data);
     
     if (frame.hasOpcode(0x0)) {
@@ -167,7 +167,7 @@ WebSocketBase.prototype._readFrame = function(data) {
         // add so much frame fragments until we have a 0x1 or 0x2
     }
     if (frame.hasOpcode(0x1)) {
-        this.emit('message', frame.getPayload());
+        this.emit('message', frame.getPayload().toString());
         
         return;
     }
@@ -182,7 +182,7 @@ WebSocketBase.prototype._readFrame = function(data) {
         return;
     }
     if (frame.hasOpcode(0x9)) {
-        this._writeFrame(0xA, frame.getPayload());
+        writeFrame.call(this, 0xA, frame.getPayload());
         
         return;
     }
@@ -207,7 +207,7 @@ WebSocketBase.prototype._readFrame = function(data) {
  * @param   {Buffer}    payload
  * @return  {Boolean}
  */ 
-WebSocketBase.prototype._writeFrame = function(opcode, payload) {
+function writeFrame(opcode, payload) {
     var mask = this.masked;
     var frame = new WebSocketFrame();
     
