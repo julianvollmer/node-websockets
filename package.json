@@ -16,5 +16,9 @@
     "repository": {
         "type": "git",
         "url": "git://gitbub.com/bodokaiser/websockets"  
-    }  
+    },
+    
+    "dependencies": {
+        "mocha": "1.8.1"
+    }
 }
