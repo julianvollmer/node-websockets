@@ -60,3 +60,4 @@ exports.maskedTextFrame = maskedTextFrame;
 exports.unmaskedTextFrame = unmaskedTextFrame;
 exports.unmaskedPingFrame = unmaskedPingFrame;
 exports.maskedPongFrame = maskedPongFrame;
+exports.unmaskedCloseFrame = unmaskedCloseFrame;

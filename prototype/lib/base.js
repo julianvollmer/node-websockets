@@ -73,7 +73,12 @@ WebSocketBase.prototype.send = function(data) {
  * @return  {Boolean}
  */
 WebSocketBase.prototype.ping = function(data) {
-    return writeFrame.call(this, 0x9, data);
+    var isStr = (typeof data === 'string');
+    
+    var opcode = (isStr) ? 0x1 : 0x2;
+    var payload = (isStr) ? new Buffer(data) : data;
+    
+    return writeFrame.call(this, 0x9, payload);
 };
 
 /**
