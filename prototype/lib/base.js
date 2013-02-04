@@ -136,10 +136,16 @@ WebSocketBase.prototype.removeExtension = function(name) {
  * 
  * @param   {Socket}    socket
  */
-WebSocketBase.prototype._assignSocket = function(socket) {
+WebSocketBase.prototype.assignSocket = function(socket) {
+    var self = this;
+    
     this.socket = socket;
-    this.socket.on('data', this._readFrame);
-    this.socket.on('end', this.close);
+    this.socket.on('data', function(data) {
+        self._readFrame(data);
+    });
+    this.socket.on('end', function(reas) {
+        self.close(reas);
+    });
     
     this.emit('open');
 };
