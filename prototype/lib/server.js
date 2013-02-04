@@ -1,6 +1,7 @@
 var util = require('util');
 
 var WebSocketBase = require('./base');
+var WebSocketUpgrade = require('./upgrade');
 
 /**
  * WebSocketServer class.
@@ -28,7 +29,15 @@ util.inherits(WebSocketServer, WebSocketBase);
  * @return  {WebSocketServer}
  */
 WebSocketServer.prototype.listen = function(server) {
+    var self = this;
     
+    server.on('upgrade', function(req, socket, head) {
+        WebSocketUpgrade.handleUpgradeRequest(req, socket, function() {
+            self.assignSocket(socket);
+        });
+    });
+    
+    return this;
 };
 
 // exports class as module

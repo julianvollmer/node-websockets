@@ -1,6 +1,7 @@
 var util = require('util');
 
 var WebSocketBase = require('./base');
+var WebSocketUpgrade = require('./upgrade');
 
 /**
  * WebSocketClient class.
@@ -13,8 +14,8 @@ var WebSocketBase = require('./base');
  * @event   ‘message'   is emitted on incoming message
  * @parent  {WebSocketBase} 
  */
-function WebSocketClient(options) {
-
+function WebSocketClient(url, options) {
+    this.url = url;
 }
 
 // inherits methods from WebSocketBase
@@ -26,7 +27,13 @@ util.inherits(WebSocketClient, WebSocketBase);
  * @return  {WebSocketClient}
  */
 WebSocketClient.prototype.open = function() {
-      
+    var self = this;
+    
+    WebSocketUpgrade.createUpgradeRequest(this.url, function(socket) {
+        self.assignSocket(socket);
+    });
+    
+    return this;
 };
 
 // exports class as module
