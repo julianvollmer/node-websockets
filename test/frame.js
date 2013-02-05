@@ -1,212 +1,123 @@
-var WebSocketFrame = require('../lib/frame');
+var assert = require('assert');
 
 var frames = require('./mockup/frames');
 
-function testSingleUnmaskedTextFrame() {
-    var frame = new WebSocketFrame(frames.unmaskedTextFrame);
+describe('WebSocketFrame', function() {
+    var WebSocketFrame = require('../lib/frame');
     
-    if (frame.isFinal() === false) {
-        console.log('final should be true', frame.isFinal());
-        
-        return false;
-    }
-    if (frame.isMasked() === true) {
-        console.log('masked should be false', frame.isMasked());
-        
-        return false;
-    }
-    if (frame.getOpcode() !== 0x1) {
-        console.log('opcode should be 0x01', frame.getOpcode());
-        
-        return false;
-    }
-    if (frame.getLength() !== 0x05) {
-        console.log('length should be 0x5', frame.getLength());
-        
-        return false;
-    }
-    if (frame.getPayload().toString() !== 'Hello') {
-        console.log('payload should be Hello', frame.getPayload().toString());
-        
-        return false;
-    }
+    var maskedCloseFrame        = new WebSocketFrame(frames.maskedCloseFrame);
+    var unmaskedCloseFrame      = new WebSocketFrame(frames.unmaskedCloseFrame);
+    var maskedPingFrame         = new WebSocketFrame(frames.maskedPingFrame);
+    var unmaskedPingFrame       = new WebSocketFrame(frames.unmaskedPingFrame);
+    var maskedPongFrame         = new WebSocketFrame(frames.maskedPongFrame);
+    var unmaskedPongFrame       = new WebSocketFrame(frames.unmaskedPongFrame);
+    var singleMaskedTextFrame   = new WebSocketFrame(frames.singleMaskedTextFrame);
+    var singleUnmaskedTextFrame = new WebSocketFrame(frames.singleUnmaskedTextFrame);
+    var firstFragmentedUnmaskedTextFrame    = new WebSocketFrame(frames.firstFragmentedUnmaskedTextFrame);
+    var secondFragmentedUnmaskedTextFrame   = new WebSocketFrame(frames.secondFragmentedUnmaskedTextFrame);
     
-    return true;
-}
+    describe('#isFinal()', function() {
+        it('should return true by all unfragmented frames', function() {
+            assert.strictEqual(true, maskedCloseFrame.isFinal());
+            assert.strictEqual(true, unmaskedCloseFrame.isFinal()); 
+            assert.strictEqual(true, maskedPingFrame.isFinal());
+            assert.strictEqual(true, unmaskedPingFrame.isFinal());
+            assert.strictEqual(true, maskedPongFrame.isFinal());
+            assert.strictEqual(true, unmaskedPongFrame.isFinal());
+            assert.strictEqual(true, singleMaskedTextFrame.isFinal());
+            assert.strictEqual(true, singleUnmaskedTextFrame.isFinal());
+            assert.strictEqual(true, secondFragmentedUnmaskedTextFrame.isFinal());
+        });
+        
+        it('should return false by continuation frames', function() {
+            assert.strictEqual(false, firstFragmentedUnmaskedTextFrame.isFinal()); 
+        });
+    });
+    
+    describe('#setFinal()', function() {
+        var frame = new WebSocketFrame();
+        
+        it('should set final state to true', function () {
+            assert.strictEqual(true, frame.setFinal(true).isFinal());
+        });
+        
+        it('should set final state to false', function() {
+            assert.strictEqual(false, frame.setFinal(false).isFinal()); 
+        });
+    });
+    
+    describe('#isMasked()', function() {
+        it('should return true by all masked frames', function() {
+            assert.strictEqual(true, maskedCloseFrame.isMasked());
+            assert.strictEqual(true, maskedPingFrame.isMasked());
+            assert.strictEqual(true, maskedPongFrame.isMasked());
+            assert.strictEqual(true, singleMaskedTextFrame.isMasked());
+        });
+        
+        it('should return false by all unmasked frames', function() {
+            assert.strictEqual(false, unmaskedCloseFrame.isMasked()); 
+            assert.strictEqual(false, unmaskedPingFrame.isMasked());
+            assert.strictEqual(false, unmaskedPongFrame.isMasked());
+            assert.strictEqual(false, singleUnmaskedTextFrame.isMasked());
+            assert.strictEqual(false, firstFragmentedUnmaskedTextFrame.isMasked());
+            assert.strictEqual(false, secondFragmentedUnmaskedTextFrame.isMasked());
+        });        
+    });
+    
+    describe('#setMasked()', function() {
+        var frame = new WebSocketFrame();
+        
+        it('should set masked state to true', function () {
+            assert.strictEqual(true, frame.setMasked(true).isMasked());
+        });
+        
+        it('should set masked state to false', function() {
+            assert.strictEqual(false, frame.setMasked(false).isMasked()); 
+        });        
+    });
+    
+    describe('#hasOpcode()', function() {
+        var frame = new WebSocketFrame();
+        
+        it('should return true if parameter equals frame opcode', function() {
+            assert.strictEqual(true, frame.setOpcode(0x1).hasOpcode(0x1));
+        });
+        
+        it('should return false if parameter does not equals frame opcode', function() {
+            assert.strictEqual(false, frame.setOpcode(0x2).hasOpcode(0x8));    
+        });
+    });
+    
+    describe('#getOpcode()', function() {
+        
+    });
+    
+    describe('#setOpcode()', function() {
+        
+    });
+    
+    describe('#getLength()', function() {
+        
+    });
+    
+    describe('#getMasking()', function() {
+        
+    });
+    
+    describe('#getPayload()', function() {
+        
+    });
+    
+    describe('#setPayload()', function() {
+        
+    });
+    
+    describe('#toBuffer()', function() {
+        
+    });
+    
+    describe('#toString()', function() {
+        
+    });
 
-function testSingleMaskedTextFrame() {    
-    var frame = new WebSocketFrame(frames.maskedTextFrame);
-    
-    if (frame.isFinal() === false) {
-        console.log('final should be true', frame.isFinal());
-        
-        return false;
-    }
-    if (frame.isMasked() === false) {
-        console.log('masked should be true', frame.isMasked());
-        
-        return false;
-    }
-    if (frame.getOpcode() !== 0x1) {
-        console.log('opcode should be 0x1', frame.getOpcode());
-        
-        return false;
-    }
-    if (frame.getLength() !== 0x5) {
-        console.log('length should be 0x5', frame.getLength());
-        
-        return false;
-    }
-    if (frame.getPayload().toString() !== 'Hello') {
-        console.log('payload should be Hello', frame.getPayload().toString(), frame.toString());
-        
-        return false;
-    }
-    
-    return true;
-}
-
-function testSingleUnmaskedPingFrame() {    
-    var frame = new WebSocketFrame(frames.unmaskedPingFrame);
-    
-    if (frame.isFinal() === false) {
-        console.log('final should be true', frame.isFinal());
-        
-        return false;
-    }
-    if (frame.isMasked() === true) {
-        console.log('masked should be false', frame.isMasked());
-        
-        return false;
-    }
-    if (frame.getOpcode() !== 0x9) {
-        console.log('opcode should be 0x9', frame.getOpcode());
-        
-        return false;
-    }
-    if (frame.getLength() !== 0x5) {
-        console.log('length should be 5', frame.getLength());
-        
-        return false;
-    }
-    if (frame.getPayload().toString() !== 'Hello') {
-        console.log('payload should be Hello', frame.getPayload().toString());
-        
-        return false;
-    }
-    
-    return true;
-}
-
-function testSingleMaskedPongFrame() {    
-    var frame = new WebSocketFrame(frames.maskedPongFrame);
-    
-    if (frame.isFinal() === false) {
-        console.log('final should be true', frame.isFinal());
-        
-        return false;
-    }
-    if (frame.isMasked() === false) {
-        console.log('masked should be true', frame.isMasked());
-        
-        return false;
-    }
-    if (frame.getOpcode() !== 0xA) {
-        console.log('opcode should be 0xA', frame.getOpcode());
-        
-        return false;
-    }
-    if (frame.getLength() !== 0x5) {
-        console.log('length should be 0x5', frame.getLength());
-        
-        return false;
-    }
-    if (frame.getPayload().toString() !== 'Hello') {
-        console.log('payload should be Hello', frame.getPayload().toString());
-        
-        return false;
-    }
-    
-    return true;
-}
-
-function testModeledSingleUnmaskedTextFrame() {    
-    var frame = new WebSocketFrame();
-    frame.setFinal(true);
-    frame.setMasked(false);
-    frame.setOpcode(0x01);
-    frame.setPayload(new Buffer('Hello'));
-    
-    var controlFrame = new WebSocketFrame(frame.toBuffer());
-    if (controlFrame.isFinal() === false) {
-        console.log('final should be true', controlFrame.isFinal());
-        
-        return false;
-    }
-    if (controlFrame.isMasked() === true) {
-        console.log('masked should be true', controlFrame.isMasked());
-        
-        return false;
-    }
-    if (controlFrame.getOpcode() !== 0x1) {
-        console.log('opcode should be 0x1', controlFrame.getOpcode());
-        
-        return false;
-    }
-    if (controlFrame.getLength() !== 0x5) {
-        console.log('length should be 0x5', controlFrame.getLength());
-        
-        return false;
-    }
-    if (controlFrame.getPayload().toString() !== 'Hello') {
-        console.log('payload should be Hello', controlFrame.getPayload().toString());
-        
-        return false;
-    }
-    
-    return true;
-}
-
-function testModeledSingleMaskedPingFrame() {    
-    var frame = new WebSocketFrame();
-    frame.setFinal(true);
-    frame.setMasked(true);
-    frame.setOpcode(0x09);
-    frame.setPayload(new Buffer('Hello'));
-    
-    var controlFrame = new WebSocketFrame(frame.toBuffer());
-    if (controlFrame.isFinal() === false) {
-        console.log('final should be true', controlFrame.isFinal());
-        
-        return false;
-    }
-    if (controlFrame.isMasked() === false) {
-        console.log('masked should be true', controlFrame.isMasked());
-        
-        return false;
-    }
-    if (controlFrame.getOpcode() !== 0x9) {
-        console.log('opcode should be 0x9', controlFrame.getOpcode());
-        
-        return false;
-    }
-    if (controlFrame.getLength() !== 0x5) {
-        console.log('length should be 0x5', controlFrame.getLength());
-        
-        return false;
-    }
-    if (controlFrame.getPayload().toString() !== 'Hello') {
-        console.log('payload should be Hello', controlFrame.getPayload().toString());
-        
-        return false;
-    }
-    
-    return true;
-}
-
-console.log('test single-frame unmasked text message: ', testSingleUnmaskedTextFrame());
-console.log('test single-frame masked text message: ', testSingleMaskedTextFrame());
-console.log('test single-frame unmasked ping request: ', testSingleUnmaskedPingFrame());
-console.log('test single-frame masked pong response: ', testSingleMaskedPongFrame());
-console.log('test modeled single-frame unmasked text message: ', testModeledSingleUnmaskedTextFrame());
-console.log('test modeled single-frame masked ping request: ', testModeledSingleMaskedPingFrame());
+});
