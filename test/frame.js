@@ -54,43 +54,124 @@ describe('WebSocketFrame', function() {
         
         it('should set masked state to false', function() {
             assert.strictEqual(false, frame.setMasked(false).isMasked()); 
-        });        
+        });
     });
     
     describe('#hasOpcode()', function() {
-
+        frames.allFrames.forEach(function(frame) {
+            var wsFrame = new WebSocketFrame(frame.frame);
+            
+            it('should return true when testing against right opcode on ' + frame.name, function() {
+                assert.strictEqual(true, wsFrame.hasOpcode(frame.opcode)); 
+            });
+        });
     });
     
     describe('#getOpcode()', function() {
+        var frame = new WebSocketFrame();
         
+        it('should return 0x1 as default opcode', function() {
+            assert.strictEqual(0x1, frame.getOpcode()); 
+        });
+        
+        frames.allFrames.forEach(function(frame) {
+            var wsFrame = new WebSocketFrame(frame.frame);
+            
+            it('should equal ' + frame.opcode + ' on '+ frame.name, function() {
+                assert.strictEqual(frame.opcode, wsFrame.getOpcode()); 
+            });
+        });
     });
     
     describe('#setOpcode()', function() {
+        var frame = new WebSocketFrame();
         
+        for (var i = 0; i < 14; i++) {
+            it('should set opcode to ' + i, function () {
+                assert.strictEqual(i, frame.setOpcode(i).getOpcode());
+            });
+        }       
     });
     
     describe('#getLength()', function() {
+        it('should return zero as default', function() {
+            var wsFrame = new WebSocketFrame();
+            
+            assert.strictEqual(0, wsFrame.getLength()); 
+        });
         
+        frames.allFrames.forEach(function(frame) {
+            var wsFrame = new WebSocketFrame(frame.frame);
+            
+            assert.strictEqual(frame.length, wsFrame.getLength());
+        });
     });
     
     describe('#getMasking()', function() {
-        
+        frames.allFrames.forEach(function(frame) {
+            var wsFrame = new WebSocketFrame(frame.frame);
+            
+            if (wsFrame.isMasked()) {
+                it('should return a buffer object', function() {
+                    assert.strictEqual(true, Buffer.isBuffer(wsFrame.getMasking()));
+                });
+            
+                it('should return a buffer object with four bytes', function() {
+                    assert.strictEqual(4, wsFrame.getMasking().length); 
+                });
+            
+                it('should return a buffer which matches ' + frame.masking, function() {
+                    assert.strictEqual(frame.masking.toString(), wsFrame.getMasking().toString()); 
+                });   
+            }
+        });
     });
     
     describe('#getPayload()', function() {
+        it('should return a empty buffer object at default', function() {
+            var wsFrame = new WebSocketFrame();
+            
+            assert.strictEqual(true, Buffer.isBuffer(wsFrame.getPayload()));
+            assert.strictEqual(0, wsFrame.getPayload().length);
+        });
         
+        frames.allFrames.forEach(function(frame) {
+            var wsFrame = new WebSocketFrame(frame.frame);
+            
+            it('should return a buffer matching ' + frame.payload, function() {
+                assert.strictEqual(frame.content, wsFrame.getPayload().toString()); 
+            }); 
+        });
     });
     
     describe('#setPayload()', function() {
+        it('should set the payload properly', function() {
+            var wsFrame = new WebSocketFrame();
         
+            assert.strictEqual('Hello World', wsFrame.setPayload('Hello World').getPayload().toString()); 
+        });
     });
     
     describe('#toBuffer()', function() {
-        
+        frames.allFrames.forEach(function(frame) {
+            var wsFrame = new WebSocketFrame();
+            
+            wsFrame.setFinal(frame.fin);
+            wsFrame.setMasked(frame.mask);
+            wsFrame.setOpcode(frame.opcode);
+            
+            if (frame.mask) {
+                wsFrame.setMasking(frame.masking);
+            }
+            
+            wsFrame.setPayload(new Buffer(frame.content));
+            
+            assert.strictEqual(frame.frame.toString(), wsFrame.toBuffer().toString());
+        });
     });
     
     describe('#toString()', function() {
-        
+
     });
 
 });
