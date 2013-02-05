@@ -1,63 +1,34 @@
+// TODO: fragmented masked text frames (do they share a masking)?
+// TODO: binary frames
+// TODO: reserved opcode frames (for error detection)
+// TODO: extension frames (?)
+
 // single unmasked text frame
-var unmaskedTextFrame = new Buffer(7);
-unmaskedTextFrame[0] = 0x81;
-unmaskedTextFrame[1] = 0x05;
-unmaskedTextFrame[2] = 0x48;
-unmaskedTextFrame[3] = 0x65;
-unmaskedTextFrame[4] = 0x6c;
-unmaskedTextFrame[5] = 0x6c;
-unmaskedTextFrame[6] = 0x6f;
+exports.singleUnmaskedTextFrame = new Buffer([0x81, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f]);
 
 // single masked text frame
-var maskedTextFrame = new Buffer(11); 
-maskedTextFrame[0] = 0x81;
-maskedTextFrame[1] = 0x85;
-maskedTextFrame[2] = 0x37;
-maskedTextFrame[3] = 0xfa;
-maskedTextFrame[4] = 0x21;
-maskedTextFrame[5] = 0x3d;
-maskedTextFrame[6] = 0x7f;
-maskedTextFrame[7] = 0x9f;
-maskedTextFrame[8] = 0x4d;
-maskedTextFrame[9] = 0x51;
-maskedTextFrame[10] = 0x58;
+exports.singleMaskedTextFrame = new Buffer([0x81, 0x85, 0x37, 0xfa, 0x21, 0x3d, 0x7f, 0x9f, 0x4d, 0x51, 0x58]);
 
-// single unmasked close frame (unconfirmed)
-var unmaskedCloseFrame = new Buffer(7);
-unmaskedCloseFrame[0] = 0x88;
-unmaskedCloseFrame[1] = 0x05;
-unmaskedCloseFrame[2] = 0x48;
-unmaskedCloseFrame[3] = 0x65;
-unmaskedCloseFrame[4] = 0x6c;
-unmaskedCloseFrame[5] = 0x6c;
-unmaskedCloseFrame[6] = 0x6f;
+// first fragmented unmasked text frame
+exports.firstFragmentedUnmaskedTextFrame = new Buffer([0x01, 0x03, 0x48, 0x65, 0x6c]);
 
-// single unmasked ping frame
-var unmaskedPingFrame = new Buffer(7);
-unmaskedPingFrame[0] = 0x89;
-unmaskedPingFrame[1] = 0x05;
-unmaskedPingFrame[2] = 0x48;
-unmaskedPingFrame[3] = 0x65;
-unmaskedPingFrame[4] = 0x6c;
-unmaskedPingFrame[5] = 0x6c;
-unmaskedPingFrame[6] = 0x6f;
+// second fragmented unmasked text frame
+exports.secondFragmentedUnmaskedTextFrame = new Buffer([0x80, 0x02, 0x6c, 0x6f]);
 
-// single masked pong frame
-var maskedPongFrame = new Buffer(11);
-maskedPongFrame[0] = 0x8a;
-maskedPongFrame[1] = 0x85;
-maskedPongFrame[2] = 0x37;
-maskedPongFrame[3] = 0xfa;
-maskedPongFrame[4] = 0x21;
-maskedPongFrame[5] = 0x3d;
-maskedPongFrame[6] = 0x7f;
-maskedPongFrame[7] = 0x9f;
-maskedPongFrame[8] = 0x4d;
-maskedPongFrame[9] = 0x51;
-maskedPongFrame[10] = 0x58;
+// unmasked close frame
+exports.unmaskedCloseFrame = new Buffer([0x88, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f]);
 
-exports.maskedTextFrame = maskedTextFrame;
-exports.unmaskedTextFrame = unmaskedTextFrame;
-exports.unmaskedPingFrame = unmaskedPingFrame;
-exports.maskedPongFrame = maskedPongFrame;
-exports.unmaskedCloseFrame = unmaskedCloseFrame;
+// masked close frame
+exports.maskedCloseFrame = new Buffer([0x88, 0x85, 0x37, 0xfa, 0x21, 0x3d, 0x7f, 0x9f, 0x4d, 0x51, 0x58])
+
+// unmasked ping frame
+exports.unmaskedPingFrame = new Buffer([0x89, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f]);
+
+// masked ping frame
+exports.maskedPingFrame = new Buffer([0x89, 0x85, 0x37, 0xfa, 0x21, 0x3d, 0x7f, 0x9f, 0x4d, 0x51, 0x58])
+
+// unmasked pong frame
+exports.unmaskedPongFrame = new Buffer([0x8a, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f]);
+
+// masked pong frame
+exports.maskedPongFrame = new Buffer([0x8a, 0x85, 0x37, 0xfa, 0x21, 0x3d, 0x7f, 0x9f, 0x4d, 0x51, 0x58]);
