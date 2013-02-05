@@ -1,6 +1,44 @@
+var assert = require('assert');
+
 var WebSocketBase = require('../lib/base');
 
 var MockupSocket = require('./mockup/socket');
+
+describe('WebSocketBase', function() {
+    
+    describe('#send()', function() {
+        
+    });
+    
+    describe('#pong()', function() {
+        
+    });
+    
+    describe('#close()', function() {
+        
+    });
+    
+    describe('event: "open"', function() {
+        
+    });
+    
+    describe('event: "pong"', function() {
+        
+    });
+    
+    describe('event: "close"', function() {
+        
+    });
+    
+    describe('event: "message"', function() {
+        
+    });
+    
+    describe('event: "error"', function() {
+        
+    });
+
+});
 
 function testEvents() {
     var wsb = new WebSocketBase();
