@@ -2,6 +2,10 @@ var assert = require('assert');
 
 var frames = require('./mockup/frames');
 
+function eachFrame(callback) {
+    frames.allFrames.forEach(callback);
+}
+
 describe('WebSocketFrame', function() {
     var WebSocketFrame = require('../lib/frame');
     
@@ -10,7 +14,7 @@ describe('WebSocketFrame', function() {
             assert.strictEqual(true, new WebSocketFrame().isFinal()); 
         });
         
-        frames.allFrames.forEach(function(frame) {
+        eachFrame(function(frame) {
             var wsFrame = new WebSocketFrame(frame.frame);
             
             it('should return ' + frame.fin + ' on ' + frame.name, function() {
@@ -36,7 +40,7 @@ describe('WebSocketFrame', function() {
             assert.strictEqual(false, new WebSocketFrame().isMasked()); 
         });
         
-        frames.allFrames.forEach(function(frame) {
+        eachFrame(function(frame) {
             var wsFrame = new WebSocketFrame(frame.frame);
             
             it('should return ' + frame.mask + ' on ' + frame.name, function() {
@@ -57,16 +61,6 @@ describe('WebSocketFrame', function() {
         });
     });
     
-    describe('#hasOpcode()', function() {
-        frames.allFrames.forEach(function(frame) {
-            var wsFrame = new WebSocketFrame(frame.frame);
-            
-            it('should return true when testing against right opcode on ' + frame.name, function() {
-                assert.strictEqual(true, wsFrame.hasOpcode(frame.opcode)); 
-            });
-        });
-    });
-    
     describe('#getOpcode()', function() {
         var frame = new WebSocketFrame();
         
@@ -74,11 +68,21 @@ describe('WebSocketFrame', function() {
             assert.strictEqual(0x1, frame.getOpcode()); 
         });
         
-        frames.allFrames.forEach(function(frame) {
+        eachFrame(function(frame) {
             var wsFrame = new WebSocketFrame(frame.frame);
             
             it('should equal ' + frame.opcode + ' on '+ frame.name, function() {
                 assert.strictEqual(frame.opcode, wsFrame.getOpcode()); 
+            });
+        });
+    });
+    
+    describe('#hasOpcode()', function() {
+        eachFrame(function(frame) {
+            var wsFrame = new WebSocketFrame(frame.frame);
+            
+            it('should return true when testing against right opcode on ' + frame.name, function() {
+                assert.strictEqual(true, wsFrame.hasOpcode(frame.opcode)); 
             });
         });
     });
@@ -100,7 +104,7 @@ describe('WebSocketFrame', function() {
             assert.strictEqual(0, wsFrame.getLength()); 
         });
         
-        frames.allFrames.forEach(function(frame) {
+        eachFrame(function(frame) {
             var wsFrame = new WebSocketFrame(frame.frame);
             
             assert.strictEqual(frame.length, wsFrame.getLength());
@@ -108,7 +112,7 @@ describe('WebSocketFrame', function() {
     });
     
     describe('#getMasking()', function() {
-        frames.allFrames.forEach(function(frame) {
+        eachFrame(function(frame) {
             var wsFrame = new WebSocketFrame(frame.frame);
             
             if (wsFrame.isMasked()) {
@@ -135,7 +139,7 @@ describe('WebSocketFrame', function() {
             assert.strictEqual(0, wsFrame.getPayload().length);
         });
         
-        frames.allFrames.forEach(function(frame) {
+        eachFrame(function(frame) {
             var wsFrame = new WebSocketFrame(frame.frame);
             
             it('should return a buffer matching ' + frame.payload, function() {
@@ -153,7 +157,7 @@ describe('WebSocketFrame', function() {
     });
     
     describe('#toBuffer()', function() {
-        frames.allFrames.forEach(function(frame) {
+        eachFrame(function(frame) {
             var wsFrame = new WebSocketFrame();
             
             wsFrame.setFinal(frame.fin);
