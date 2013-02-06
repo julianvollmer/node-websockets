@@ -107,7 +107,9 @@ describe('WebSocketFrame', function() {
         eachFrame(function(frame) {
             var wsFrame = new WebSocketFrame(frame.frame);
             
-            assert.strictEqual(frame.length, wsFrame.getLength());
+            it('should return a length of ' + frame.length + ' on ' + frame.name, function() {
+                assert.strictEqual(frame.length, wsFrame.getLength()); 
+            });
         });
     });
     
@@ -158,19 +160,21 @@ describe('WebSocketFrame', function() {
     
     describe('#toBuffer()', function() {
         eachFrame(function(frame) {
-            var wsFrame = new WebSocketFrame();
+            it('should equal the frame of ' + frame.name, function() {
+                var wsFrame = new WebSocketFrame();
             
-            wsFrame.setFinal(frame.fin);
-            wsFrame.setMasked(frame.mask);
-            wsFrame.setOpcode(frame.opcode);
+                wsFrame.setFinal(frame.fin);
+                wsFrame.setMasked(frame.mask);
+                wsFrame.setOpcode(frame.opcode);
             
-            if (frame.mask) {
-                wsFrame.setMasking(frame.masking);
-            }
+                if (frame.mask) {
+                    wsFrame.setMasking(frame.masking);
+                }
             
-            wsFrame.setPayload(new Buffer(frame.content));
+                wsFrame.setPayload(new Buffer(frame.content));
             
-            assert.strictEqual(frame.frame.toString(), wsFrame.toBuffer().toString());
+                assert.strictEqual(frame.frame.toString(), wsFrame.toBuffer().toString()); 
+            });
         });
     });
     

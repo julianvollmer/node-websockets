@@ -22,40 +22,40 @@ describe('#createMask()', function() {
 describe('#createHead()', function() {
     var createHead = parser.createHead;
     
-    var headOne = createHead(true, true, 0x1, 40);
-    var headTwo = createHead(true, false, 0x2, 120);
-    var headThree = createHead(false, true, 0x3, 123);
-    var headFour = createHead(false, false, 0x4, 124);
+    var heads = [
+        { fin: true, mask: true, opcode: 0x1, length: 40, buffer: createHead(true, true, 0x1, 40) },
+        { fin: true, mask: false, opcode: 0x2, length: 125, buffer: createHead(true, false, 0x2, 125) },
+        { fin: false, mask: true, opcode: 0x3, length: 65535, buffer: createHead(false, true, 0x3, 65535) },
+        { fin: false, mask: false, opcode: 0x4, length: 70000, buffer: createHead(false, false, 0x4, 70000) }
+    ];
     
-    it('should return a buffer', function() {
-        assert.equal(true, Buffer.isBuffer(headOne));
-        assert.equal(true, Buffer.isBuffer(headTwo));
-        assert.equal(true, Buffer.isBuffer(headThree));
-        assert.equal(true, Buffer.isBuffer(headFour));
-    });
-    
-    it('should have set fin bit in head one and two', function() {
-        assert.equal(true, Boolean(headOne[0] & 0x80));
-        assert.equal(true, Boolean(headTwo[0] & 0x80));
-    });
-    
-    it('should have not set fin bit in head three and four', function() {
-        assert.equal(false, Boolean(headThree[0] & 0x80));
-        assert.equal(false, Boolean(headFour[0] & 0x80));
-    });
-    
-    it('should have set the correct opcode from head one to four', function() {
-        assert.equal(0x1, headOne[0] & 0xF);
-        assert.equal(0x2, headTwo[0] & 0xF);
-        assert.equal(0x3, headThree[0] & 0xF);
-        assert.equal(0x4, headFour[0] & 0xF);
-    });
-    
-    it('should have set the correct length from head one to four', function() {
-        assert.equal(40, headOne[1] & 0x7F);
-        assert.equal(120, headTwo[1] & 0x7F);
-        assert.equal(123, headThree[1] & 0x7F);
-        assert.equal(124, headFour[1] & 0x7F);
+    heads.forEach(function(head, i) {
+        it('should return a buffer object on ' + i, function() {
+            assert.strictEqual(true, Buffer.isBuffer(head.buffer)); 
+        });
+        it('should have set fin bit to ' + head.fin + ' on '+ i, function() {
+            assert.strictEqual(head.fin, Boolean(head.buffer[0] & 0x80)); 
+        });
+        it('should have set mask bit to ' + head.mask + ' on ' + i, function() {
+            assert.strictEqual(head.mask, Boolean(head.buffer[1] & 0x80)); 
+        });
+        it('should have set opcode of ' + head.opcode + ' on ' + i, function() {
+            assert.strictEqual(head.opcode, head.buffer[0] & 0xf); 
+        });
+        it('should have set length of ' + head.length + ' on ' + i, function() {
+            var headLen = head.buffer[1] & 0x7f;
+            
+            if (headLen < 126) {
+                assert.strictEqual(head.length, head.buffer[1] & 0x7f);    
+            }
+            if (headLen == 126) {
+                assert.strictEqual(head.length, head.buffer.slice(2, 4).readUInt16BE(0));
+            }
+            if (headLen == 127) {
+                var lenBuf = head.buffer.slice(2, 10);
+                assert.strictEqual(head.length, (lenBuf.readUInt32BE(0) << 8) + lenBuf.readUInt32BE(4));
+            }
+        });
     });
 });
 
