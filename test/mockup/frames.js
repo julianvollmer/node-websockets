@@ -5,7 +5,7 @@
 
 var lorem = require('./lorem');
 
-module.exports = {
+var frames = {
 
     "maskedPingFrame": {
         content: "Hello",
@@ -98,3 +98,13 @@ module.exports = {
     }
 
 };
+
+function eachFrame(callback) {
+    for (var name in frames) {
+        var frame = frames[name];
+        
+        callback(name, frame.fin, frame.mask, frame.opcode, frame.length, frame.masking, frame.payload, frame.content, frame.frame);
+    }
+}
+
+module.exports = eachFrame;

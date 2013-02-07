@@ -1,15 +1,10 @@
+var util = require('util');
 var assert = require('assert');
 
-var frames = require('../mockup/frames');
+var eachFrame = require('../mockup/frames');
 var parser = require('../../lib/helper/parser');
 
-function eachFrame(callback) {
-    for (var name in frames) {
-        var frame = frames[name];
-        
-        callback(name, frame.fin, frame.mask, frame.opcode, frame.length, frame.masking, frame.payload, frame.content, frame.frame);
-    }
-}
+var format = util.format;
 
 describe('#createMask()', function() {
     var mask = parser.createMask();
@@ -34,19 +29,19 @@ describe('#createHead()', function() {
     ];
     
     heads.forEach(function(head, i) {
-        it('should return a buffer object on ' + i, function() {
-            assert.strictEqual(true, Buffer.isBuffer(head.buffer)); 
+        it(format('should return a buffer object on %d', i), function() {
+            assert.strictEqual(true, Buffer.isBuffer(head.buffer));
         });
-        it('should have set fin bit to ' + head.fin + ' on '+ i, function() {
+        it(format('should have set fin bit to %s on %d', head.fin, i), function() {
             assert.strictEqual(head.fin, Boolean(head.buffer[0] & 0x80)); 
         });
-        it('should have set mask bit to ' + head.mask + ' on ' + i, function() {
+        it(format('should have set mask bit to %s on %d', head.mask, i), function() {
             assert.strictEqual(head.mask, Boolean(head.buffer[1] & 0x80)); 
         });
-        it('should have set opcode of ' + head.opcode + ' on ' + i, function() {
+        it(format('should have set opcode of %d on %d', head.opcode, i), function() {
             assert.strictEqual(head.opcode, head.buffer[0] & 0xf); 
         });
-        it('should have set length of ' + head.length + ' on ' + i, function() {
+        it(format('should have set length of %d on %d', head.length, i), function() {
             var headLen = head.buffer[1] & 0x7f;
             
             if (headLen < 126) {
@@ -68,7 +63,7 @@ describe('#isFinal()', function() {
     
     eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
         
-        it('should return ' + fin + ' on ' + name, function() {
+        it(format('should return %s on %s', fin, name), function() {
             assert.equal(fin, isFinal(frame)); 
         });
         
@@ -80,7 +75,7 @@ describe('#isMasked()', function() {
     
     eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
         
-        it('should return '+ mask + ' on ' + name, function() {
+        it(format('should return %s on %s', mask, name), function() {
             assert.equal(mask, isMasked(frame));
         });
         
@@ -92,7 +87,7 @@ describe('#getOpcode()', function() {
     
     eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
         
-        it('should return ' + opcode + ' on ' + name, function() {
+        it(format('should return %d on %s', opcode, name), function() {
             assert.strictEqual(opcode, getOpcode(frame)); 
         });
         
@@ -104,7 +99,7 @@ describe('#getLength()', function() {
     
     eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
         
-        it('should return ' + length + ' on ' + name, function() {
+        it(format('should return %d on %s', length, name), function() {
             assert.strictEqual(length, getLength(frame));
         });
         
@@ -118,17 +113,17 @@ describe('#getMasking()', function() {
     eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
         
         if (mask) {
-            it('should return a buffer on ' + name, function() {
+            it(format('should return a buffer on %s', name), function() {
                 assert.strictEqual(true, Buffer.isBuffer(getMasking(frame)));
             });
-            it('should return a buffer with length of four on ' + name, function() {
+            it(format('should return a buffer with length of four on %s', name), function() {
                 assert.strictEqual(0x04, getMasking(frame).length); 
             });
-            it('should return a correct buffer on ' + name, function() {
+            it(format('should return the correct buffer on %s', name), function() {
                 assert.strictEqual(masking.toString(), getMasking(frame).toString()); 
             });
         } else {
-            it('should return undefined on ' + name, function() {
+            it(format('should return undefined on %s', name), function() {
                 assert.strictEqual(undefined, getMasking(frame)); 
             });
         }
@@ -141,13 +136,13 @@ describe('#getPayload()', function() {
     
     eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
         
-        it('should return a buffer on '+ name, function() {
+        it(format('should return a buffer on %s', name), function() {
             assert.strictEqual(true, Buffer.isBuffer(getPayload(frame)));
         });
-        it('should return a buffer with length of ' + length + ' on '+ name, function() {
+        it(format('should return a buffer with length of %d on %s', length, name), function() {
             assert.strictEqual(length, getPayload(frame).length); 
         });
-        it('should return a buffer matching the payload', function() {
+        it(format('should return a buffer matching the payload on %s', name), function() {
             assert.strictEqual(payload.toString(), getPayload(frame).toString());
         });
         
@@ -159,10 +154,10 @@ describe('#unmask()', function() {
     
     eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
         
-        it('should return a buffer on ' + name, function() {
+        it(format('should return a buffer on %s', name), function() {
             assert.strictEqual(true, Buffer.isBuffer(unmask(masking, payload))); 
         });
-        it('should match the content of ' + name, function() {
+        it(format('should match the content of %s', name), function() {
             assert.strictEqual(content, unmask(masking, payload).toString()); 
         });
     

@@ -1,14 +1,9 @@
+var util = require('util');
 var assert = require('assert');
 
-var frames = require('./mockup/frames');
+var eachFrame = require('./mockup/frames');
 
-function eachFrame(callback) {
-    for (var name in frames) {
-        var frame = frames[name];
-        
-        callback(name, frame.fin, frame.mask, frame.opcode, frame.length, frame.masking, frame.payload, frame.content, frame.frame);
-    }
-}
+var format = util.format;
 
 describe('WebSocketFrame', function() {
     var WebSocketFrame = require('../lib/frame');
@@ -21,7 +16,7 @@ describe('WebSocketFrame', function() {
         eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
             var wsFrame = new WebSocketFrame(frame);
             
-            it('should return ' + fin + ' on ' + name, function() {
+            it(format('should return %s on %s', fin, name), function() {
                 assert.strictEqual(fin, wsFrame.isFinal());
             });
         });
@@ -47,7 +42,7 @@ describe('WebSocketFrame', function() {
         eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
             var wsFrame = new WebSocketFrame(frame);
             
-            it('should return ' + mask + ' on ' + name, function() {
+            it(format('should return %s on %s', mask, name), function() {
                 assert.strictEqual(mask, wsFrame.isMasked());
             });
         });
@@ -75,7 +70,7 @@ describe('WebSocketFrame', function() {
         eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
             var wsFrame = new WebSocketFrame(frame);
             
-            it('should equal ' + opcode + ' on '+ name, function() {
+            it(format('should equal %d on %s', opcode, name), function() {
                 assert.strictEqual(opcode, wsFrame.getOpcode()); 
             });
         });
@@ -85,8 +80,8 @@ describe('WebSocketFrame', function() {
         eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
             var wsFrame = new WebSocketFrame(frame);
             
-            it('should return true when testing against right opcode on ' + name, function() {
-                assert.strictEqual(true, wsFrame.hasOpcode(opcode)); 
+            it(format('should return true when testing against opcode %d on %s', opcode, name), function() {
+                assert.strictEqual(true, wsFrame.hasOpcode(opcode));
             });
         });
     });
@@ -95,7 +90,7 @@ describe('WebSocketFrame', function() {
         var frame = new WebSocketFrame();
         
         for (var i = 0; i < 14; i++) {
-            it('should set opcode to ' + i, function () {
+            it(format('should set opcode to %d', i), function () {
                 assert.strictEqual(i, frame.setOpcode(i).getOpcode());
             });
         }       
@@ -111,7 +106,7 @@ describe('WebSocketFrame', function() {
         eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
             var wsFrame = new WebSocketFrame(frame);
             
-            it('should return a length of ' + length + ' on ' + name, function() {
+            it(format('should return a length of %d on %s', length, name), function() {
                 assert.strictEqual(length, wsFrame.getLength()); 
             });
         });
@@ -148,7 +143,7 @@ describe('WebSocketFrame', function() {
         eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
             var wsFrame = new WebSocketFrame(frame);
             
-            it('should return a buffer matching ' + payload, function() {
+            it(format('should return a buffer matching encoded %s on %s', content, name), function() {
                 assert.strictEqual(content, wsFrame.getPayload().toString()); 
             }); 
         });
@@ -164,7 +159,7 @@ describe('WebSocketFrame', function() {
     
     describe('#toBuffer()', function() {
         eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
-            it('should equal the frame of ' + name, function() {
+            it(format('should equal the frame of %s', name), function() {
                 var wsFrame = new WebSocketFrame();
             
                 wsFrame.setFinal(fin);
