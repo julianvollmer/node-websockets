@@ -178,7 +178,21 @@ describe('WebSocketFrame', function() {
     });
     
     describe('#toString()', function() {
-
+        eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
+            it(format('should return a string on %s', name), function() {
+               assert.strictEqual('string', typeof new WebSocketFrame(frame).toString()); 
+            });
+        });
+    });
+    
+    describe('#isValid()', function() {
+        eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
+            var wsFrame = new WebSocketFrame(frame);
+            
+            it(format('should return true on %s', name), function() {
+                assert.strictEqual(true, wsFrame.isValid()); 
+            });
+        });
     });
 
 });

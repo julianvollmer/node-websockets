@@ -21,6 +21,7 @@ describe('#createMask()', function() {
 describe('#createHead()', function() {
     var createHead = parser.createHead;
     
+    // TODO: use frames instead of this
     var heads = [
         { fin: true, mask: true, opcode: 0x1, length: 40, buffer: createHead(true, true, 0x1, 40) },
         { fin: true, mask: false, opcode: 0x2, length: 125, buffer: createHead(true, false, 0x2, 125) },

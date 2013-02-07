@@ -1,7 +1,7 @@
 // TODO: fragmented masked text frames (do they share a masking)?
 // TODO: binary frames
 // TODO: reserved opcode frames (for error detection)
-// TODO: extension frames (?)
+// TODO: add head property
 
 var lorem = require('./lorem');
 
