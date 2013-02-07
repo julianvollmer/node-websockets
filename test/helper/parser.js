@@ -4,7 +4,11 @@ var frames = require('../mockup/frames');
 var parser = require('../../lib/helper/parser');
 
 function eachFrame(callback) {
-    frames.allFrames.forEach(callback);
+    for (var name in frames) {
+        var frame = frames[name];
+        
+        callback(name, frame.fin, frame.mask, frame.opcode, frame.length, frame.masking, frame.payload, frame.content, frame.frame);
+    }
 }
 
 describe('#createMask()', function() {
@@ -62,92 +66,105 @@ describe('#createHead()', function() {
 describe('#isFinal()', function() {
     var isFinal = parser.isFinal;
     
-    eachFrame(function(frame) {
-        it('should return ' + frame.fin + ' on ' + frame.name, function() {
-            assert.equal(frame.fin, isFinal(frame.frame)); 
+    eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
+        
+        it('should return ' + fin + ' on ' + name, function() {
+            assert.equal(fin, isFinal(frame)); 
         });
+        
     });
 });
 
 describe('#isMasked()', function() {
     var isMasked = parser.isMasked;
     
-    eachFrame(function(frame) {
-        it('should return '+ frame.mask + ' on ' + frame.name, function() {
-            assert.equal(frame.mask, isMasked(frame.frame));
+    eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
+        
+        it('should return '+ mask + ' on ' + name, function() {
+            assert.equal(mask, isMasked(frame));
         });
+        
     });
 });
 
 describe('#getOpcode()', function() {
     var getOpcode = parser.getOpcode;
     
-    eachFrame(function(frame) {
-        it('should return ' + frame.opcode + ' on ' + frame.name, function() {
-            assert.strictEqual(frame.opcode, getOpcode(frame.frame)); 
+    eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
+        
+        it('should return ' + opcode + ' on ' + name, function() {
+            assert.strictEqual(opcode, getOpcode(frame)); 
         });
-    })
+        
+    });
 });
 
 describe('#getLength()', function() {
     var getLength = parser.getLength;
     
-    eachFrame(function(frame) {
-        it('should return ' + frame.length + ' on ' + frame.name, function() {
-            assert.strictEqual(frame.length, getLength(frame.frame));
+    eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
+        
+        it('should return ' + length + ' on ' + name, function() {
+            assert.strictEqual(length, getLength(frame));
         });
-    })
+        
+    });
+    
 });
 
 describe('#getMasking()', function() {
     var getMasking = parser.getMasking;
     
-    eachFrame(function(frame) {
-        if (frame.mask) {
-            it('should return a buffer on ' + frame.name, function() {
-                assert.strictEqual(true, Buffer.isBuffer(getMasking(frame.frame)));
+    eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
+        
+        if (mask) {
+            it('should return a buffer on ' + name, function() {
+                assert.strictEqual(true, Buffer.isBuffer(getMasking(frame)));
             });
-            it('should return a buffer with length of four on ' + frame.name, function() {
-                assert.strictEqual(0x04, getMasking(frame.frame).length); 
+            it('should return a buffer with length of four on ' + name, function() {
+                assert.strictEqual(0x04, getMasking(frame).length); 
             });
-            it('should return a correct buffer on ' + frame.name, function() {
-                assert.strictEqual(frame.masking.toString(), getMasking(frame.frame).toString()); 
+            it('should return a correct buffer on ' + name, function() {
+                assert.strictEqual(masking.toString(), getMasking(frame).toString()); 
             });
         } else {
-            it('should return undefined on ' + frame.name, function() {
-                assert.strictEqual(undefined, getMasking(frame.frame)); 
+            it('should return undefined on ' + name, function() {
+                assert.strictEqual(undefined, getMasking(frame)); 
             });
         }
+        
     });
 });
 
 describe('#getPayload()', function() {
     var getPayload = parser.getPayload;
     
-    eachFrame(function(frame) {
-        it('should return a buffer on '+ frame.name, function() {
-            assert.strictEqual(true, Buffer.isBuffer(getPayload(frame.frame)));
+    eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
+        
+        it('should return a buffer on '+ name, function() {
+            assert.strictEqual(true, Buffer.isBuffer(getPayload(frame)));
         });
-        it('should return a buffer with length of ' + frame.length + ' on '+ frame.name, function() {
-            assert.strictEqual(frame.length, getPayload(frame.frame).length); 
+        it('should return a buffer with length of ' + length + ' on '+ name, function() {
+            assert.strictEqual(length, getPayload(frame).length); 
         });
         it('should return a buffer matching the payload', function() {
-            assert.strictEqual(frame.payload.toString(), getPayload(frame.frame).toString());
+            assert.strictEqual(payload.toString(), getPayload(frame).toString());
         });
+        
     });
 });
 
-describe('#mask()', function() {
-    var mask = parser.mask;
+describe('#unmask()', function() {
+    var unmask = parser.unmask;
     
-    eachFrame(function(frame) {
-        it('should return a buffer on ' + frame.name, function() {
-            assert.strictEqual(true, Buffer.isBuffer(mask(frame.masking, frame.payload))); 
+    eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
+        
+        it('should return a buffer on ' + name, function() {
+            assert.strictEqual(true, Buffer.isBuffer(unmask(masking, payload))); 
         });
-        it('should match the content of ' + frame.name, function() {
-            assert.strictEqual(frame.content, mask(frame.masking, frame.payload).toString()); 
+        it('should match the content of ' + name, function() {
+            assert.strictEqual(content, unmask(masking, payload).toString()); 
         });
+    
     });
 });
-
-
