@@ -37,11 +37,9 @@ describe('WebSocketFrame', function() {
             it(format('should return %d for property length on %s', length, name), function() {
                 assert.strictEqual(length, wsFrame.length); 
             });
-            
             it(format('should return %s for property masking on %s', masking.toString(), name), function() {
                 assert.strictEqual(masking.toString(), wsFrame.masking.toString()); 
             }); 
-            
             it(format('should return %s for property payload on %s', content, name), function() {
                 assert.strictEqual(content, wsFrame.payload.toString()); 
             });
@@ -73,11 +71,9 @@ describe('WebSocketFrame', function() {
             it(format('should return %d for property length on %s', length, name), function() {
                 assert.strictEqual(length, wsFrame.length); 
             });
-            
             it(format('should return %s for property masking on %s', masking.toString(), name), function() {
                 assert.strictEqual(masking.toString(), wsFrame.masking.toString()); 
             }); 
-            
             it(format('should return %s for property payload on %s', content, name), function() {
                 assert.strictEqual(content, wsFrame.payload.toString()); 
             });
