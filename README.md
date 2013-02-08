@@ -7,13 +7,9 @@ simple websocket server implementation for nodejs
 * easy way to register extensions
 * allow different websocket instances for different urls
 * implement secured version of protocol "wss"
-* buffer frames which get split by highWaterMark in socket stream (or throw error)
+* handle too big frames (validate frames)
 * allow sending data with continuation frames
 * queue send calls if there is no connection
-* validate websocket frames
-* update docs
-* use mocha for tests
-* add JsDocs to all modules
 
 
 ## license (MIT)
