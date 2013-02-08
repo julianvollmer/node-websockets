@@ -1,101 +1,134 @@
 var assert = require('assert');
 
 var WebSocketBase = require('../lib/base');
+var WebSocketFrame = require('../lib/frame');
 
+var eachFrame = require('./mockup/frames');
 var MockupSocket = require('./mockup/socket');
 
 describe('WebSocketBase', function() {
     
     describe('#send()', function() {
+        var wsb = new WebSocketBase();
+        var socket = new MockupSocket();
         
+        wsb.assignSocket(socket);
+        wsb.masked = true;
+        
+        it('should send a text frame containing "Hello World."', function(done) {
+            socket.on('data', function(chunk) {
+                var frame = new WebSocketFrame(chunk);
+                
+                assert.strictEqual(true, frame.fin);
+                assert.strictEqual(true, frame.mask);
+                assert.strictEqual(0x01, frame.opcode);
+                assert.strictEqual(0x0c, frame.length);
+                assert.strictEqual('Hello World.', frame.payload.toString());
+                
+                done(); 
+            });
+            
+            wsb.send('Hello World.');
+        });
     });
     
-    describe('#pong()', function() {
+    describe('#ping()', function() {
+        var wsb = new WebSocketBase();
+        var socket = new MockupSocket();
         
+        wsb.assignSocket(socket);
+        wsb.masked = false;
+        
+        it('should send a ping frame containing "pongy"', function() {
+            
+            wsb.ping('pongy');
+        });
     });
     
     describe('#close()', function() {
+        var wsb = new WebSocketBase();
+        var socket = new MockupSocket();
         
+        wsb.masked = true;
+        wsb.assignSocket(socket);
+        
+        // TODO: fix the bellow
+        it('should send a close frame and cut the connection', function() {
+            socket.on('data', function(data) {
+                var frame = new WebSocketFrame(data);
+                
+                assert.equal(true, frame.fin);
+                assert.equal(true, frame.mask);
+                assert.equal(0x08, frame.opcode);
+                assert.equal(0x07, frame.length);
+                assert.equal('closing', frame.payload.toString());
+            });
+            socket.on('end', function(error) {
+                //done(); is not getting executed...
+            });
+            
+            wsb.close('closing');
+        });
     });
     
     describe('event: "open"', function() {
+        var wsb = new WebSocketBase();
+        var socket = new MockupSocket();
         
+        it('should emit a open event on connection', function(done) {
+            wsb.on('open', function() {
+                done();
+            });
+            
+            wsb.assignSocket(socket);
+        });
     });
     
     describe('event: "pong"', function() {
+        var wsb = new WebSocketBase();
+        var socket = new MockupSocket();
         
+        wsb.assignSocket(socket);
+        wsb.masked = true;
+        
+        it('should emit a pong event when receiving a ping frame and give the content', function(done) {
+            wsb.on('pong', function(message) {
+                assert.equal('ping-pong', message);
+                
+                done(); 
+            });
+            
+            wsb.ping('ping-pong');
+        });
     });
     
     describe('event: "close"', function() {
+        var wsb = new WebSocketBase();
+        var socket = new MockupSocket();
         
+        wsb.masked = true;
+        wsb.assignSocket(socket);
     });
     
     describe('event: "message"', function() {
+        var wsb = new WebSocketBase();
+        var socket = new MockupSocket();
         
+        wsb.masked = true;
+        wsb.assignSocket(socket);
+        
+        it('should be a message event emitted when getting a data frame', function(done) {
+            wsb.on('message', function(message) {
+                assert.equal('nodejs is fucking great', message);
+                done();
+            });
+            
+            wsb.send('nodejs is fucking great');
+        });
     });
     
     describe('event: "error"', function() {
-        
+         
     });
 
 });
-
-function testEvents() {
-    var wsb = new WebSocketBase();
-    var socket = new MockupSocket();
-    
-    wsb.on('open', function() {
-       console.log('open event works'); 
-    });
-    
-    wsb.on('pong', function() {
-        console.log('pong event works');
-    });
-    
-    wsb.on('close', function() {
-        console.log('close event works');
-    });
-    
-    wsb.on('message', function(mess) {
-        console.log('message event works', mess);
-    });
-    
-    wsb.assignSocket(socket);
-    
-    setTimeout(function() {
-        socket.beginTest();
-    }, 500);
-}
-
-function testMethods() {
-    var wsb = new WebSocketBase();
-    var socket = new MockupSocket();
-    
-    wsb.on('pong', function(mess) {
-        console.log(mess.toString());
-        
-        wsb.close('I have enough friends.'); 
-    });
-    
-    wsb.on('message', function(mess) {
-        console.log(mess); 
-    });
-    
-    wsb.assignSocket(socket);
-    
-    setTimeout(function() {
-        wsb.send('Hello my friend!'); 
-    }, 100);
-    setTimeout(function() {
-        wsb.send('How are you my friend?'); 
-    }, 1000);
-    setTimeout(function() {
-        wsb.send('What is your wife doing?');
-    }, 4000);
-    setTimeout(function() {
-        wsb.ping('You are not that communicative!');
-    }, 8000);
-}
-
-testEvents();
-testMethods();
