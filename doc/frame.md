@@ -1,21 +1,16 @@
 # WebSocketFrame
 
-The frame prototype is a helper which allows you to build own WebSocket frame
-buffers by providing a simple, intuitive api. It is also possible to use the
-frame the other way: If you pass the raw frame as buffer to the constructor
-you can read out different flags.
-
-
+The frame prototype is a helper which allows you to build own WebSocket frame by providing a simple, intuitive property-based api. 
+It is also possible to use the WebSocketFrame the other way: You can pass the raw frame as buffer to the constructor and can read out different attributes.
 
 ## require
 
 The frame object is available through the websockets namespace.
-Note: I am not sure if this works with manuel clone..
 
 ```
 var websockets = require('websockets');
 
-var Frame = websockets.Frame;
+var WebSocketFrame = websockets.Frame;
 ```
 
 
@@ -25,28 +20,25 @@ var Frame = websockets.Frame;
 This is how you can use the frame object for building raw websocket frames.
 
 ```
-var frame = new Frame();
+var frame = new WebSocketFrame();
 
-// is this the final frame (default: true)
-frame.setFinal(true);
+// set fin flag (default: true)
+frame.fin = true;
 
-// is this frame masked (default: false)
-frame.setMasked(false);
+// set mask flag (default: false)
+frame.mask = false;
 
-// set the opcode of the frame (default: 0x1 text frame)
-frame.setOpcode(0x1);
+// set opcode (default: 0x01 text frame)
+frame.opcode = 0x01;
 
-// set the length (default: uses the length of the payload)
-frame.setLength(11);
+// set length (default: zero)
+frame.length = 0x05;
 
-// set the payload buffer (default: null)
-frame.setPayload(new Buffer('hello world'));
+// set payload (default: empty buffer)
+frame.payload = new Buffer('Hello');
 
-// convert the frame to raw buffer
-var rawFrame = frame.toBuffer();
-
-// apply the frame to a upgrade handled socket conenction
-socket.write(rawFrame);
+// transform the object to buffer and write it to socket
+socket.write(frame.toBuffer());
 ```
 
 
@@ -54,35 +46,38 @@ socket.write(rawFrame);
 ## usage for reading frames
 
 Reading out frames is also quite easy.
-Note: decoding a frame with the mask algorithm is currently not implemented
-in the frame object itself. You may copy it out of the source if you require.
 
 ```
 socket.on('data', function(data) {
-    var frame = new Frame(data);
+    var frame = new WebSocketFrame(data);
 
-    // is this a final frame
-    frame.isFinal(); 
+    // fin flag
+    frame.fin; 
 
-    // is this frame masked
-    frame.isMasked();
+    // mask flag
+    frame.mask;
 
-    // what is the opcode
-    frame.getOpcode();
+    // opcode
+    frame.opcode;
 
-    // how much bytes does the payload have
-    frame.getLength();
+    // length
+    frame.length;
 
-    // what does the masking looks like
-    frame.getMasking();
+    // masking (if not masked undefined)
+    frame.masking;
 
-    // give me the payload buffer
-    frame.getPayload();
+    // unmasked payload buffer
+    frame.payload;
 });
 ```
 
 
+## #mapFrame(rawFrame)
 
-## further example
+Maps a websocket buffer onto the object (is used in the constructor).
 
-Visit test/frame_test.js to see a fully operable example.
+
+
+## #isValid()
+
+Returns true if frame is valid that means is conform to the standard RFC 6455.
