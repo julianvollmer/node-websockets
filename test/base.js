@@ -39,7 +39,20 @@ describe('WebSocketBase', function() {
         wsb.assignSocket(socket);
         wsb.masked = false;
         
-        it('should send a ping frame containing "pongy"', function() {
+        it('should send a ping frame containing "pongy"', function(done) {
+            socket.on('data', function(data) {
+                var frame = new WebSocketFrame(data);
+                
+                if (frame.opcode == 0x09) {
+                    assert.equal(true, frame.fin);
+                    assert.equal(false, frame.mask);
+                    assert.equal(0x09, frame.opcode);
+                    assert.equal(0x05, frame.length);
+                    assert.equal('pongy', frame.payload.toString());
+                    
+                    done();
+                }
+            });
             
             wsb.ping('pongy');
         });
