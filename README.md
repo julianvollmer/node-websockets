@@ -1,19 +1,7 @@
 # websockets
-
 simple websocket server implementation for nodejs
 
-## todos:
-
-* easy way to register extensions
-* allow different websocket instances for different urls
-* implement secured version of protocol "wss"
-* handle too big frames (validate frames)
-* allow sending data with continuation frames
-* queue send calls if there is no connection
-
-
 ## license (MIT)
-
 Copyright 2013 Bodo Kaiser <bodo.kaiser@enabre.com>
 
 Permission is hereby granted, free of charge, to any person obtaining
