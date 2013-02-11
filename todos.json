@@ -81,16 +81,6 @@
         "type": "bug-fix",
         "modules": ['WebSocketBase', 'WebSocketFrame'],
         "description": "the per standard defined payload maximum of two gigabytes is too much in reality catch them up"
-    },
-    
-    "validate websocket frames": {
-        "type": "bug-fix",
-        "modules": ['WebSocketBase', 'WebSocketFrame'],
-        "description": "to avoid errors or security leaks it is recommand to validate a frame",
-        "steps": [
-            { name: "implement isValid() on frame object", done: true },
-            { name: "call isValid() on frame object on read- and writeFrame in base", done: false }
-        ]
     }
 
 }

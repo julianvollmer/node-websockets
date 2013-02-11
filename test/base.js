@@ -1,3 +1,4 @@
+var util = require('util');
 var assert = require('assert');
 
 var WebSocketBase = require('../lib/base');
@@ -5,6 +6,8 @@ var WebSocketFrame = require('../lib/frame');
 
 var eachFrame = require('./mockup/frames');
 var MockupSocket = require('./mockup/socket');
+
+var format = util.format;
 
 describe('WebSocketBase', function() {
     
@@ -142,6 +145,54 @@ describe('WebSocketBase', function() {
     
     describe('event: "error"', function() {
          
+    });
+    
+    
+    eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
+        it(format('should handle %s frame properly', name), function(done) {
+            var wsb = new WebSocketBase();
+            var socket = new MockupSocket();
+            
+            wsb.masked = true;
+            wsb.assignSocket(socket);
+            
+            switch (opcode) {
+                case 0x01:
+                    wsb.on('message', function(mess) {
+                        assert.equal(typeof mess, 'string');
+                        done();
+                    });
+                    
+                    socket.write(frame);
+                    
+                    break;
+                
+                case 0x08:
+                    wsb.on('close', function(reason) {
+                       done(); 
+                    });
+                    
+                    socket.write(frame);
+                    
+                    break;
+                    
+                case 0x09:
+                    wsb.on('pong', function(mess) {
+                        done(); 
+                    });
+                    
+                    socket.write(frame);
+                    
+                    break;
+                    
+                default:
+                    socket.write(frame);
+                    
+                    done();
+                    
+                    break;
+            }
+        });
     });
 
 });
