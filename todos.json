@@ -11,17 +11,6 @@
         ]
     },
         
-    "listen only to url": {
-        "type": "feature",
-        "modules": ['WebSocketServer'],
-        "description": "currently the websocket server is bound to all http upgrades but actually it should only upgraded when the url path matches",
-        "steps": [
-            { name: "check if this is a valid strategy", done: true },
-            { name: "check how much listeners can be bound to the upgrade event", done: true },
-            { name: "add some if clause to the upgrade callback which only works on right path", done: false }
-        ]
-    },
-        
     "extension management": {
         "type": "feature",
         "modules": ['WebSocketBase', 'WebSocketClient', 'WebSocketServer', 'WebSocketUpgrade'],
