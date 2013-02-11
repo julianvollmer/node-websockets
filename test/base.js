@@ -21,7 +21,7 @@ describe('WebSocketBase', function() {
             assert.equal(wsb.url.href, 'ws://localhost:3000');
             assert.equal(wsb.url.host, 'localhost:3000');
             assert.equal(wsb.url.port, '3000');
-            assert.equal(wsb.url.path, null);
+            assert.equal(wsb.url.path, '/');
         });
         
         it('should use the url defined in options if provided', function() {
