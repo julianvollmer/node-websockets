@@ -11,6 +11,32 @@ var format = util.format;
 
 describe('WebSocketBase', function() {
     
+    describe('#constructor()', function() {
+        it('should set ws://localhost:3000 as default url', function() {
+            var wsb = new WebSocketBase();
+            
+            assert.equal(wsb.url.slashes, true);
+            assert.equal(wsb.url.protocol, 'ws:');
+            assert.equal(wsb.url.hostname, 'localhost');
+            assert.equal(wsb.url.href, 'ws://localhost:3000');
+            assert.equal(wsb.url.host, 'localhost:3000');
+            assert.equal(wsb.url.port, '3000');
+            assert.equal(wsb.url.path, null);
+        });
+        
+        it('should use the url defined in options if provided', function() {
+            var wsb = new WebSocketBase({ url: "ws://sockets.org:5000/index" });
+            
+            assert.equal(wsb.url.slashes, true);
+            assert.equal(wsb.url.protocol, 'ws:');
+            assert.equal(wsb.url.hostname, 'sockets.org');
+            assert.equal(wsb.url.href, 'ws://sockets.org:5000/index');
+            assert.equal(wsb.url.host, 'sockets.org:5000');
+            assert.equal(wsb.url.port, '5000');
+            assert.equal(wsb.url.path, '/index');            
+        });
+    });
+    
     describe('#send()', function() {
         var wsb = new WebSocketBase();
         var socket = new MockupSocket();
