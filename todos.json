@@ -54,10 +54,14 @@
         "modules": ['Test']
     },
     
-    "update tests to use more mocha features": {
+    "use mocha hooks and bdd test style": {
         "type": "improvement",
         "modules": ['Test'],
-        "description": "maybe we can use mochas after, before, etc. and find some replace for eachFrame"
+        "description": "maybe we can use mochas after, before, etc. and find some replace for eachFrame",
+        "steps": [
+            { name: "use should (bdd) style testing", done: true },
+            { name: "check how hooks could improve my test case (eachFrame)", done: false }
+        ]
     },
     
     "add some more examples": {
@@ -70,6 +74,15 @@
         "type": "bug-fix",
         "modules": ['WebSocketBase', 'WebSocketFrame'],
         "description": "the per standard defined payload maximum of two gigabytes is too much in reality catch them up"
+    },
+    
+    "update WebSocketFrame to use content property instead of overwriting the payload": {
+        "type": "improvement",
+        "modules": ['WebSocketBase', 'WebSocketFrame'],
+        "steps": [
+            { name: "add content property in #mapFrame", done: false },
+            { name: "add content property in #toBuffer", done: false }
+        ]
     }
 
 }
