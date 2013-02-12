@@ -76,15 +76,6 @@
         "description": "the per standard defined payload maximum of two gigabytes is too much in reality catch them up"
     },
     
-    "update WebSocketFrame to use content property instead of overwriting the payload": {
-        "type": "improvement",
-        "modules": ['WebSocketBase', 'WebSocketFrame'],
-        "steps": [
-            { name: "add content property in #mapFrame", done: false },
-            { name: "add content property in #toBuffer", done: false }
-        ]
-    },
-    
     "execute tests on npm test (makefile)": {
         "type": "feature",
         "modules": []
