@@ -18,12 +18,12 @@
         "url": "git://gitbub.com/bodokaiser/websockets"  
     },
     
-    "dependencies": {
+    "devDependencies": {
         "mocha": "1.8.1",
         "should": "1.2.1"
     },
     
     "script": {
-        "test": "mocha test/frame && mocha test/base"
+        "test": "./node_modules/.bin/mocha test/frame && ./node_modules/.bin/mocha test/base"
     }
 }
