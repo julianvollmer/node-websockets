@@ -4,7 +4,7 @@ var should = require('should');
 var WebSocketBase = require('../lib/base');
 var WebSocketFrame = require('../lib/frame');
 
-var eachFrame = require('./mockup/frames');
+var mockupFrames = require('./mockup/frames');
 var MockupSocket = require('./mockup/socket');
 
 var format = util.format;
@@ -177,22 +177,24 @@ describe('WebSocketBase', function() {
     });
     
     
-    eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
+    mockupFrames.each(function(name, container) {
+        
         it(format('should handle %s frame properly', name), function(done) {
             var wsb = new WebSocketBase();
             var socket = new MockupSocket();
             
-            wsb.masked = true;
+            wsb.masked = container.mask;
             wsb.assignSocket(socket);
             
-            switch (opcode) {
+            switch (container.opcode) {
                 case 0x01:
                     wsb.on('message', function(mess) {
                         mess.should.be.a('string');
+                        mess.should.equal(container.content.toString());
                         done();
                     });
                     
-                    socket.write(frame);
+                    socket.write(container.frame);
                     
                     break;
                 
@@ -201,7 +203,7 @@ describe('WebSocketBase', function() {
                        done(); 
                     });
                     
-                    socket.write(frame);
+                    socket.write(container.frame);
                     
                     break;
                     
@@ -210,18 +212,20 @@ describe('WebSocketBase', function() {
                         done(); 
                     });
                     
-                    socket.write(frame);
+                    socket.write(container.frame);
                     
                     break;
                     
                 default:
-                    socket.write(frame);
+                    socket.write(container.frame);
                     
                     done();
                     
                     break;
             }
+            
         });
+    
     });
 
 });

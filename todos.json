@@ -68,7 +68,7 @@
         "type": "improvement",
         "modules": ['Example'],
         "description": "there should be some examples for client, base, frame"
-    }
+    },
     
     "catch and error too big websocket frames": {
         "type": "bug-fix",
@@ -83,6 +83,11 @@
             { name: "add content property in #mapFrame", done: false },
             { name: "add content property in #toBuffer", done: false }
         ]
+    },
+    
+    "execute tests on npm test (makefile)": {
+        "type": "feature",
+        "modules": []
     }
 
 }
