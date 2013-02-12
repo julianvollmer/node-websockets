@@ -61,7 +61,7 @@ describe('WebSocketFrame', function() {
             buildFrame.opcode = container.opcode;
             buildFrame.length = container.length;
             buildFrame.masking = container.masking;
-            buildFrame.payload = new Buffer(container.content);
+            buildFrame.content = new Buffer(container.content);
         
             var wsFrame = new WebSocketFrame(buildFrame.toBuffer());
             
@@ -80,8 +80,11 @@ describe('WebSocketFrame', function() {
             it(format('should return %s for property masking on %s', container.masking.toString(), name), function() {
                 wsFrame.masking.toString().should.equal(container.masking.toString());
             }); 
-            it(format('should return %s for property payload on %s', container.content, name), function() {
+            it(format('should return %s for property payload on %s', container.payload.toString(), name), function() {
                 wsFrame.payload.toString().should.equal(container.payload.toString());
+            });
+            it(format('should return %s for property content on %s', container.content.toString(), name), function() {
+                wsFrame.content.toString().should.equal(container.content.toString()); 
             });
         });
     
