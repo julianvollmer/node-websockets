@@ -54,7 +54,7 @@ describe('WebSocketBase', function() {
                 frame.mask.should.be.true;
                 frame.opcode.should.equal(0x01);
                 frame.length.should.equal(0x0c);
-                frame.payload.toString().should.equal('Hello World.');
+                frame.content.toString().should.equal('Hello World.');
                 
                 done(); 
             });
@@ -79,7 +79,7 @@ describe('WebSocketBase', function() {
                     frame.mask.should.be.false;
                     frame.opcode.should.equal(0x09);
                     frame.length.should.equal(0x05);
-                    frame.payload.toString().should.equal('pongy');
+                    frame.content.toString().should.equal('pongy');
                     
                     done();
                 }
@@ -105,7 +105,7 @@ describe('WebSocketBase', function() {
                 frame.mask.should.be.true;
                 frame.opcode.should.equal(0x08);
                 frame.length.should.equal(0x07);
-                frame.payload.toString().should.equal('closing');;
+                frame.content.toString().should.equal('closing');;
             });
             socket.on('end', function(error) {
                 //done(); is not getting executed...

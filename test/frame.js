@@ -42,8 +42,11 @@ describe('WebSocketFrame', function() {
             it(format('should return %s for property masking on %s', container.masking.toString(), name), function() {
                 wsFrame.masking.toString().should.equal(container.masking.toString());
             }); 
-            it(format('should return %s for property payload on %s', container.content, name), function() {
-                wsFrame.payload.toString().should.equal(container.content.toString());
+            it(format('should return %s for property payload on %s', container.payload, name), function() {
+                wsFrame.payload.toString().should.equal(container.payload.toString()); 
+            });
+            it(format('should return %s for property content on %s', container.content, name), function() {
+                wsFrame.content.toString().should.equal(container.content.toString());
             });
         });
     });
@@ -78,7 +81,7 @@ describe('WebSocketFrame', function() {
                 wsFrame.masking.toString().should.equal(container.masking.toString());
             }); 
             it(format('should return %s for property payload on %s', container.content, name), function() {
-                wsFrame.payload.toString().should.equal(container.content.toString());
+                wsFrame.payload.toString().should.equal(container.payload.toString());
             });
         });
     
