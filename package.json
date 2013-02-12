@@ -19,6 +19,11 @@
     },
     
     "dependencies": {
-        "mocha": "1.8.1"
+        "mocha": "1.8.1",
+        "should": "1.2.1"
+    },
+    
+    "script": {
+        "test": "mocha test/frame && mocha test/base"
     }
 }

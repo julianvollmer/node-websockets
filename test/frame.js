@@ -1,5 +1,5 @@
 var util = require('util');
-var assert = require('assert');
+var should = require('should');
 
 var eachFrame = require('./mockup/frames');
 
@@ -13,7 +13,7 @@ describe('WebSocketFrame', function() {
             var wsFrame = new WebSocketFrame(frame);
             
             it(format('should return true on %s', name), function() {
-                assert.strictEqual(true, wsFrame.isValid()); 
+                wsFrame.isValid().should.be.true;
             });
         });
     });
@@ -26,22 +26,22 @@ describe('WebSocketFrame', function() {
             wsFrame.mapFrame(frame);
            
             it(format('should return %s for property fin on %s', fin, name), function() {
-                assert.strictEqual(fin, wsFrame.fin); 
+                wsFrame.fin.should.be[fin];
             });
             it(format('should return %s for property mask on %s', mask, name), function() {
-                assert.strictEqual(mask, wsFrame.mask); 
+                wsFrame.mask.should.be[mask];
             });
             it(format('should return %d for property opcode on %s', opcode, name), function() {
-                assert.strictEqual(opcode, wsFrame.opcode); 
+                wsFrame.opcode.should.equal(opcode);
             });
             it(format('should return %d for property length on %s', length, name), function() {
-                assert.strictEqual(length, wsFrame.length); 
+                wsFrame.length.should.equal(length);
             });
             it(format('should return %s for property masking on %s', masking.toString(), name), function() {
-                assert.strictEqual(masking.toString(), wsFrame.masking.toString()); 
+                wsFrame.masking.toString().should.equal(masking.toString());
             }); 
             it(format('should return %s for property payload on %s', content, name), function() {
-                assert.strictEqual(content, wsFrame.payload.toString()); 
+                wsFrame.payload.toString().should.equal(content);
             });
         });
     });
@@ -60,22 +60,22 @@ describe('WebSocketFrame', function() {
             var wsFrame = new WebSocketFrame(buildFrame.toBuffer());
             
             it(format('should return %s for property fin on %s', fin, name), function() {
-                assert.strictEqual(fin, wsFrame.fin); 
+                wsFrame.fin.should.be[fin];
             });
             it(format('should return %s for property mask on %s', mask, name), function() {
-                assert.strictEqual(mask, wsFrame.mask); 
+                wsFrame.mask.should.be[mask];
             });
             it(format('should return %d for property opcode on %s', opcode, name), function() {
-                assert.strictEqual(opcode, wsFrame.opcode); 
+                wsFrame.opcode.should.equal(opcode);
             });
             it(format('should return %d for property length on %s', length, name), function() {
-                assert.strictEqual(length, wsFrame.length); 
+                wsFrame.length.should.equal(length);
             });
             it(format('should return %s for property masking on %s', masking.toString(), name), function() {
-                assert.strictEqual(masking.toString(), wsFrame.masking.toString()); 
+                wsFrame.masking.toString().should.equal(masking.toString());
             }); 
             it(format('should return %s for property payload on %s', content, name), function() {
-                assert.strictEqual(content, wsFrame.payload.toString()); 
+                wsFrame.payload.toString().should.equal(content);
             });
         });
     });

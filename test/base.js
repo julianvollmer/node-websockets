@@ -1,5 +1,5 @@
 var util = require('util');
-var assert = require('assert');
+var should = require('should');
 
 var WebSocketBase = require('../lib/base');
 var WebSocketFrame = require('../lib/frame');
@@ -15,25 +15,27 @@ describe('WebSocketBase', function() {
         it('should set ws://localhost:3000 as default url', function() {
             var wsb = new WebSocketBase();
             
-            assert.equal(wsb.url.slashes, true);
-            assert.equal(wsb.url.protocol, 'ws:');
-            assert.equal(wsb.url.hostname, 'localhost');
-            assert.equal(wsb.url.href, 'ws://localhost:3000');
-            assert.equal(wsb.url.host, 'localhost:3000');
-            assert.equal(wsb.url.port, '3000');
-            assert.equal(wsb.url.path, '/');
+            wsb.url.should.be.a('object');
+            wsb.url.slashes.should.be.true;
+            wsb.url.protocol.should.equal('ws:');
+            wsb.url.hostname.should.equal('localhost');
+            wsb.url.href.should.equal('ws://localhost:3000');
+            wsb.url.host.should.equal('localhost:3000');
+            wsb.url.port.should.equal('3000');
+            wsb.url.path.should.equal('/');
         });
         
         it('should use the url defined in options if provided', function() {
             var wsb = new WebSocketBase({ url: "ws://sockets.org:5000/index" });
             
-            assert.equal(wsb.url.slashes, true);
-            assert.equal(wsb.url.protocol, 'ws:');
-            assert.equal(wsb.url.hostname, 'sockets.org');
-            assert.equal(wsb.url.href, 'ws://sockets.org:5000/index');
-            assert.equal(wsb.url.host, 'sockets.org:5000');
-            assert.equal(wsb.url.port, '5000');
-            assert.equal(wsb.url.path, '/index');            
+            wsb.url.should.be.a('object');
+            wsb.url.slashes.should.be, true;
+            wsb.url.protocol.should.equal('ws:');
+            wsb.url.hostname.should.equal('sockets.org');
+            wsb.url.href.should.equal('ws://sockets.org:5000/index');
+            wsb.url.host.should.equal('sockets.org:5000');
+            wsb.url.port.should.equal('5000');
+            wsb.url.path.should.equal('/index');            
         });
     });
     
@@ -44,15 +46,15 @@ describe('WebSocketBase', function() {
         wsb.assignSocket(socket);
         wsb.masked = true;
         
-        it('should send a text frame containing "Hello World."', function(done) {
+        it(format('should send a text frame containing "%s"', 'Hello World.'), function(done) {
             socket.on('data', function(chunk) {
                 var frame = new WebSocketFrame(chunk);
                 
-                assert.strictEqual(true, frame.fin);
-                assert.strictEqual(true, frame.mask);
-                assert.strictEqual(0x01, frame.opcode);
-                assert.strictEqual(0x0c, frame.length);
-                assert.strictEqual('Hello World.', frame.payload.toString());
+                frame.fin.should.be.true;
+                frame.mask.should.be.true;
+                frame.opcode.should.equal(0x01);
+                frame.length.should.equal(0x0c);
+                frame.payload.toString().should.equal('Hello World.');
                 
                 done(); 
             });
@@ -73,11 +75,11 @@ describe('WebSocketBase', function() {
                 var frame = new WebSocketFrame(data);
                 
                 if (frame.opcode == 0x09) {
-                    assert.equal(true, frame.fin);
-                    assert.equal(false, frame.mask);
-                    assert.equal(0x09, frame.opcode);
-                    assert.equal(0x05, frame.length);
-                    assert.equal('pongy', frame.payload.toString());
+                    frame.fin.should.be.true;
+                    frame.mask.should.be.false;
+                    frame.opcode.should.equal(0x09);
+                    frame.length.should.equal(0x05);
+                    frame.payload.toString().should.equal('pongy');
                     
                     done();
                 }
@@ -99,11 +101,11 @@ describe('WebSocketBase', function() {
             socket.on('data', function(data) {
                 var frame = new WebSocketFrame(data);
                 
-                assert.equal(true, frame.fin);
-                assert.equal(true, frame.mask);
-                assert.equal(0x08, frame.opcode);
-                assert.equal(0x07, frame.length);
-                assert.equal('closing', frame.payload.toString());
+                frame.fin.should.be.true;
+                frame.mask.should.be.true;
+                frame.opcode.should.equal(0x08);
+                frame.length.should.equal(0x07);
+                frame.payload.toString().should.equal('closing');;
             });
             socket.on('end', function(error) {
                 //done(); is not getting executed...
@@ -135,7 +137,7 @@ describe('WebSocketBase', function() {
         
         it('should emit a pong event when receiving a ping frame and give the content', function(done) {
             wsb.on('pong', function(message) {
-                assert.equal('ping-pong', message);
+                message.toString().should.equal('ping-pong');
                 
                 done(); 
             });
@@ -161,7 +163,8 @@ describe('WebSocketBase', function() {
         
         it('should be a message event emitted when getting a data frame', function(done) {
             wsb.on('message', function(message) {
-                assert.equal('nodejs is fucking great', message);
+                message.should.equal('nodejs is fucking great');
+                
                 done();
             });
             
@@ -185,7 +188,7 @@ describe('WebSocketBase', function() {
             switch (opcode) {
                 case 0x01:
                     wsb.on('message', function(mess) {
-                        assert.equal(typeof mess, 'string');
+                        mess.should.be.a('string');
                         done();
                     });
                     
