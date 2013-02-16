@@ -7,16 +7,23 @@ var WebSocketUpgrade = require('../lib/upgrade');
 // NOTE: tests not tested
 describe('WebSocketUpgrade', function() {
    
+    var server;
+    var url = 'ws://localhost:3000';
+
+    beforeEach(function() {
+	    server  = http.createServer().listen(3000);
+    });
+
+    afterEach(function() {
+        // close the server
+        server.close();
+    });
+
     describe('#createUpgradeRequest()', function() {
-
-        var server;
-
-        before(function() {
-            server  = http.createServer().listen(3000);
-        });
        
         it('should send a ws upgrade request to a server', function(done) {
             server.once('upgrade', function(req, socket) {
+                req.method.should.equal('GET');
                 req.headers.should.have.property('upgrade', 'websocket');
                 req.headers.should.have.property('connection', 'upgrade');
                 req.headers.should.have.property('sec-websocket-key');
@@ -25,24 +32,13 @@ describe('WebSocketUpgrade', function() {
                 done();
             });
             
-            WebSocketUpgrade.createUpgradeRequest('ws://localhost:3000');
+            WebSocketUpgrade.createUpgradeRequest(url);
         });
         
-        after(function() {
-            // close the server
-            server.close();
-        });
-
     });
     
     describe('#handleUpgradeRequest()', function() {
 
-        var server;
-
-        before(function() {
-            server = http.createServer().listen(3000);
-        });
-                        
         it('should read the ws upgrade request and call the optional callback', function(done) {
             server.once('upgrade', function(req, socket) {
                 WebSocketUpgrade.handleUpgradeRequest(req, socket, function(socket) {
@@ -50,7 +46,7 @@ describe('WebSocketUpgrade', function() {
                 });
             });
             
-            WebSocketUpgrade.createUpgradeRequest('ws://localhost:3000');
+            WebSocketUpgrade.createUpgradeRequest(url);
         });
 
         it('should send back a valid http websocket upgrade response', function(done) {
@@ -58,7 +54,7 @@ describe('WebSocketUpgrade', function() {
                 WebSocketUpgrade.handleUpgradeRequest(req, socket);
             });
             
-            WebSocketUpgrade.createUpgradeRequest('ws://localhost:3000', function(res, socket) {
+            WebSocketUpgrade.createUpgradeRequest(url, function(res, socket) {
                 res.statusCode.should.equal(101);
                 
                 res.headers.should.have.property('upgrade', 'websocket');
@@ -68,12 +64,7 @@ describe('WebSocketUpgrade', function() {
                 done();     
             });
         });
-        
-        after(function() {
-            // close the server
-            server.close();
-        });
 
     });
-   
+
 });
