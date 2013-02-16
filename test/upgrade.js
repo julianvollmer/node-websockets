@@ -21,7 +21,7 @@ describe('WebSocketUpgrade', function() {
 
     describe('#createUpgradeRequest()', function() {
        
-        it('should send a ws upgrade request to a server', function(done) {
+        it('should send a valid upgrade request to the http server', function(done) {
             server.once('upgrade', function(req, socket) {
                 req.method.should.equal('GET');
                 req.headers.should.have.property('upgrade', 'websocket');
@@ -34,20 +34,25 @@ describe('WebSocketUpgrade', function() {
             
             WebSocketUpgrade.createUpgradeRequest(url);
         });
+
+        it('should send a valid upgrade request to the http server (with one extension)', function(done) {
+            server.once('upgrade', function(req, socket) {
+                req.method.should.equal('GET');
+                req.headers.should.have.property('upgrade', 'websocket');
+                req.headers.should.have.property('connection', 'upgrade');
+                req.headers.should.have.property('sec-websocket-key');
+                req.headers.should.have.property('sec-websocket-version', '13');
+                req.headers.should.have.property('sec-websocket-extensions', 'x-test');                
+
+                done();
+            });
+
+            WebSocketUpgrade.createUpgradeRequest(url, { extensions: ['x-test'] });
+        });
         
     });
     
     describe('#handleUpgradeRequest()', function() {
-
-        it('should read the ws upgrade request and call the optional callback', function(done) {
-            server.once('upgrade', function(req, socket) {
-                WebSocketUpgrade.handleUpgradeRequest(req, socket, function(socket) {
-                    done();
-                });
-            });
-            
-            WebSocketUpgrade.createUpgradeRequest(url);
-        });
 
         it('should send back a valid http websocket upgrade response', function(done) {
             server.once('upgrade', function(req, socket) {
@@ -60,6 +65,23 @@ describe('WebSocketUpgrade', function() {
                 res.headers.should.have.property('upgrade', 'websocket');
                 res.headers.should.have.property('connection', 'upgrade');
                 res.headers.should.have.property('sec-websocket-accept');
+
+                done();     
+            });
+        });
+
+        it('should send back a valid http websocket upgrade response (with one extension)', function(done) {
+            server.once('upgrade', function(req, socket) {
+                WebSocketUpgrade.handleUpgradeRequest(req, socket, { extensions: ['x-test'] });
+            });
+            
+            WebSocketUpgrade.createUpgradeRequest(url, { extensions: ['x-test'] }, function(res, socket) {
+                res.statusCode.should.equal(101);
+                
+                res.headers.should.have.property('upgrade', 'websocket');
+                res.headers.should.have.property('connection', 'upgrade');
+                res.headers.should.have.property('sec-websocket-accept');
+                res.headers.should.have.property('sec-websocket-extensions', 'x-test');
 
                 done();     
             });
