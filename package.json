@@ -7,7 +7,7 @@
 
     "version": "0.0.1",
 
-    "license": "BSD",
+    "license": "MIT",
 
     "keywords": ["websockets", "network"],
 
@@ -24,6 +24,6 @@
     },
     
     "script": {
-        "test": "./node_modules/.bin/mocha test/frame && ./node_modules/.bin/mocha test/base"
+        "test": "make test"
     }
 }
