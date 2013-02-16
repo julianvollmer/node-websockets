@@ -18,19 +18,23 @@ describe('WebSocketServer', function() {
     });
 
     describe('#listen()', function() {
-    
         it('should listen on the defined url for upgrade requests', function(done) {
             var wss = new WebSocketServer({ url: ressource });
-
             wss.on('open', function() {
                 done();
             });
-
             wss.listen(server);
-
             WebSocketUpgrade.createUpgradeRequest(ressource);
         });
-
+        it('should listen on the defined url for upgrade requests (one extension)', function(done) {
+            var wss = new WebSocketServer({ url: ressource });
+            wss.on('open', function() {
+                done();
+            });
+            wss.listen(server);
+            wss.addExtension('x-test', function() {});
+            WebSocketUpgrade.createUpgradeRequest(ressource, { extensions: ['x-test'] });
+        });
     });
 
 });
