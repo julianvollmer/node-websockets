@@ -10,11 +10,20 @@ var MockupSocket = require('./mockup/socket');
 var format = util.format;
 
 describe('WebSocketBase', function() {
-    
+ 
+    var wsb;
+    var socket;
+
+    beforeEach(function() {
+        wsb = new WebSocketBase({ mask: true });
+        socket = new MockupSocket();
+
+        wsb.assignSocket(socket);
+    });
+
     describe('#constructor()', function() {
+
         it('should set ws://localhost:3000 as default url', function() {
-            var wsb = new WebSocketBase();
-            
             wsb.url.should.be.a('object');
             wsb.url.should.have.property('slashes', true);
             wsb.url.should.have.property('protocol', 'ws:');
@@ -37,14 +46,10 @@ describe('WebSocketBase', function() {
             wsb.url.should.have.property('path', '/index');
             wsb.url.should.have.property('port', '5000'); 
         });
+
     });
     
     describe('#send()', function() {
-        var wsb = new WebSocketBase();
-        var socket = new MockupSocket();
-        
-        wsb.assignSocket(socket);
-        wsb.masked = true;
         
         it(format('should send a text frame containing "%s"', 'Hello World.'), function(done) {
             socket.on('data', function(chunk) {
@@ -64,11 +69,6 @@ describe('WebSocketBase', function() {
     });
     
     describe('#ping()', function() {
-        var wsb = new WebSocketBase();
-        var socket = new MockupSocket();
-        
-        wsb.assignSocket(socket);
-        wsb.masked = false;
         
         it('should send a ping frame containing "pongy"', function(done) {
             socket.on('data', function(data) {
@@ -76,7 +76,7 @@ describe('WebSocketBase', function() {
                 
                 if (frame.opcode == 0x09) {
                     frame.fin.should.be.true;
-                    frame.mask.should.be.false;
+                    frame.mask.should.be.true;
                     frame.opcode.should.equal(0x09);
                     frame.length.should.equal(0x05);
                     frame.content.toString().should.equal('pongy');
@@ -90,11 +90,6 @@ describe('WebSocketBase', function() {
     });
     
     describe('#close()', function() {
-        var wsb = new WebSocketBase();
-        var socket = new MockupSocket();
-        
-        wsb.masked = true;
-        wsb.assignSocket(socket);
         
         // TODO: fix the bellow
         it('should send a close frame and cut the connection', function() {
@@ -113,11 +108,43 @@ describe('WebSocketBase', function() {
             
             wsb.close('closing');
         });
+
     });
-    
+
+    describe('#addExtension()', function() {
+
+        it('should add a function to this.extensions', function() {
+            wsb.addExtension('x-test', function() {});
+
+            wsb.extensions.should.have.property('x-test');
+        });
+
+    });
+
+    describe('#hasExtension()', function() {
+
+        it('should return false if extension has not been added', function() {
+            wsb.hasExtension('x-test').should.be.false;
+        });
+
+        it('should return true if extension is already added', function() {
+            wsb.addExtension('x-test', function() {});
+            wsb.hasExtension('x-test').should.be.true;
+        });
+
+    });
+
+    describe('#removeExtension()', function() {
+ 
+        it('should return the added extension from this.extensions', function() {
+            wsb.addExtension('x-test', function() {});
+            wsb.removeExtension('x-test');
+            wsb.hasExtension('x-test').should.be.false;
+        });
+
+    });
+
     describe('event: "open"', function() {
-        var wsb = new WebSocketBase();
-        var socket = new MockupSocket();
         
         it('should emit a open event on connection', function(done) {
             wsb.on('open', function() {
@@ -126,14 +153,10 @@ describe('WebSocketBase', function() {
             
             wsb.assignSocket(socket);
         });
+
     });
     
     describe('event: "pong"', function() {
-        var wsb = new WebSocketBase();
-        var socket = new MockupSocket();
-        
-        wsb.assignSocket(socket);
-        wsb.masked = true;
         
         it('should emit a pong event when receiving a ping frame and give the content', function(done) {
             wsb.on('pong', function(message) {
@@ -144,22 +167,14 @@ describe('WebSocketBase', function() {
             
             wsb.ping('ping-pong');
         });
+
     });
     
-    describe('event: "close"', function() {
-        var wsb = new WebSocketBase();
-        var socket = new MockupSocket();
-        
-        wsb.masked = true;
-        wsb.assignSocket(socket);
+    xdescribe('event: "close"', function() {
+ 
     });
     
     describe('event: "message"', function() {
-        var wsb = new WebSocketBase();
-        var socket = new MockupSocket();
-        
-        wsb.masked = true;
-        wsb.assignSocket(socket);
         
         it('should be a message event emitted when getting a data frame', function(done) {
             wsb.on('message', function(message) {
@@ -170,9 +185,10 @@ describe('WebSocketBase', function() {
             
             wsb.send('nodejs is fucking great');
         });
-    });
+ 
+   });
     
-    describe('event: "error"', function() {
+    xdescribe('event: "error"', function() {
          
     });
     
