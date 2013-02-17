@@ -21,6 +21,11 @@ describe('WebSocketBase', function() {
         wsb.assignSocket(socket);
     });
 
+    afterEach(function() {
+        wsb = null;
+        socket = null;
+    });
+
     describe('#constructor()', function() {
         it('should set ws://localhost:3000 as default url', function() {
             wsb.url.should.be.a('object');
@@ -47,7 +52,7 @@ describe('WebSocketBase', function() {
     
     describe('#send()', function() {
         it(format('should send a text frame containing "%s"', 'Hello World.'), function(done) {
-            socket.on('data', function(chunk) {
+            socket.once('data', function(chunk) {
                 var frame = new WebSocketFrame(chunk);
                 frame.fin.should.be.true;
                 frame.mask.should.be.true;
@@ -62,7 +67,7 @@ describe('WebSocketBase', function() {
     
     describe('#ping()', function() {
         it('should send a ping frame containing "pongy"', function(done) {
-            socket.on('data', function(data) {
+            socket.once('data', function(data) {
                 var frame = new WebSocketFrame(data);
                 if (frame.opcode == 0x09) {
                     frame.fin.should.be.true;
@@ -80,7 +85,7 @@ describe('WebSocketBase', function() {
     describe('#close()', function() {
         // TODO: fix the bellow
         it('should send a close frame and cut the connection', function() {
-            socket.on('data', function(data) {
+            socket.once('data', function(data) {
                 var frame = new WebSocketFrame(data);
                 frame.fin.should.be.true;
                 frame.mask.should.be.true;
@@ -88,7 +93,7 @@ describe('WebSocketBase', function() {
                 frame.length.should.equal(0x07);
                 frame.content.toString().should.equal('closing');;
             });
-            socket.on('end', function(error) {
+            socket.once('end', function(error) {
                 //done(); is not getting executed...
             });
             wsb.close('closing');
@@ -128,7 +133,7 @@ describe('WebSocketBase', function() {
 
     describe('event: "open"', function() {
         it('should emit a open event on connection', function(done) {
-            wsb.on('open', function() {
+            wsb.once('open', function() {
                 done();
             });
             wsb.assignSocket(socket);
@@ -137,7 +142,7 @@ describe('WebSocketBase', function() {
     
     describe('event: "pong"', function() {
         it('should emit a pong event when receiving a ping frame and give the content', function(done) {
-            wsb.on('pong', function(message) {
+            wsb.once('pong', function(message) {
                 message.toString().should.equal('ping-pong');
                 
                 done(); 
@@ -152,7 +157,7 @@ describe('WebSocketBase', function() {
     
     describe('event: "message"', function() {
         it('should be a message event emitted when getting a data frame', function(done) {
-            wsb.on('message', function(message) {
+            wsb.once('message', function(message) {
                 message.should.equal('nodejs is fucking great');
                 
                 done();
@@ -173,7 +178,7 @@ describe('WebSocketBase', function() {
             wsb.assignSocket(socket);
             switch (container.opcode) {
                 case 0x01:
-                    wsb.on('message', function(mess) {
+                    wsb.once('message', function(mess) {
                         mess.should.be.a('string');
                         mess.should.equal(container.content.toString());
                         done();
@@ -181,13 +186,13 @@ describe('WebSocketBase', function() {
                     socket.write(container.frame);
                     break;
                 case 0x08:
-                    wsb.on('close', function(reason) {
+                    wsb.once('close', function(reason) {
                        done(); 
                     });
                     socket.write(container.frame);
                     break;
                 case 0x09:
-                    wsb.on('pong', function(mess) {
+                    wsb.once('pong', function(mess) {
                         done(); 
                     });
                     socket.write(container.frame);
