@@ -1,93 +1,91 @@
 var util = require('util');
 var should = require('should');
 
+
+var WebSocketFrame = require('../lib/frame');
 var mockupFrames = require('./mockup/frames');
 
 var format = util.format;
 
 describe('WebSocketFrame', function() {
-    var WebSocketFrame = require('../lib/frame');
+
+    xdescribe('#constructor([frame])', function() {
+        // should be tested to act as alias to mapFrame   
+    });
+
+    describe('#mapFrame(frame)', function() {
+        mockupFrames.each(function(name, mock) {
+            
+            var wsFrame;
+
+            beforeEach(function() {
+                wsFrame = new WebSocketFrame();
+            });
+            
+            it('should actually have such a method', function() {
+                wsFrame.should.have.property('mapFrame').be.a('function');
+            });
+            
+            it('should map the raw frame buffer properly to readable properties', function() {
+                wsFrame.mapFrame(mock.frame);
+                wsFrame.should.have.property('fin', mock.fin, format('property fin is expected to be %s', mock.fin));
+                wsFrame.should.have.property('mask', mock.mask, format('property mask is expected to be %s', mock.mask));
+                wsFrame.should.have.property('opcode', mock.opcode, format('property opcode is expected to be %s', mock.opcode));
+                wsFrame.should.have.property('length', mock.length, format('property length is expected to be %s', mock.length, name));
+                wsFrame.masking.toString().should.equal(mock.masking.toString(), format('property masking is expected to be %s', mock.masking));
+                wsFrame.payload.toString().should.equal(mock.payload.toString(), format('property payload is expected to be %s', mock.masking));
+                wsFrame.content.toString().should.equal(mock.content.toString(), format('property content is expected to be %s', mock.masking));
+            });
+        
+        });
+    });
+    
+    describe('#toBuffer()', function() {
+        mockupFrames.each(function(name, mock) {
+            
+            var wsFrame, buildFrame;
+
+            beforeEach(function() {
+                wsFrame = new WebSocketFrame();
+                buildFrame = new WebSocketFrame();
+                buildFrame.fin = mock.fin;
+                buildFrame.mask = mock.mask;
+                buildFrame.opcode = mock.opcode;
+                buildFrame.length = mock.length;
+                buildFrame.masking = mock.masking;
+                buildFrame.content = mock.content;
+            });
+
+            it(format('should return a buffer object for %s mockup frame', name), function() {
+                buildFrame.toBuffer().should.be.an.instanceOf(Buffer);
+            });
+                
+            it(format('should equal the %s mockup frame buffer', name), function() {
+                wsFrame.mapFrame(buildFrame.toBuffer());
+                wsFrame.should.have.property('fin', mock.fin, format('property fin is expected to be %s', mock.fin));
+                wsFrame.should.have.property('mask', mock.mask, format('property mask is expected to be %s', mock.mask));
+                wsFrame.should.have.property('opcode', mock.opcode, format('property opcode is expected to be %s', mock.opcode));
+                wsFrame.should.have.property('length', mock.length, format('property length is expected to be %s', mock.length, name));
+                wsFrame.masking.toString().should.equal(mock.masking.toString(), format('property masking is expected to be %s', mock.masking));
+                wsFrame.payload.toString().should.equal(mock.payload.toString(), format('property payload is expected to be %s', mock.masking));
+                wsFrame.content.toString().should.equal(mock.content.toString(), format('property content is expected to be %s', mock.masking));
+            });
+        });
+    });
 
     describe('#isValid()', function() {
-        
-        mockupFrames.each(function(name, container) {
-            var wsFrame = new WebSocketFrame(container.frame);
+        mockupFrames.each(function(name, mock) {
+            
+            var wsFrame;
+
+            before(function() {
+                wsFrame = new WebSocketFrame(mock.frame);
+            });
             
             it(format('should return true on %s', name), function() {
                 wsFrame.isValid().should.be.true;
             });
         });
-        
     });
     
-    describe('#mapFrame()', function() {
-        
-        mockupFrames.each(function(name, container) {
-            var wsFrame = new WebSocketFrame();
-            
-            wsFrame.mapFrame(container.frame);
-           
-            it(format('should return %s for property fin on %s', container.fin, name), function() {
-                wsFrame.fin.should.be[container.fin];
-            });
-            it(format('should return %s for property mask on %s', container.mask, name), function() {
-                wsFrame.mask.should.be[container.mask];
-            });
-            it(format('should return %d for property opcode on %s', container.opcode, name), function() {
-                wsFrame.opcode.should.equal(container.opcode);
-            });
-            it(format('should return %d for property length on %s', container.length, name), function() {
-                wsFrame.length.should.equal(container.length);
-            });
-            it(format('should return %s for property masking on %s', container.masking.toString(), name), function() {
-                wsFrame.masking.toString().should.equal(container.masking.toString());
-            }); 
-            it(format('should return %s for property payload on %s', container.payload, name), function() {
-                wsFrame.payload.toString().should.equal(container.payload.toString()); 
-            });
-            it(format('should return %s for property content on %s', container.content, name), function() {
-                wsFrame.content.toString().should.equal(container.content.toString());
-            });
-        });
-    });
-    
-    describe('#toBuffer()', function() {
-        
-        mockupFrames.each(function(name, container) {
-            var buildFrame = new WebSocketFrame();
-            
-            buildFrame.fin = container.fin;
-            buildFrame.mask = container.mask;
-            buildFrame.opcode = container.opcode;
-            buildFrame.length = container.length;
-            buildFrame.masking = container.masking;
-            buildFrame.content = new Buffer(container.content);
-        
-            var wsFrame = new WebSocketFrame(buildFrame.toBuffer());
-            
-            it(format('should return %s for property fin on %s', container.fin, name), function() {
-                wsFrame.fin.should.be[container.fin];
-            });
-            it(format('should return %s for property mask on %s', container.mask, name), function() {
-                wsFrame.mask.should.be[container.mask];
-            });
-            it(format('should return %d for property opcode on %s', container.opcode, name), function() {
-                wsFrame.opcode.should.equal(container.opcode);
-            });
-            it(format('should return %d for property length on %s', container.length, name), function() {
-                wsFrame.length.should.equal(container.length);
-            });
-            it(format('should return %s for property masking on %s', container.masking.toString(), name), function() {
-                wsFrame.masking.toString().should.equal(container.masking.toString());
-            }); 
-            it(format('should return %s for property payload on %s', container.payload.toString(), name), function() {
-                wsFrame.payload.toString().should.equal(container.payload.toString());
-            });
-            it(format('should return %s for property content on %s', container.content.toString(), name), function() {
-                wsFrame.content.toString().should.equal(container.content.toString()); 
-            });
-        });
-    
-    });
-
 });
