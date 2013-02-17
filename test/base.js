@@ -99,7 +99,10 @@ describe('WebSocketBase', function() {
         it('should add a function to this.extensions', function() {
             var parser = function() {};
             wsb.addExtension('x-test', parser, parser);
-            wsb.extensions.should.have.property('x-test');
+            wsb.extensions[0].should.have.property('name', 'x-test');
+            wsb.extensions[0].should.have.property('read', parser); 
+            wsb.extensions[0].should.have.property('write', parser); 
+            wsb.extensions[0].should.have.property('enabled', false); 
         });
     });
 

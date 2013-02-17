@@ -9,6 +9,7 @@ describe('WebSocketUpgrade', function() {
    
     var server;
     var url = 'ws://localhost:3000';
+    var extens = [{ name: "x-test", enabled: true, read: function() {}, write: function() {} }];
 
     beforeEach(function() {
 	    server  = http.createServer().listen(3000);
@@ -47,7 +48,7 @@ describe('WebSocketUpgrade', function() {
                 done();
             });
 
-            WebSocketUpgrade.createUpgradeRequest(url, { extensions: ['x-test'] });
+            WebSocketUpgrade.createUpgradeRequest(url, { extensions: extens });
         });
         
     });
@@ -72,10 +73,10 @@ describe('WebSocketUpgrade', function() {
 
         it('should send back a valid http websocket upgrade response (with one extension)', function(done) {
             server.once('upgrade', function(req, socket) {
-                WebSocketUpgrade.handleUpgradeRequest(req, socket, { extensions: ['x-test'] });
+                WebSocketUpgrade.handleUpgradeRequest(req, socket, { extensions: extens });
             });
             
-            WebSocketUpgrade.createUpgradeRequest(url, { extensions: ['x-test'] }, function(res, socket) {
+            WebSocketUpgrade.createUpgradeRequest(url, { extensions: extens }, function(res, socket) {
                 res.statusCode.should.equal(101);
                 
                 res.headers.should.have.property('upgrade', 'websocket');
