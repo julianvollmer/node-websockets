@@ -11,16 +11,20 @@ describe('WebSocketServer', function() {
     var extenOne = { enabled: true, name: "x-test-one", read: one, write: parser };
     var extenTwo = { enabled: true, name: "x-test-two", read: two, write: parser };
 
-    function one(next, result) {
-        next(null, new Buffer(result.toString() + ' one'));
+    function one(next, frame) {
+        frame.content = new Buffer(frame.content.toString() + ' one');
+        
+        next(null, frame);
     }
 
-    function two(next, result) {
-        next(null, new Buffer(result.toString() + ' two'));
+    function two(next, frame) {
+        frame.content = new Buffer(frame.content.toString() + ' two');
+
+        next(null, frame);
     }
 
-    function parser(next, result) {
-        next(null, result);
+    function parser(next, frame) {
+        next(null, frame);
     }
 
     beforeEach(function() {

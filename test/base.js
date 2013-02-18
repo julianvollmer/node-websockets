@@ -101,13 +101,34 @@ describe('WebSocketBase', function() {
     });
 
     describe('#addExtension()', function() {
-        it('should add a function to this.extensions', function() {
+        it('should add a extension container to internal storage', function() {
             var parser = function() {};
             wsb.addExtension('x-test', parser, parser);
             wsb.extensions[0].should.have.property('name', 'x-test');
             wsb.extensions[0].should.have.property('read', parser); 
             wsb.extensions[0].should.have.property('write', parser); 
-            wsb.extensions[0].should.have.property('enabled', false); 
+            wsb.extensions[0].should.have.property('enabled', false);
+        });
+        it('should use read and write chains on incoming data', function(done) {
+            // this will remove prefix from the front of the content
+            function read(next, frame) {
+                frame.content = new Buffer(frame.content.toString().slice(6));
+
+                next(null, frame);
+            }
+            // this will add prefix to the front of the content
+            function write(next, frame) {
+                frame.content = new Buffer('prefix' + frame.content.toString());
+
+                next(null, frame);
+            }
+            // both extensions should compensate
+            wsb.addExtension('x-test', read, write);
+            wsb.on('message', function(message) {
+                message.should.equal('hello');
+                done();
+            });
+            wsb.send('hello');
         });
     });
 
