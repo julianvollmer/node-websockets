@@ -8,8 +8,16 @@ describe('WebSocketServer', function() {
 
     var server;
     var ressource = 'ws://localhost:3000';
-    var extenOne = { enabled: true, name: "x-test-one", read: parser, write: parser };
-    var extenTwo = { enabled: true, name: "x-test-two", read: parser, write: parser };
+    var extenOne = { enabled: true, name: "x-test-one", read: one, write: parser };
+    var extenTwo = { enabled: true, name: "x-test-two", read: two, write: parser };
+
+    function one(next, result) {
+        next(null, new Buffer(result.toString() + ' one'));
+    }
+
+    function two(next, result) {
+        next(null, new Buffer(result.toString() + ' two'));
+    }
 
     function parser(next, result) {
         next(null, result);
@@ -60,7 +68,8 @@ describe('WebSocketServer', function() {
         });
         it('should listen on the defined url for upgrade requests (one extension)', function(done) {
             var wss = new WebSocketServer({ url: ressource });
-            wss.once('message', function() {
+            wss.once('message', function(message) {
+                message.should.be.equal('Hello one');
                 done();
             });
             wss.listen(server);
@@ -71,7 +80,8 @@ describe('WebSocketServer', function() {
         });
         it('should listen on the defined url for upgrade requests (two extensions)', function(done) {
             var wss = new WebSocketServer({ url: ressource });
-            wss.once('open', function() {
+            wss.once('message', function(message) {
+                message.should.be.equal('Hello one two');
                 done();
             });
             wss.listen(server);

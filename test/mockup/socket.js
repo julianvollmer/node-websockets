@@ -10,9 +10,7 @@ function MockupSocket() {
 
 util.inherits(MockupSocket, stream.Stream);
 
-MockupSocket.prototype.end = function() {
-    console.log('connection determinated, socket closing');
-};
+MockupSocket.prototype.end = function() {};
 
 MockupSocket.prototype.write = function(frame) {
     this.emit('data', frame);
