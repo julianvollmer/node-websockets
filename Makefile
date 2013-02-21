@@ -1,10 +1,6 @@
 check: test
 
-test: test-core test-base test-frame test-proto
-
-test-core: 
-	./node_modules/.bin/mocha \
-		test/upgrade.js
+test: test-base test-frame test-upgrade test-server
 
 test-base:
 	./node_modules/.bin/mocha \
@@ -14,6 +10,10 @@ test-frame:
 	./node_modules/.bin/mocha  \
         test/frame/*.js
 
-test-proto: 
+test-upgrade:
 	./node_modules/.bin/mocha \
-		test/server.js
+        test/upgrade/*.js
+
+test-server: 
+	./node_modules/.bin/mocha \
+		test/server/*.js
