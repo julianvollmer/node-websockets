@@ -65,18 +65,48 @@ describe('WebSocketBase', function() {
     });
 
     describe('#hasExtension(name)', function() {
-
+        it('should be a function', function() {
+            wsb.hasExtension.should.be.a('function');
+        });
+        it('should throw an error on wrong arguments', function() {
+            (function() {
+                wsb.hasExtension(func);
+            }).should.throwError();
+        });
     });
 
     describe('#removeExtension(name)', function() {
+        it('should be a function', function() {
+            wsb.removeExtension.should.be.a('function');
+        });
+        it('should throw an error on wrong arguments', function() {
+            (function() {
+                wsb.removeExtension(func);
+            }).should.throwError();
+        });
+    });
+
+    describe('#enableExtension([name, names])', function() {
+        it('should be a function', function() {
+            wsb.enableExtension.should.be.a('function');
+        });
+        it('should throw an error on wrong arguments', function() {
+            (function() {
+                wsb.enableExtension(func);
+            }).should.throwError();
+        });
 
     });
 
-    describe('#enableExtensions(extensions)', function() {
-
-    });
-
-    describe('#disableExtensions(extensions)', function() {
+    describe('#disableExtension([name, names])', function() {
+        it('should be a function', function() {
+            wsb.disableExtension.should.be.a('function');
+        });
+        it('should throw an error on wrong arguments', function() {
+            (function() {
+                wsb.disableExtension(func);
+            }).should.throwError();
+        });
 
     });
 
