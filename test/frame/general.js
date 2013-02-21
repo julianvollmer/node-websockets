@@ -1,9 +1,8 @@
 var util = require('util');
 var should = require('should');
 
-
-var WebSocketFrame = require('../lib/frame');
-var mockupFrames = require('./mockup/frames');
+var WebSocketFrame = require('../../lib/frame');
+var mockupFrames = require('../mockup/frames');
 
 var format = util.format;
 
@@ -89,3 +88,4 @@ describe('WebSocketFrame', function() {
     });
     
 });
+
