@@ -50,8 +50,8 @@ describe('WebSocketServer', function() {
                 message.should.be.equal('Hello one');
                 done();
             });
-            wss.listen(server);
             wss.addExtension(extenOne.name, extenOne.read, extenOne.write);
+            wss.listen(server);
             WebSocketUpgrade.createUpgradeRequest(ressource, { extensions: [extenOne] }, function(res, socket) {
                 socket.write(new Buffer([0x81, 0x85, 0x37, 0xfa, 0x21, 0x3d, 0x7f, 0x9f, 0x4d, 0x51, 0x58]));
             });
@@ -62,9 +62,9 @@ describe('WebSocketServer', function() {
                 message.should.be.equal('Hello one two');
                 done();
             });
-            wss.listen(server);
             wss.addExtension(extenOne.name, extenOne.read, extenOne.write);
             wss.addExtension(extenTwo.name, extenTwo.read, extenTwo.write);
+            wss.listen(server);
             WebSocketUpgrade.createUpgradeRequest(ressource, { extensions: [extenOne, extenTwo] }, function(res, socket) {
                 socket.write(new Buffer([0x81, 0x85, 0x37, 0xfa, 0x21, 0x3d, 0x7f, 0x9f, 0x4d, 0x51, 0x58]));
             });

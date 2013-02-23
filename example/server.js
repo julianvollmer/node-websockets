@@ -5,7 +5,7 @@ var httpServer = new http.createServer();
 var websocketServer = new websockets.Server();
 
 websocketServer.on('open', function() {
-    websocketServer.send('Hello Client.');
+    websocketServer.send('hello');
 });
 
 websocketServer.on('message', function(message) {
