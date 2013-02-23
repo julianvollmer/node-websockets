@@ -1,5 +1,33 @@
-# websockets
-simple websocket server implementation for nodejs
+# node-websockets
+a simple, fundamental implementation of the websocket protocol which supports easy extension handling
+
+## snippet
+'''
+var http = require('http');
+var websockets = require('websockets');
+
+// create http server
+var server = http.createServer();
+
+// create websocket server
+var wss = new websockets.Server();
+
+// send hello when someone connects
+wss.on('open', function() {
+    wss.send('hello');
+});
+
+// log the received message
+wss.on('message', function(message) {
+    console.log(message);
+});
+
+// bind to http server
+wss.listen(server);
+
+// bind http server to port 3000
+server.listen(3000);
+'''
 
 ## license (MIT)
 Copyright 2013 Bodo Kaiser <bodo.kaiser@enabre.com>

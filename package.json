@@ -5,17 +5,17 @@
 
     "author": "Bodo Kaiser <bodo.kaiser@enabre.com>",
 
-    "version": "0.0.1",
+    "version": "0.0.8",
 
     "license": "MIT",
 
     "keywords": ["websockets", "network"],
 
-    "description": "easy to understand websocket implementation for nodejs",
+    "description": "a simple, fundamental implementation of the websocket protocol which supports easy extension handling",
 
     "repository": {
         "type": "git",
-        "url": "git://gitbub.com/bodokaiser/websockets"  
+        "url": "git://gitbub.com/bodokaiser/node-websockets"  
     },
     
     "devDependencies": {
