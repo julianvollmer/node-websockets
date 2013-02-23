@@ -87,25 +87,49 @@ describe('WebSocketBase', function() {
     });
 
     describe('#enableExtension([name, names])', function() {
+
         it('should be a function', function() {
             wsb.enableExtension.should.be.a('function');
         });
+
         it('should throw an error on wrong arguments', function() {
             (function() {
                 wsb.enableExtension(func);
             }).should.throwError();
         });
+ 
+        it('should mark all defined extensions as enabled', function() {
+
+        });
 
     });
 
     describe('#disableExtension([name, names])', function() {
+        
         it('should be a function', function() {
             wsb.disableExtension.should.be.a('function');
         });
+
         it('should throw an error on wrong arguments', function() {
             (function() {
                 wsb.disableExtension(func);
             }).should.throwError();
+        });
+
+        it('should mark all defined extensions as disabled', function() {
+
+        });
+
+    });
+
+    describe('#reloadExtensions()', function() {
+
+        it('should be a function', function() {
+            wsb.reloadExtensions.should.be.a('function');
+        });
+
+        it('should recreate the read and write chains', function() {
+
         });
 
     });
