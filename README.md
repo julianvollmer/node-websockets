@@ -2,7 +2,7 @@
 a simple, fundamental implementation of the websocket protocol which supports easy extension handling
 
 ## snippet
-'''
+```
 var http = require('http');
 var websockets = require('websockets');
 
@@ -27,7 +27,7 @@ wss.listen(server);
 
 // bind http server to port 3000
 server.listen(3000);
-'''
+```
 
 ## license (MIT)
 Copyright 2013 Bodo Kaiser <bodo.kaiser@enabre.com>
