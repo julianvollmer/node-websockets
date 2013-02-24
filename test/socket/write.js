@@ -1,8 +1,6 @@
 var net = require('net');
-var util = require('util');
 var should = require('should');
 
-var mockupFrames = require('../mockup/frames');
 var WebSocketFrame = require('../../lib/frame');
 var WebSocketSocket = require('../../lib/socket');
 
@@ -14,18 +12,27 @@ describe('WebSocketSocket', function() {
 
     beforeEach(function() {
         sck = new Socket();
-        wss = new WebSocketSocket(socket);
+        wss = new WebSocketSocket(sck);
     });
 
-    describe('#write([str, buf])', function() {
+    describe('#write([opcode,] [buffer])', function() {
 
         it('should throw an error on wrong argument type', function() {
             (function() {
-                wss.write(500);
+                wss.write('str');
             }).should.throwError();
             (function() {
-                wss.write(function() {});
+                wss.write({}, 'str');
             }).should.throwError();
+            (function() {
+                wss.write(0x0a);
+            }).should.not.throwError();
+            (function() {
+                wss.write(new Buffer('hi'));
+            }).should.not.throwError();
+            (function() {
+                wss.write(0x01, new Buffer('hi'));
+            }).should.not.throwError();
         });
 
         it('should send a text frame through the socket', function(done) {
@@ -38,7 +45,7 @@ describe('WebSocketSocket', function() {
                 done();
             });
 
-            wss.write('Hello World');
+            wss.write(0x01, new Buffer('Hello World'));
         });
 
         it('should send a binary frame through the socket', function() {
@@ -53,7 +60,19 @@ describe('WebSocketSocket', function() {
                 done();
             });
 
-            wss.write(bin);
+            wss.write(0x02, bin);
+        });
+
+        it('should send a pong frame through the socket', function() {
+            sck.once('data', function(buf) {
+                var wsf = new WebSocketFrame(buf);
+
+                wsf.opcode.should.equal(0x0a);
+                
+                done();
+            });
+
+            wss.write(0x0a);
         });
 
     });

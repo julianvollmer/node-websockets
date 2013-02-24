@@ -1,8 +1,6 @@
 var net = require('net');
-var util = require('util');
 var should = require('should');
 
-var mockupFrames = require('../mockup/frames');
 var WebSocketFrame = require('../../lib/frame');
 var WebSocketSocket = require('../../lib/socket');
 
@@ -14,7 +12,7 @@ describe('WebSocketSocket', function() {
 
     beforeEach(function() {
         sck = new Socket();
-        wss = new WebSocketSocket(socket);
+        wss = new WebSocketSocket(sck);
     });
 
     describe('#close([reason])', function() {

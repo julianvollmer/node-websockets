@@ -53,8 +53,4 @@ describe('WebSocketSocket', function() {
 
     });
 
-    describe('#destroy([reason])', function() {
-
-    });
-
 });
