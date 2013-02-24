@@ -1,16 +1,14 @@
-var net = require('net');
 var should = require('should');
 
+var MockupSocket = require('../mockup/socket');
 var WebSocketSocket = require('../../lib/socket');
-
-var Socket = net.Socket();
 
 describe('WebSocketSocket', function() {
 
     var sck, wss;
 
     beforeEach(function() {
-        sck = new Socket();
+        sck = new MockupSocket();
         wss = new WebSocketSocket(sck);
     });
 
@@ -19,7 +17,7 @@ describe('WebSocketSocket', function() {
             done();
         });
         
-        sck.assign(sck);
+        wss.assign(sck);
     });
 
     it('should emit a text event', function(done) {
@@ -43,7 +41,7 @@ describe('WebSocketSocket', function() {
     });
 
     it('should emit a ping event', function(done) {
-        wss.once('ping', function(payload) {
+        wss.once('pong', function(payload) {
             payload.toString().should.equal('Hello');
             
             done();

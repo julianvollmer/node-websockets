@@ -1,17 +1,15 @@
-var net = require('net');
 var should = require('should');
 
+var MockupSocket = require('../mockup/socket');
 var WebSocketFrame = require('../../lib/frame');
 var WebSocketSocket = require('../../lib/socket');
-
-var Socket = net.Socket;
 
 describe('WebSocketSocket', function() {
 
     var sck, wss;
 
     beforeEach(function() {
-        sck = new Socket();
+        sck = new MockupSocket();
         wss = new WebSocketSocket(sck);
     });
 
@@ -48,7 +46,7 @@ describe('WebSocketSocket', function() {
             wss.write(0x01, new Buffer('Hello World'));
         });
 
-        it('should send a binary frame through the socket', function() {
+        it('should send a binary frame through the socket', function(done) {
             var bin = new Buffer([0x01, 0x02, 0x03, 0x04]);
 
             sck.on('data', function(buf) {
@@ -63,7 +61,7 @@ describe('WebSocketSocket', function() {
             wss.write(0x02, bin);
         });
 
-        it('should send a pong frame through the socket', function() {
+        it('should send a pong frame through the socket', function(done) {
             sck.once('data', function(buf) {
                 var wsf = new WebSocketFrame(buf);
 
