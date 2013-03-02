@@ -31,7 +31,7 @@ describe('WebSocketBase', function() {
             socket.once('end', function(error) {
                 //done(); is not getting executed...
             });
-            wsb.close('closing');
+            wsb.close(wsb.connected, 'closing');
         });
     });
 
