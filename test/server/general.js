@@ -16,9 +16,6 @@ describe('WebSocketServer', function() {
         wss.should.have.property('send');
         wss.should.have.property('ping');
         wss.should.have.property('close');
-        wss.should.have.property('hasExtension');
-        wss.should.have.property('addExtension');
-        wss.should.have.property('removeExtension');
         wss.should.have.property('assignSocket');
     });
 
