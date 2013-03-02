@@ -44,7 +44,7 @@ describe('WebSocketServer', function() {
             wss.listen(server);
             WebSocketUpgrade.createUpgradeRequest(ressource);
         });
-        it('should listen on the defined url for upgrade requests (one extension)', function(done) {
+        xit('should listen on the defined url for upgrade requests (one extension)', function(done) {
             var wss = new WebSocketServer({ url: ressource });
             wss.once('message', function(message) {
                 message.should.be.equal('Hello one');
@@ -56,7 +56,7 @@ describe('WebSocketServer', function() {
                 socket.write(new Buffer([0x81, 0x85, 0x37, 0xfa, 0x21, 0x3d, 0x7f, 0x9f, 0x4d, 0x51, 0x58]));
             });
         });
-        it('should listen on the defined url for upgrade requests (two extensions)', function(done) {
+        xit('should listen on the defined url for upgrade requests (two extensions)', function(done) {
             var wss = new WebSocketServer({ url: ressource });
             wss.once('message', function(message) {
                 message.should.be.equal('Hello one two');
