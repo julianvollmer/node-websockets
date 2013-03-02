@@ -25,7 +25,7 @@ describe('WebSocketUpgrade', function() {
             server.once('upgrade', function(req, socket) {
                 req.method.should.equal('GET');
                 req.should.have.header('upgrade', 'websocket');
-                req.should.have.header('connection', 'upgrade');
+                req.should.have.header('connection', 'Upgrade');
                 req.should.have.header('sec-websocket-key');
                 req.should.have.header('sec-websocket-version', '13');
                 done();
@@ -36,7 +36,7 @@ describe('WebSocketUpgrade', function() {
             server.once('upgrade', function(req, socket) {
                 req.method.should.equal('GET');
                 req.should.have.header('upgrade', 'websocket');
-                req.should.have.header('connection', 'upgrade');
+                req.should.have.header('connection', 'Upgrade');
                 req.should.have.header('sec-websocket-key');
                 req.should.have.header('sec-websocket-version', '13');
                 req.should.have.header('sec-websocket-extensions', 'x-test-one');                
@@ -48,7 +48,7 @@ describe('WebSocketUpgrade', function() {
             server.once('upgrade', function(req, socket) {
                 req.method.should.equal('GET');
                 req.should.have.header('upgrade', 'websocket');
-                req.should.have.header('connection', 'upgrade');
+                req.should.have.header('connection', 'Upgrade');
                 req.should.have.header('sec-websocket-key');
                 req.should.have.header('sec-websocket-version', '13');
                 req.should.have.header('sec-websocket-extensions', 'x-test-one;x-test-two');                
@@ -60,7 +60,7 @@ describe('WebSocketUpgrade', function() {
             server.once('upgrade', function(req, socket) {
                 req.method.should.equal('GET');
                 req.should.have.header('upgrade', 'websocket');
-                req.should.have.header('connection', 'upgrade');
+                req.should.have.header('connection', 'Upgrade');
                 req.should.have.header('sec-websocket-key');
                 req.should.have.header('sec-websocket-version', '13');
                 WebSocketUpgrade.handleUpgradeRequest(req, socket);
