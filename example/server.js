@@ -9,14 +9,14 @@ httpServer.on('request', function(req, res) {
     res.end('Hello World\n');
 });
 
-websocketServer.on('open', function(client) {
+websocketServer.on('open', function(sid) {
     websocketServer.send('new client has connected');
-    client.send('hello');
+    websocketServer.send(sid, 'hello');
 });
 
-websocketServer.on('message', function(message, client) {
+websocketServer.on('message', function(message, sid) {
     websocketServer.send('received message ' + message);
-    client.send('have got yor mess');
+    websocketServer.send(sid, 'have got yor mess');
 });
 
 websocketServer.listen(httpServer);
