@@ -46,7 +46,8 @@ describe('WebSocketUpgrade', function() {
  
         it('should set extension header if no extension on server but on client', function(done) {
             server.once('upgrade', function(req, socket) {
-                WebSocketUpgrade.handleUpgradeRequest(req, socket, function(socket, options) {
+                WebSocketUpgrade.handleUpgradeRequest(req, socket, function(err, socket, options) {
+                    should.not.exist(err);
                     options.should.not.have.property('extensions');
                 });
             });
@@ -75,7 +76,8 @@ describe('WebSocketUpgrade', function() {
         it('should set extension header if client and server support same extension', function(done) {
             server.once('upgrade', function(req, socket) {
                 var options = { extensions: ['x-test'] };
-                WebSocketUpgrade.handleUpgradeRequest(req, socket, options, function(socket, options) {
+                WebSocketUpgrade.handleUpgradeRequest(req, socket, options, function(err, socket, options) {
+                    should.not.exist(err);
                     options.should.have.property('extensions');
                     options.extensions.should.include('x-test');
                 });
@@ -105,7 +107,8 @@ describe('WebSocketUpgrade', function() {
         it('should set extension header if client and server support same extensions', function(done) {
             server.once('upgrade', function(req, socket) {
                 var options = { extensions: ['x-test-one', 'x-test-two'] };
-                WebSocketUpgrade.handleUpgradeRequest(req, socket, options, function(socket, options) {
+                WebSocketUpgrade.handleUpgradeRequest(req, socket, options, function(err, socket, options) {
+                    should.not.exist(err);
                     options.should.have.property('extensions');
                     options.extensions.should.include('x-test-one');
                     options.extensions.should.include('x-test-two');
@@ -129,6 +132,32 @@ describe('WebSocketUpgrade', function() {
                 res.should.have.header('Sec-WebSocket-Accept', 'HSmrc0sMlYUkAGmm5OPpG2HaGWk=');
                 res.should.have.header('Sec-WebSocket-Version', '13');
                 res.should.have.header('Sec-WebSocket-Extensions', 'x-test-one;x-test-two');
+                done();
+            });
+        });
+
+
+        it('should send a 400 invalid response and pass an error object to callback', function(done) {
+            server.once('upgrade', function(req, socket) {
+                WebSocketUpgrade.handleUpgradeRequest(req, socket, function(err, socket, options) {
+                    (function() {
+                        throw err;
+                    }).should.throwError();
+                });
+            });
+            http.get({
+                port: "3000",
+                path: "/",
+                headers: {
+                    "Host": "localhost",
+                    "Upgrade": "websocket",
+                    "Connection": "upgrade", // should be Upgrade
+                    "Sec-WebSocket-Key": "x3JJHMbDL1EzLkh9GBhXDw==",
+                    "Sec-WebSocket-Version": "13",
+                    "Sec-WebSocket-Extensions": "x-test-one; x-test-two"
+                }
+            }).once('response', function(res) {
+                res.should.have.status(400);
                 done();
             });
         });
