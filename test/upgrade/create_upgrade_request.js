@@ -42,7 +42,8 @@ describe('WebSocketUpgrade', function() {
                 req.should.have.header('sec-websocket-extensions', 'x-test');                
                 done();
             });
-            WebSocketUpgrade.createUpgradeRequest(url, { extensions: ['x-test'] }, function(socket, settings) {
+            WebSocketUpgrade.createUpgradeRequest(url, { extensions: ['x-test'] }, function(err, socket, settings) {
+                should.not.exist(err);
                 settings.should.have.property('extensions');
                 settings.extensions.should.include('x-test');
             });
@@ -57,7 +58,8 @@ describe('WebSocketUpgrade', function() {
                 req.should.have.header('sec-websocket-extensions', 'x-test-one;x-test-two');                
                 done();
             });
-            WebSocketUpgrade.createUpgradeRequest(url, { extensions: ['x-test-one', 'x-test-two'] }, function(socket, settings) {
+            WebSocketUpgrade.createUpgradeRequest(url, { extensions: ['x-test-one', 'x-test-two'] }, function(err, socket, settings) {
+                should.not.exist(err);
                 settings.should.have.property('extensions');
                 settings.extensions.should.include('x-test-one');
                 settings.extensions.should.include('x-test-two');
@@ -72,7 +74,8 @@ describe('WebSocketUpgrade', function() {
                 req.should.have.header('sec-websocket-version', '13');
                 WebSocketUpgrade.handleUpgradeRequest(req, socket);
             });
-            WebSocketUpgrade.createUpgradeRequest(url, function(socket, settings) {
+            WebSocketUpgrade.createUpgradeRequest(url, function(err, socket, settings) {
+                should.not.exist(err);
                 socket.should.be.an.instanceOf(Socket);
                 settings.should.be.an.instanceOf(Object);
                 done();
