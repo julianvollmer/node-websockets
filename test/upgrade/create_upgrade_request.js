@@ -3,16 +3,16 @@ var http = require('http');
 var stream = require('stream');
 var should = require('should');
 
+var Socket = net.Socket;
+
 var WebSocketUpgrade = require('../../lib/upgrade');
 
 describe('WebSocketUpgrade', function() {
    
-    var server;
-    var url = 'ws://localhost:3000';
-    var exten = [{ name: "x-test-one", enabled: true, read: function() {}, write: function() {} }];
-    var extens = exten.concat({ name: "x-test-two", enabled: true, read: function() {}, write: function() {} });
+    var url, server;
 
     beforeEach(function() {
+        url = 'ws://localhost:3000';
 	    server  = http.createServer().listen(3000);
     });
 
@@ -25,7 +25,7 @@ describe('WebSocketUpgrade', function() {
             server.once('upgrade', function(req, socket) {
                 req.method.should.equal('GET');
                 req.should.have.header('upgrade', 'websocket');
-                req.should.have.header('connection', 'upgrade');
+                req.should.have.header('connection', 'Upgrade');
                 req.should.have.header('sec-websocket-key');
                 req.should.have.header('sec-websocket-version', '13');
                 done();
@@ -36,38 +36,45 @@ describe('WebSocketUpgrade', function() {
             server.once('upgrade', function(req, socket) {
                 req.method.should.equal('GET');
                 req.should.have.header('upgrade', 'websocket');
-                req.should.have.header('connection', 'upgrade');
+                req.should.have.header('connection', 'Upgrade');
                 req.should.have.header('sec-websocket-key');
                 req.should.have.header('sec-websocket-version', '13');
-                req.should.have.header('sec-websocket-extensions', 'x-test-one');                
+                req.should.have.header('sec-websocket-extensions', 'x-test');                
                 done();
             });
-            WebSocketUpgrade.createUpgradeRequest(url, { extensions: exten });
+            WebSocketUpgrade.createUpgradeRequest(url, { extensions: ['x-test'] }, function(socket, settings) {
+                settings.should.have.property('extensions');
+                settings.extensions.should.include('x-test');
+            });
         });
         it('should send a valid upgrade request to the http server (with two extensions)', function(done) {
             server.once('upgrade', function(req, socket) {
                 req.method.should.equal('GET');
                 req.should.have.header('upgrade', 'websocket');
-                req.should.have.header('connection', 'upgrade');
+                req.should.have.header('connection', 'Upgrade');
                 req.should.have.header('sec-websocket-key');
                 req.should.have.header('sec-websocket-version', '13');
                 req.should.have.header('sec-websocket-extensions', 'x-test-one;x-test-two');                
                 done();
             });
-            WebSocketUpgrade.createUpgradeRequest(url, { extensions: extens });
+            WebSocketUpgrade.createUpgradeRequest(url, { extensions: ['x-test-one', 'x-test-two'] }, function(socket, settings) {
+                settings.should.have.property('extensions');
+                settings.extensions.should.include('x-test-one');
+                settings.extensions.should.include('x-test-two');
+            });
         });
         it('should pass response and socket object to optional callback', function(done) {
             server.once('upgrade', function(req, socket) {
                 req.method.should.equal('GET');
                 req.should.have.header('upgrade', 'websocket');
-                req.should.have.header('connection', 'upgrade');
+                req.should.have.header('connection', 'Upgrade');
                 req.should.have.header('sec-websocket-key');
                 req.should.have.header('sec-websocket-version', '13');
                 WebSocketUpgrade.handleUpgradeRequest(req, socket);
             });
-            WebSocketUpgrade.createUpgradeRequest(url, function(res, socket) {
-                res.should.be.an.instanceOf(stream.Stream);
-                socket.should.be.an.instanceOf(net.Socket);
+            WebSocketUpgrade.createUpgradeRequest(url, function(socket, settings) {
+                socket.should.be.an.instanceOf(Socket);
+                settings.should.be.an.instanceOf(Object);
                 done();
             });
         });
