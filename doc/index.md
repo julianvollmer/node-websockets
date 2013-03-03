@@ -1,14 +1,12 @@
 # websockets
+the websockets project provides components for users and developers:
 
-the websockets project contains following public components:
+1. Users
+* WebSocketBase
+* WebSocketClient
+* WebSocketServer
 
-1. WebSocketBase
-2. WebSocketFrame
-3. WebSocketClient
-4. WebSocketServer
-5. WebSocketUpgrade
-
-## ATTENTION:
-It is adviced to read the code documentation in the lib directory instead to get more
-knowledge of the internals and to get the latest doc.
-Also it may help to read the examples.
+2. Developers
+* WebSocketFrame
+* WebSocketSocket
+* WebSocketUpgrade
