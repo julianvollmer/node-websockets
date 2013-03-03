@@ -72,20 +72,4 @@ describe('WebSocketFrame', function() {
         });
     });
 
-    describe('#isValid()', function() {
-        mockupFrames.each(function(name, mock) {
-            
-            var wsFrame;
-
-            before(function() {
-                wsFrame = new WebSocketFrame(mock.frame);
-            });
-            
-            it(format('should return true on %s', name), function() {
-                wsFrame.isValid().should.be.true;
-            });
-        });
-    });
-    
 });
-

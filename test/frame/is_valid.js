@@ -1,10 +1,10 @@
 var util = require('util');
 var should = require('should');
 
+var format = util.format;
+
 var WebSocketFrame = require('../../lib/frame');
 var mockupFrames = require('../mockup/frames');
-
-var format = util.format;
 
 describe('WebSocketFrame', function() {
 
@@ -14,8 +14,9 @@ describe('WebSocketFrame', function() {
         mockupFrames.each(function(name, mock) {
             wsFrame = new WebSocketFrame(mock.frame);
             
-            it(format('should return true on %s', name), function() {
-                wsFrame.isValid().should.be.true;
+            it(format('should return null if no error on %s', name), function() {
+                var err = wsFrame.isValid();
+                should.not.exist(err);
             });
 
         });
