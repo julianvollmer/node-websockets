@@ -1,4 +1,4 @@
-var ws = new WebSocket('ws://localhost:3000');
+var ws = new WebSocket('ws://192.168.178.37:3000');
 
 var input = document.getElementById('input');
 var messager = document.getElementById('messager');
