@@ -26,7 +26,7 @@ describe('WebSocketServer', function() {
             wss.url.should.be.a('object');
             wss.url.should.have.property('protocol', 'ws:');
             wss.url.should.have.property('hostname', 'localhost');
-            wss.url.should.have.property('href', ressource);
+            wss.url.should.have.property('href', ressource + '/');
             wss.url.should.have.property('host', 'localhost:3000');
             wss.url.should.have.property('port', '3000');
         });
