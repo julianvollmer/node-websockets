@@ -28,4 +28,8 @@ MockupSocket.prototype.beginTest = function() {
     });
 };
 
+MockupSocket.prototype.setTimeout = function() {
+    // dummy method
+};
+
 module.exports = MockupSocket;

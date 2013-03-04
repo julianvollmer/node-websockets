@@ -10,6 +10,7 @@ describe('WebSocketBase', function() {
         it('should set default parameters', function() {
             wsb = new WebSocketBase();
             wsb.mask.should.be.false;
+            wsb.timeout.should.equal(0);
             wsb.connections.should.equal(0);
             wsb.maxConnections.should.equal(10);
             wsb.sockets.should.be.an.instanceOf(Object);
@@ -26,6 +27,10 @@ describe('WebSocketBase', function() {
         it('should overwrite mask on options', function() {
             wsb = new WebSocketBase({ mask: true });
             wsb.mask.should.be.true;
+        });
+        it('should overwrite timeout on options', function() {
+            wsb = new WebSocketBase({ timeout: 60000 });
+            wsb.timeout.should.equal(60000);
         });
         it('should overwrite maxConnections on options', function() {
             wsb = new WebSocketBase({ maxConnections: 5 });
