@@ -14,6 +14,10 @@ websocketServer.on('open', function(sid) {
     websocketServer.send(sid, 'hello');
 });
 
+websocketServer.on('close', function(reason, sid) {
+    websocketServer.send(sid + ' has left');
+});
+
 websocketServer.on('message', function(message, sid) {
     websocketServer.send('received message ' + message);
     websocketServer.send(sid, 'have got yor mess');

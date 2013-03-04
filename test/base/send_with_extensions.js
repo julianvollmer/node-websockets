@@ -8,7 +8,7 @@ var WebSocketFrame = require('../../lib/frame');
 
 describe('WebSocketBase', function() {
     
-    var str, wsb, options, socketOne, socketTwo;
+    var str, wsb, options, socketOne, socketOneId, socketTwo, socketTwoId;
 
     beforeEach(function() {
         str = 'Hello World.';
@@ -22,6 +22,9 @@ describe('WebSocketBase', function() {
         wsb.extensions = mockupExtensions;
         wsb.assignSocket(socketOne, options);
         wsb.assignSocket(socketTwo, options);
+
+        socketOneId = wsb.socketsHistory[0];
+        socketTwoId = wsb.socketsHistory[1];
     });
 
     describe('#send(data) with two extensions', function() {
@@ -58,7 +61,7 @@ describe('WebSocketBase', function() {
                 frame.content.toString().should.equal(str + 'bubutaja');
                 done();
             });
-            wsb.send(1, str);
+            wsb.send(socketTwoId, str);
         });
     });
 
