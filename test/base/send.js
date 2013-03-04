@@ -6,7 +6,7 @@ var WebSocketFrame = require('../../lib/frame');
 
 describe('WebSocketBase', function() {
     
-    var str, wsb, socketOne, socketTwo;
+    var str, wsb, socketOne, socketOneId, socketTwo, socketTwoId;
 
     beforeEach(function() {
         str = 'Hello World.';
@@ -16,6 +16,9 @@ describe('WebSocketBase', function() {
 
         wsb.assignSocket(socketOne);
         wsb.assignSocket(socketTwo);
+
+        socketOneId = wsb.socketsHistory[0];
+        socketTwoId = wsb.socketsHistory[1];
     });
 
     describe('#send(data)', function() {
@@ -52,7 +55,7 @@ describe('WebSocketBase', function() {
                 frame.content.toString().should.equal(str);
                 done();
             });
-            wsb.send(1, str);
+            wsb.send(socketTwoId, str);
         });
     });
 
