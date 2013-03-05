@@ -8,8 +8,28 @@ var format = util.format;
 
 describe('WebSocketFrame', function() {
 
-    xdescribe('#constructor([frame])', function() {
-        // should be tested to act as alias to mapFrame   
+    var wsf;
+
+    before(function() {
+        wsf = new WebSocketFrame();
+    });
+
+    describe('#constructor([frame])', function() {
+        // TODO: should be tested to act as alias to mapFrame  
+        it('should have set default settings', function() {
+            wsf.fin.should.be.true;
+            wsf.rsv1.should.be.false;
+            wsf.rsv2.should.be.false;
+            wsf.rsv3.should.be.false;
+            wsf.mask.should.be.false;
+            wsf.glued.should.be.false;
+            wsf.opcode.should.equal(0x01);
+            wsf.length.should.equal(0x00);
+            wsf.should.have.property('payload');
+            wsf.should.have.property('masking');
+            wsf.should.have.property('content');
+            wsf.should.have.property('remnant');
+        });
     });
 
     describe('#mapFrame(frame)', function() {
