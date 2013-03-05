@@ -1,7 +1,9 @@
 # node-websockets
+
 a simple, fundamental implementation of the websocket protocol which supports easy extension handling
 
-## snippet
+## Snippet
+
 ```
 var http = require('http');
 var websockets = require('websockets');
@@ -29,7 +31,53 @@ wss.listen(server);
 server.listen(3000);
 ```
 
-## license (MIT)
+## Documentation
+
+### Installation
+
+Use npm for installation.
+
+Example:
+
+    npm install websockets
+
+### Modules
+
+Access following modules through `websockets` namespace:
+
+* `WebSocketFrame` reads and writes WebSocket binary frames
+* `WebSocketSocket` handles a single WebSocket connection
+* `WebSocketUpgrade` handles a WebSocket http upgrade process
+* `WebSocketBase` base high-level api class for WebSockets
+* `WebSocketClient` high-level api class for WebSocket clients
+* `WebSocketServer` high-level api class for WebSocket servers
+
+Example:
+
+    var websockets = require('websockets');
+    var WebSocketBase = websockets.Base;
+    var WebSocketClient = websockets.Client;
+
+## Further documentation
+
+Further documentation is splitted into user and developer level.
+User level contains high-level api for endusers and developer level 
+contains api for internal modules.
+
+User level:
+
+* [WebSocketBase](https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md)
+* [WebSocketClient](https://github.com/bodokaiser/node-websockets/blob/master/doc/client.md) 
+* [WebSocketServer](https://github.com/bodokaiser/node-websockets/blob/master/doc/server.md)
+
+Developer level:
+
+* [WebSocketFrame](https://github.com/bodokaiser/node-websockets/blob/master/doc/frame.md)
+* [WebSocketSocket](https://github.com/bodokaiser/node-websockets/blob/master/doc/socket.md)
+* [WebSocketUpgrade](https://github.com/bodokaiser/node-websockets/blob/master/doc/upgrade.md)
+
+## License (MIT)
+
 Copyright 2013 Bodo Kaiser <bodo.kaiser@enabre.com>
 
 Permission is hereby granted, free of charge, to any person obtaining

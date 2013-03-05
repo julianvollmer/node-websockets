@@ -1,19 +1,36 @@
 # WebSocketBase
-The WebSocketBase prototype shares the API of WebSocketServer and WebSocketClient.
-It can be used for custom WebSocketServer implementations.
 
-## new WebSocketBase([options])
-Creates a new instance of the WebSocketBase.
+    Stability: 1 - Experimental; Event and method names are settling down
+    but arguments changes will likely be done.
+    
+Use `require('websockets').Base` to access this module.
 
-## event: "open"
+## Class: WebSocketBase
+
+The WebSocketBase class provides a high-level api to multiple ws connections.
+
+### new WebSocketBase([options])
+
+* `options` Object, Optional
+
+Will return a new instance of the WebSocketBase.
+Default parameters can be overwritten in optional options hash.
+Options hash can contain `mask` with bool which determinates if frames should be 
+masked (defaults to `false`), `url` with websocket url (defaults to `ws://localhost:3000`),
+timeout in ms (defaults to `600000`) and the amount of maxConnections (defaults to `10`).
+
+### Event: 'open'
+
 An open event is emitted each time a new socket is assigned.
 It contains the connected sid as parameter.
 
-## event: "pong"
+## Event: 'pong'
+
 A pong event is always emitted when a pong frame is send (e.g. after a ping request).
 It contains the sid and the ping payload as callback parameter.
 
-## event: "close"
+## Event: 'close'
+
 A close event is emitted when the connection was closed.
 It provides sid and reason as callback parameters.
 
