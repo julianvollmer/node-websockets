@@ -21,38 +21,74 @@ timeout in ms (defaults to `600000`) and the amount of maxConnections (defaults 
 
 ### Event: 'open'
 
-An open event is emitted each time a new socket is assigned.
-It contains the connected sid as parameter.
+`function(sid) { }`
 
-## Event: 'pong'
+Emitted each time a new socket is assigned.
+`sid` can be used for sending something only to the new endpoint
+for example to provide him the data to start with.
 
-A pong event is always emitted when a pong frame is send (e.g. after a ping request).
-It contains the sid and the ping payload as callback parameter.
+### Event: 'pong'
 
-## Event: 'close'
+`function(message, sid) { }`
 
-A close event is emitted when the connection was closed.
-It provides sid and reason as callback parameters.
+Emitted when a pong frame is send (after a ping request).
+`message` is the frame payload as string `sid` is the id of the corresponding `WebSocketSocket` 
+and can be used for specific interaction to only this endpoint.
 
-## event: "error"
-An error event is emitted when an error happens (e.g. too big frame, invalid frame encoding).
+### Event: 'close'
 
-## event: "message"
-A message event is emitted each time a text frame is received.
-The callback will get a sid and the string as message.
+`function(reason, sid) { }`
 
-## send([sid,] data)
-If both parameters are provided it will send some data (which can be a string or a buffer) to the specified endpoint (sid).
-If only one parameter is provided it will send the data to all connected sockets.
+Emitted when the connection of `sid` has been closed.
+`reason` should be a string which contains the close reason.
 
-## ping([sid,] data)
-This method will send a ping frame to a specified endpoint (sid) or to all connected sockets with the data as payload.
+### Event: 'error'
 
-## close([sid,] [reason])
-This method will close the connection to a specified endpoint or if not provided to all connenctions and send a close frame.
+`function(error) { }`
 
-## assignSocket(socket [,options])
-This method will assign a node socket to the WebSocketBase instance.
-After calling this method on a socket the socket can emit events and receive frames.
-The optional options parameters defines which extensions should be used.
-This method is mostly used internally when binding to a http upgrade.
+Emitted when an error happens (e.g. too big frame, invalid frame encoding).
+`error` should be an instance of `Error` the developer should decide what then to do.
+
+### Event: 'message'
+
+`function(message, sid) { }`
+
+Emitted each time a text frame is received.
+`message` is the payload as string and `sid` the id of the endpoint which has sent the frame.
+
+### wsbase.send(data)
+
+Sends a `String` or `Buffer` to all connected WebSockets.
+
+### wsbase.send(sid, data)
+
+Sends a `String` or `Buffer` to a specified endpoint (`sid`).
+You can specify multiple endpoints by providing the sids as `Array`.
+
+### wsbase.ping([data])
+
+Sends a `ping` frame to all connected WebSockets which can contain data as `Buffer` or `String`.
+
+### wsbase.ping([sid], [data])
+
+Sends a `ping` frame to one or multiple specified endpoints (`sid`) which can contain data as `Buffer` or `String`.
+
+### wsbase.close(sid, [reason])
+
+Sends a `close` frame to one or multiple specified endpoints (`sid` or `Array` of `sids`) which can contain a reason as
+`Buffer` or `String` and closes the underlaying socket. Will emit a `close` event.
+
+### wsbase.assignSocket(socket, [options])
+
+* `socket`, Socket
+* `options`, Object, Optional
+
+Binds a node socket to the api of the `WebSocketBase`.
+This method is most used internally after a http upgrade handle.
+`options` can contain specific settings for the WebSocket which may be figured out after an upgrade (e.g. extensions).
+
+### wsbase.extensions
+
+Contains an object storage of usable extensions. Extensions are objects with `read` and `write` function.
+The property name of wsbase.extensions is used as identifier in `Sec-WebSocket-Extensions` headers on
+`WebSocketServer` and `WebSocketClient` implementations.
