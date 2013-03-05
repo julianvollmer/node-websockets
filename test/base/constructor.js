@@ -10,7 +10,7 @@ describe('WebSocketBase', function() {
         it('should set default parameters', function() {
             wsb = new WebSocketBase();
             wsb.mask.should.be.false;
-            wsb.timeout.should.equal(0);
+            wsb.timeout.should.equal(600000);
             wsb.connections.should.equal(0);
             wsb.maxConnections.should.equal(10);
             wsb.sockets.should.be.an.instanceOf(Object);
