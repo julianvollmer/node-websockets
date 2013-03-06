@@ -1,8 +1,7 @@
 # WebSocketFrame
 
-    Stability: 2 - Unstable; Can be that we split the WebSocketFrame
-    down to IncomingFrame and OutgoingFrame and/or the support of
-    concating fragmented frame payloads together.
+    Stability: 2 - Unstable; Can be that we split the WebSocketFrame down to IncomingFrame 
+    and OutgoingFrame and/or the support of concating fragmented frame payloads together.
 
 Use `require('websockets').Frame` to access this module.
 

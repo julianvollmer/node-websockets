@@ -1,21 +1,63 @@
 # WebSocketUpgrade
-The WebSocketUpgrade object provides to functions for handling the http websocket upgrade process.
 
-# require
-```
-var websockets = require('websockets');
+    Stability: 3 - Stable; There are no changes suggested in feature except some improved options support.
 
-websockets.createUpgradeRequest
-websockets.handleUpgradeRequest
-```
+Use `require('websockets').upgrade` to access this module.
 
-# createUpgradeRequest(url, [options, callback])
-This will send a http upgrade request to the specified url.
-Options can take an extension array which will be synced with the server.
-The response is validated and the callback will contain the socket object and the settings (e.g. synced extensions).
+## upgrade.createUpgradeRequest(url, [options], [callback])
 
-# handleUpgradeRequest(request, socket, [options, callback])
-Execute this function in the callback of a http server upgrade event.
-You need to provide a request and socket object.
-Options can contain an extensions array.
-The callback will get a socket object and the settings which where used (e.g. extensions)
+Example:
+
+    upgrade.createUpgradeRequest('ws://localhost:3000', { extensions: ['x-test'] }, function(err, socket, options) {
+        if (err)
+            throw err;
+
+        socket.on('data', function(chunk) {
+            // will receive websocket frames
+        });
+        // will output ['x-test'] if extension is supported by both sides
+        console.log(options);
+    });
+
+* url {String}, Contains the WebSocket url.
+* options {Object}, Contains options (e.g. Sec-WebSocket headers), Optional.
+* callback {Function}, Called on response with `Error` argument (null if no error), `Socket` object and synced `options`, Optional.
+
+This will send a http upgrade request to the specified `url`. The response is validated and the callback will
+contain the socket object and the settings like `Sec-WebSocket-Extensions` or `Sec-WebSocket-Protocol`.
+
+## upgrade.handleUpgradeRequest(request, socket, [options], [callback])
+
+Example:
+
+    var http = require('http');
+    var server = http.createServer();
+
+    server.on('upgrade', function(req, socket) {
+        if (err)
+            throw err;
+
+        upgrade.handleUpgradeRequest(req, socket, { extensions: ['x-test'] }, function(err, socket, options) {
+            if (err)
+                throw err;
+
+            // will be empty object if client and server do not support same extensions
+            console.log(options);
+            
+            socket.on('data', function(chunk) {
+
+            });
+        });
+    });
+
+    server.listen(3000);
+
+* request {Request}, http request instance.
+* socket {Socket}, net socket instance.
+* options {Object}, Contains options (e.g. for headers), Optional.
+* callback {Function}, Contains callback on request validation, Optional.
+
+This function has to be executed in a server upgrade callback.
+It will parse and validate all incoming upgrade requests and will send a upgrade or error response to the client.
+If a handshake went successful it will call the supplied callback with passing an `Error`, `Socket` instance and 
+synced settings (e.g. from both side supported extensions.
