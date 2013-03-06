@@ -7,7 +7,7 @@ Use `require('websockets').Base` to access this module.
 
 ## Class: WebSocketBase
 
-The WebSocketBase class provides a high-level api to multiple ws connections.
+The WebSocketBase class provides a high-level api for handling ws connections.
 
 ### new WebSocketBase([options])
 
@@ -95,6 +95,10 @@ Sends a `ping` frame to one or multiple specified endpoints (`sid`) which can co
 
 ### wsbase.close(sid, [reason])
 
+Example:
+
+    wsbase.close('jd48');
+
 Sends a `close` frame to one or multiple specified endpoints (`sid` or `Array` of `sids`) which can contain a reason as
 `Buffer` or `String` and closes the underlaying socket. Will emit a `close` event.
 
@@ -110,6 +114,8 @@ This method is most used internally after a http upgrade handle and only should 
 
 ### Event: 'open'
 
+Example:
+
     wsbase.on('open', function(sid) {
         wsbase.send('New WebSocket connected.');
         wsbase.send(sid, 'Hello new WebSocket.');
@@ -120,6 +126,8 @@ Emitted each time a new socket is assigned.
 for example to provide him the data to start with.
 
 ### Event: 'pong'
+
+Example:
 
     wsbase.on('pong', function(message, sid) {
         wsbase.send('A WebSocket has pinged me.');
@@ -132,6 +140,8 @@ and can be used for specific interaction to only this endpoint.
 
 ### Event: 'close'
 
+Example:
+
     wsbase.on('close', function(reason, sid) {
         wsb.send('WebSocket ' + sid + ' has left us.');
     });
@@ -140,6 +150,8 @@ Emitted when the connection of `sid` has been closed.
 `reason` should be a string which contains the close reason.
 
 ### Event: 'error'
+
+Example:
 
     wsbase.on('error', function(error) {
         // because we are in developement, app should crash
@@ -150,6 +162,8 @@ Emitted when an error happens (e.g. too big frame, invalid frame encoding).
 `error` should be an instance of `Error` the developer should decide what then to do.
 
 ### Event: 'message'
+
+Example:
 
     wsbase.on('message', function(message, sid) {
         wsb.send('A WebSocket has sent ' + message);
