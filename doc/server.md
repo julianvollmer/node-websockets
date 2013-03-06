@@ -21,7 +21,7 @@ Example:
 
 Returns an instance of `WebSocketServer`.
 
-## wssclient.listen(server)
+### wssclient.listen(server)
 
 Example:
 
