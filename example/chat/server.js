@@ -8,7 +8,8 @@ var websockets = require('../../lib/index');
 
 // create servers
 var httpServer = http.createServer();
-var socketServer = websockets.createServer();
+var imageSocketServer = new websockets.Server({ url: "ws://localhost:3000/images", timeout: 0 });
+var messageSocketServer = new websockets.Server({ url: "ws://localhost:3000/messages", timeout: 0 });
 
 // server static files
 httpServer.on('request', function(req, res) {
@@ -40,22 +41,27 @@ httpServer.on('request', function(req, res) {
     });
 });
 
+imageSocketServer.on('message', function(message, sid) {
+    imageSocketServer.send(message);
+});
+
 // informs about new clients connected
-socketServer.on('open', function(sid) {
-    socketServer.send(util.format('Client no. %d has connected', sid));
+messageSocketServer.on('open', function(sid) {
+    messageSocketServer.send(util.format('Client no. %d has connected', sid));
 });
 
 // informs about clients left
-socketServer.on('close', function(reason, sid) {
-    socketServer.send(util.format('Client no. %s has left', sid));
+messageSocketServer.on('close', function(reason, sid) {
+    messageSocketServer.send(util.format('Client no. %s has left', sid));
 });
 
 // shares a sent message through all clients
-socketServer.on('message', function(message, sid) {
+messageSocketServer.on('message', function(message, sid) {
     console.log('message:', message);
-    socketServer.send(message);
+    messageSocketServer.send(message);
 });
 
-socketServer.listen(httpServer);
+imageSocketServer.listen(httpServer);
+messageSocketServer.listen(httpServer);
 
 httpServer.listen(3000);
