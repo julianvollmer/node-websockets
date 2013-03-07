@@ -22,7 +22,7 @@ describe('WebSocketBase', function() {
         });
         it('should overwrite url on options', function() {
             wsb = new WebSocketBase({ url: "ws://example.com:467/grinch" });
-            wsb.url.href.should.equal('ws://example.com:467/grinch/');
+            wsb.url.href.should.equal('ws://example.com:467/grinch');
         });
         it('should overwrite mask on options', function() {
             wsb = new WebSocketBase({ mask: true });

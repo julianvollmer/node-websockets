@@ -1,6 +1,8 @@
 var http = require('http');
 var should = require('should');
 
+var mockupExtensions = require('../mockup/extensions');
+
 var WebSocketServer = require('../../lib/server');
 var WebSocketUpgrade = require('../../lib/upgrade');
 
@@ -8,24 +10,6 @@ describe('WebSocketServer', function() {
 
     var server;
     var ressource = 'ws://localhost:3000';
-    var extenOne = { enabled: true, name: "x-test-one", read: one, write: parser };
-    var extenTwo = { enabled: true, name: "x-test-two", read: two, write: parser };
-
-    function one(next, frame) {
-        frame.content = new Buffer(frame.content.toString() + ' one');
-        
-        next(null, frame);
-    }
-
-    function two(next, frame) {
-        frame.content = new Buffer(frame.content.toString() + ' two');
-
-        next(null, frame);
-    }
-
-    function parser(next, frame) {
-        next(null, frame);
-    }
 
     beforeEach(function() {
         server = http.createServer().listen(3000);
@@ -44,30 +28,42 @@ describe('WebSocketServer', function() {
             wss.listen(server);
             WebSocketUpgrade.createUpgradeRequest(ressource);
         });
-        xit('should listen on the defined url for upgrade requests (one extension)', function(done) {
+        it('should listen on the defined url for upgrade requests (one extension)', function(done) {
             var wss = new WebSocketServer({ url: ressource });
             wss.once('message', function(message) {
-                message.should.be.equal('Hello one');
+                message.should.be.equal('Hellobubu');
                 done();
             });
             wss.listen(server);
-            wss.addExtension(extenOne.name, extenOne.read, extenOne.write);
-            WebSocketUpgrade.createUpgradeRequest(ressource, { extensions: [extenOne] }, function(res, socket) {
+            wss.extensions['x-concat-bubu'] = mockupExtensions['x-concat-bubu'];
+            WebSocketUpgrade.createUpgradeRequest(ressource, { extensions: ['x-concat-bubu'] }, function(err, socket) {
                 socket.write(new Buffer([0x81, 0x85, 0x37, 0xfa, 0x21, 0x3d, 0x7f, 0x9f, 0x4d, 0x51, 0x58]));
             });
         });
-        xit('should listen on the defined url for upgrade requests (two extensions)', function(done) {
+        it('should listen on the defined url for upgrade requests (two extensions)', function(done) {
             var wss = new WebSocketServer({ url: ressource });
             wss.once('message', function(message) {
-                message.should.be.equal('Hello one two');
+                message.should.be.equal('Hellobubutaja');
                 done();
             });
+            wss.extensions = mockupExtensions;
             wss.listen(server);
-            wss.addExtension(extenOne.name, extenOne.read, extenOne.write);
-            wss.addExtension(extenTwo.name, extenTwo.read, extenTwo.write);
-            WebSocketUpgrade.createUpgradeRequest(ressource, { extensions: [extenOne, extenTwo] }, function(res, socket) {
+            WebSocketUpgrade.createUpgradeRequest(ressource, { extensions: ['x-concat-bubu', 'x-concat-taja'] }, function(err, socket) {
                 socket.write(new Buffer([0x81, 0x85, 0x37, 0xfa, 0x21, 0x3d, 0x7f, 0x9f, 0x4d, 0x51, 0x58]));
             });
+        });
+        it('should only listen to upgrades on the defined url', function(done) {
+            var wssOne = new WebSocketServer({ url: "ws://localhost:3000/images" });
+            var wssTwo = new WebSocketServer({ url: "ws://localhost:3000/messages" });
+            wssOne.once('open', function() {
+               throw new Error('first ws server one should not listen on upgrade of ws server two');
+            });
+            wssTwo.once('open', function() {
+                done();
+            });
+            wssOne.listen(server);
+            wssTwo.listen(server);
+            WebSocketUpgrade.createUpgradeRequest("ws://localhost:3000/messages");
         });
     });
 
