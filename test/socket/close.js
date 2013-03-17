@@ -12,7 +12,7 @@ describe('WebSocketSocket', function() {
 
     before(function() {
         msocket = new MockupSocket();
-        wssocket = new WebSocketBase(msocket, options);
+        wssocket = new WebSocketSocket(msocket, options);
     });
 
     describe('#close(data)', function() {
@@ -23,6 +23,7 @@ describe('WebSocketSocket', function() {
                 frame.opcode.should.equal(0x08);
                 frame.length.should.equal(0x0c);
                 frame.content.toString().should.equal('Hello World.');
+                done();
             });
             wssocket.close('Hello World.');
         });

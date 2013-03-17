@@ -36,7 +36,7 @@ describe('WebSocketSocket', function() {
         });
 
         it('should store socket in property', function() {
-            wss.should.have.property('socket', sck);
+            wss.should.have.property('_socket', sck);
         });
 
         it('should create a read and write chain if extensions set in options', function() {
@@ -61,7 +61,7 @@ describe('WebSocketSocket', function() {
 
         it('should store socket in property', function() {
             wss.assign(sck);
-            wss.should.have.property('socket', sck);
+            wss.should.have.property('_socket', sck);
         });
 
     });
