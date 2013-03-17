@@ -5,6 +5,7 @@ var MockupSocket = require('../mockup/socket');
 var mockupFrames = require('../mockup/frames');
 
 var WebSocketBase = require('../../lib/base');
+var WebSocketSocket = require('../../lib/socket');
 
 describe('WebSocketBase', function() {
 
@@ -18,7 +19,8 @@ describe('WebSocketBase', function() {
 
     describe('event: "open"', function() {
         it('should emit a open event on connection', function(done) {
-            wsb.once('open', function() {
+            wsb.once('open', function(socket) {
+                socket.should.be.an.instanceOf(WebSocketSocket);
                 done();
             });
             wsb.assignSocket(socket);
@@ -27,9 +29,9 @@ describe('WebSocketBase', function() {
     
     describe('event: "pong"', function() {
         it('should emit a pong event when receiving a ping frame and give the content', function(done) {
-            wsb.once('pong', function(message) {
+            wsb.once('pong', function(message, socket) {
+                socket.should.be.an.instanceOf(WebSocketSocket);
                 message.toString().should.equal('ping-pong');
-                
                 done(); 
             });
             wsb.assignSocket(socket);
@@ -39,8 +41,9 @@ describe('WebSocketBase', function() {
     
     describe('event: "close"', function() {
         it('should emit a close event when connection is closed', function(done) {    
-            wsb.once('open', function(reason, sid) {
-                wsb.close(reason, sid);
+            wsb.once('open', function(socket) {
+                socket.should.be.an.instanceOf(WebSocketSocket);
+                socket.close();
             });
             wsb.once('close', function() {
                 done();
@@ -58,8 +61,8 @@ describe('WebSocketBase', function() {
     
     describe('event: "custom"', function() {
         it('should emit a real event when listening on the sockets custom event', function(done) {
-            wsb.once('open', function(sid) {
-                wsb.sockets[sid].emit('custom', 'heartbeat', true);
+            wsb.once('open', function(socket) {
+                socket.emit('custom', 'heartbeat', true);
             });
             wsb.once('heartbeat', function(someVal) {
                 someVal.should.be.true;
@@ -71,7 +74,8 @@ describe('WebSocketBase', function() {
 
     describe('event: "message"', function() {
         it('should be a message event emitted when getting a data frame', function(done) {
-            wsb.once('message', function(message) {
+            wsb.once('message', function(message, socket) {
+                socket.should.be.an.instanceOf(WebSocketSocket);
                 message.should.equal('nodejs is fucking great');
                 done();
             });
