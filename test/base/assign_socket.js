@@ -6,7 +6,7 @@ var WebSocketFrame = require('../../lib/frame');
 
 describe('WebSocketBase', function() {
     
-    var str, wsb, socketOne, socketTwo, socketThree;
+    var str, wsbase, socketOne, socketTwo, socketThree;
 
     beforeEach(function() {
         str = 'Hello World.';
@@ -18,7 +18,7 @@ describe('WebSocketBase', function() {
 
     describe('#assignSocket(socket)', function() {
         it('should close the first added socket if maxConnections reached', function(done) {
-            wsb = new WebSocketBase({ maxConnections: 1 });
+            wsbase = new WebSocketBase({ maxConnections: 1 });
             socketOne.once('data', function(data) {
                 var wsf = new WebSocketFrame(data);
                 wsf.opcode.should.equal(0x08);
@@ -28,9 +28,9 @@ describe('WebSocketBase', function() {
                 wsf.opcode.should.equal(0x01);
                 done();
             });
-            wsb.assignSocket(socketOne);
-            wsb.assignSocket(socketTwo);
-            wsb.send('blabla');
+            wsbase.assignSocket(socketOne);
+            wsbase.assignSocket(socketTwo);
+            wsbase.sockets[1].send('blabla');
         });
     });
 

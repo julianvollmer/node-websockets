@@ -1,5 +1,3 @@
-var should = require('should');
-
 var MockupSocket = require('../mockup/socket');
 var mockupExtensions = require('../mockup/extensions');
 
@@ -8,21 +6,33 @@ var WebSocketSocket = require('../../lib/socket');
 
 describe('WebSocketSocket', function() {
     
-    var options, msocket, wssocket;
+    var msocket, wssocket;
 
-    before(function() {
+    beforeEach(function() {
         msocket = new MockupSocket();
-        wssocket = new WebSocketSocket(msocket, options);
+        wssocket = new WebSocketSocket(msocket, { mask: true });
     });
 
-    describe('#close(data)', function() {
-        it('should send a close frame through the underlaying socket', function(done) {
+    describe('#close([reason])', function() {
+        it('should send a close frame with empty body', function(done) {
             msocket.once('data', function(chunk) {
-                var frame = new WebSocketFrame(chunk);
-                frame.fin.should.be.true;
-                frame.opcode.should.equal(0x08);
-                frame.length.should.equal(0x0c);
-                frame.content.toString().should.equal('Hello World.');
+                var wsframe = new WebSocketFrame(chunk);
+                wsframe.fin.should.be.true;
+                wsframe.mask.should.be.true;
+                wsframe.opcode.should.equal(0x08);
+                wsframe.length.should.equal(0x00);
+                done();
+            });
+            wssocket.close();
+        });
+        it('should send a close frame with "Hello World."', function(done) {
+            msocket.once('data', function(chunk) {
+                var wsframe = new WebSocketFrame(chunk);
+                wsframe.fin.should.be.true;
+                wsframe.mask.should.be.true;
+                wsframe.opcode.should.equal(0x08);
+                wsframe.length.should.equal(0x0c);
+                wsframe.content.toString().should.equal('Hello World.');
                 done();
             });
             wssocket.close('Hello World.');

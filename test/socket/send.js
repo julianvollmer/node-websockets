@@ -1,5 +1,3 @@
-var should = require('should');
-
 var MockupSocket = require('../mockup/socket');
 var mockupExtensions = require('../mockup/extensions');
 
@@ -8,18 +6,20 @@ var WebSocketSocket = require('../../lib/socket');
 
 describe('WebSocketSocket', function() {
     
-    var options, msocket, wssocket;
+    var msocket, wssocket;
 
-    describe('#send(data)', function() {
+    describe('#send(message)', function() {
+        
         before(function() {
             msocket = new MockupSocket();
             wssocket = new WebSocketSocket(msocket);
         });
 
-        it('should send a text frame through the underlaying socket', function(done) {
+        it('should send a text frame if argument is a string', function(done) {
             msocket.once('data', function(chunk) {
                 var frame = new WebSocketFrame(chunk);
                 frame.fin.should.be.true;
+                frame.mask.should.be.false;
                 frame.opcode.should.equal(0x01);
                 frame.length.should.equal(0x0c);
                 frame.content.toString().should.equal('Hello World.');
@@ -27,17 +27,29 @@ describe('WebSocketSocket', function() {
             });
             wssocket.send('Hello World.');
         });
+
+        it('should send a binary frame if argument is a buffer', function(done) {
+            msocket.once('data', function(chunk) {
+                var frame = new WebSocketFrame(chunk);
+                frame.fin.should.be.true;
+                frame.mask.should.be.false;
+                frame.opcode.should.equal(0x02);
+                frame.length.should.equal(0x03);
+                frame.content.toString().should.equal('\u0001\u0002\u0003');
+                done();
+            });
+            wssocket.send(new Buffer([0x01, 0x02, 0x03]));
+        });
     });
 
-    describe('#send(data) with extensions', function() {
-        before(function() {
-            options = { extensions: mockupExtensions };
+    describe('#send(message) with extensions', function() {
 
+        before(function() {
             msocket = new MockupSocket();
-            wssocket = new WebSocketSocket(msocket, options);
+            wssocket = new WebSocketSocket(msocket, { extensions: mockupExtensions });
         });
 
-        it('should send a extended text frame through the underlaying socket', function(done) {
+        it('should send a text frame extended with "bubutaja"', function(done) {
             msocket.once('data', function(chunk) {
                 var frame = new WebSocketFrame(chunk);
                 frame.fin.should.be.true;
