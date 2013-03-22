@@ -1,6 +1,7 @@
 # WebSocketUpgrade
 
-    Stability: 3 - Stable; There are no changes suggested in feature except some improved options support.
+    Stability: 3 - Stable; 
+    There are no changes suggested in feature except some improved options support.
 
 Use `require('websockets').upgrade` to access this module.
 
@@ -19,9 +20,9 @@ Example:
         console.log(options);
     });
 
-* url {String}, Contains the WebSocket url.
-* options {Object}, Contains options (e.g. Sec-WebSocket headers), Optional.
-* callback {Function}, Called on response with `Error` argument (null if no error), `Socket` object and synced `options`, Optional.
+* `url`, String, Contains the WebSocket url.
+* `options`, Object, Contains options (e.g. Sec-WebSocket headers), Optional.
+* `callback`, Function, Called on response with `Error` argument (null if no error), `Socket` object and synced `options`, Optional.
 
 This will send a http upgrade request to the specified `url`. The response is validated and the callback will
 contain the socket object and the settings like `Sec-WebSocket-Extensions` or `Sec-WebSocket-Protocol`.
@@ -52,10 +53,10 @@ Example:
 
     server.listen(3000);
 
-* request {Request}, http request instance.
-* socket {Socket}, net socket instance.
-* options {Object}, Contains options (e.g. for headers), Optional.
-* callback {Function}, Contains callback on request validation, Optional.
+* `request`, Request, http request instance.
+* `socket`, Socket, net socket instance.
+* `options`, Object, Contains options (e.g. for headers), Optional.
+* `callback`, Function, Contains callback on request validation, Optional.
 
 This function has to be executed in a server upgrade callback.
 It will parse and validate all incoming upgrade requests and will send a upgrade or error response to the client.

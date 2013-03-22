@@ -20,7 +20,7 @@ Example:
     // or with wrapping some binary frame
     var wsframe = new WebSocketFrame(chunk);
 
-* `chunk` {Buffer}, Optional, WebSocketFrame to wrap or map.
+* `chunk`, Buffer, Optional, WebSocketFrame to wrap or map.
 
 The constructor creates a new instance of the WebSocketFrame prototype.
 It will either set some default frame parameters or map the provided chunk.
@@ -110,7 +110,7 @@ Example:
     var masked = wsframe.get('mask');
     var content = wsframe.get('content');
 
-* `key` {String}, Contains the property name.
+* `key`, String, Contains the property name.
 
 This method is only an alternative to accessing direclty the properties for those who prefer getters.
 

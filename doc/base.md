@@ -15,11 +15,12 @@ Example:
 
     var wsbase = new WebSocketBase({ mask: true });
 
-* `options` {Object}, Optional
-    * `url` {String}, Contains the websocket url, Default: `ws://localhost:3000/`
-    * `mask` {Boolean}, Determinates if frames should be masked, Default: `false`
-    * `timeout` {Number}, Time in ms when an idling socket is closed, Default: `600000`
-    * `maxConnections` {Number}, Amount of maximal concurrent connections, Default: `10`
+* `options`, Object, Optional
+    * `url`, String, Contains the websocket url, Default: `ws://localhost:3000/`
+    * `mask`, Boolean, Determinates if frames should be masked, Default: `false`
+    * `timeout`, Number, Time in ms when an idling socket is closed, Default: `600000`
+    * `extensions`, Object, See `wsbase.extensions` below for more information, Default: none
+    * `maxConnections`, Number, Amount of maximal concurrent connections, Default: `10`
 
 Will return a new instance of the WebSocketBase class.
 You can set several parameters through object hash which may be necessary if you 
@@ -56,58 +57,12 @@ The property name of wsbase.extensions is used as identifier in `Sec-WebSocket-E
 a next function for passing the parsed extension to the next step or to handle errors and an instance of
 `WebSocketFrame` for easy frame manipulation.
 
-### wsbase.send(data)
-
-Example:
-
-    wsbase.send('some message');
-    // or a buffer
-    wsbase.send(new Buffer([0x04, 0x11]));
-
-Sends a `String` (as text frame) or `Buffer` (as binary frame) to all connected WebSockets.
-
-### wsbase.send(sid, data)
-
-Example:
-
-    wsbase.send('jd84', 'this is a private message');
-    wsbase.send(['jd74', 'ld34'], 'this is only for your guys');
-
-Sends a `String` or `Buffer` to a specified endpoint (`sid`).
-You can specify multiple endpoints by providing the sids as `Array`.
-Currently it is hard to get the `sid` when not listening on an event.
-
-### wsbase.ping([data])
-
-Example:
-
-    wsbase.ping();
-
-Sends a `ping` frame to all connected WebSockets which can contain data as `Buffer` or `String`.
-
-### wsbase.ping([sid], [data])
-
-Example:
-
-    wsbase.ping(['jd85'], 'ping');
-
-Sends a `ping` frame to one or multiple specified endpoints (`sid`) which can contain data as `Buffer` or `String`.
-
-### wsbase.close(sid, [reason])
-
-Example:
-
-    wsbase.close('jd48');
-
-Sends a `close` frame to one or multiple specified endpoints (`sid` or `Array` of `sids`) which can contain a reason as
-`Buffer` or `String` and closes the underlaying socket. Will emit a `close` event.
-
 ### wsbase.assignSocket(socket, [options])
 
-* `socket` {Socket}
-* `options` {Object}, Optional
-    * `mask` {Boolean}, Does the endpoint should receive masked frames, Default: `this.mask`
-    * `extensions` {Object}, Contains `Array` of extensions supported by both endpoints, Default: `null`
+* `socket`, Socket
+* `options`, Object, Optional
+    * `mask`, Boolean, Does the endpoint should receive masked frames, Default: `this.mask`
+    * `extensions`, Object, Contains `Array` of extensions supported by both endpoints, Default: `null`
 
 Binds a node socket to the api of the `WebSocketBase`.
 This method is most used internally after a http upgrade handle and only should be used wise.
@@ -116,38 +71,34 @@ This method is most used internally after a http upgrade handle and only should 
 
 Example:
 
-    wsbase.on('open', function(sid) {
-        wsbase.send('New WebSocket connected.');
-        wsbase.send(sid, 'Hello new WebSocket.');
+    wsbase.on('open', function(wssocket) {
+        wssocket.send('Hello new WebSocket.');
     });
 
-Emitted each time a new socket is assigned.
-`sid` can be used for sending something only to the new endpoint
-for example to provide him the data to start with.
+Emitted each time a new socket is assigned. The invoked `WebSocketSocket` instance
+is passed as parameter for direct communication.
 
 ### Event: 'pong'
 
 Example:
 
-    wsbase.on('pong', function(message, sid) {
-        wsbase.send('A WebSocket has pinged me.');
-        wsbase.send(sid, 'Here you have got your pong.');
+    wsbase.on('pong', function(message, wssocket) {
+        wssocket.send('You have pinged me?');
     });
 
-Emitted when a pong frame is send (after a ping request).
-`message` is the frame payload as string `sid` is the id of the corresponding `WebSocketSocket` 
-and can be used for specific interaction to only this endpoint.
+Emitted when a pong frame is send (after a ping request). `message` is the frame 
+payload as string and `wssocket` the instance of the corresponding `WebSocketSocket`.
 
 ### Event: 'close'
 
 Example:
 
-    wsbase.on('close', function(reason, sid) {
-        wsb.send('WebSocket ' + sid + ' has left us.');
+    wsbase.on('close', function(reason, wssocket) {
+        console.log(util.format('WebSocket #%d has left us', wssocket.index));
     });
 
-Emitted when the connection of `sid` has been closed.
-`reason` should be a string which contains the close reason.
+Emitted when a WebSocket connection closes. Passes optional reason and leaving
+`wssocket` instance as arguments. `wssocket` will be removed out of socket storage.
 
 ### Event: 'error'
 
@@ -159,15 +110,16 @@ Example:
     });
 
 Emitted when an error happens (e.g. too big frame, invalid frame encoding).
-`error` should be an instance of `Error` the developer should decide what then to do.
+`error` should be an instance of `Error` the developer can decided how to proceed.
 
 ### Event: 'message'
 
 Example:
 
-    wsbase.on('message', function(message, sid) {
-        wsb.send('A WebSocket has sent ' + message);
+    wsbase.on('message', function(message, wssocket) {
+        wssocket.send('You have sent me ' + message);
     });
 
-Emitted each time a text frame is received.
-`message` is the payload as string and `sid` the id of the endpoint which has sent the frame.
+Emitted each time a text frame is received. `message` is the payload as string if
+we have a text frame or a buffer if we have a binary frame. `wssocket` is the 
+instance of `WebSocketSocket` which has sent us the messsage.
