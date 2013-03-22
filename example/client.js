@@ -2,34 +2,36 @@ var http = require('http');
 var websockets = require('../lib');
 
 var httpServer = new http.createServer();
-var websocketServer = new websockets.Server();
-var websocketClient = new websockets.Client();
+var wsserver = new websockets.Server();
+var wsclient = new websockets.Client();
 
 httpServer.on('request', function(req, res) {
     res.writeHead(200, { "Content-Type": "text/plain" });
     res.end('Hello World\n');
 });
 
-websocketServer.on('open', function(sid) {
-    websocketServer.send('new client has connected');
-    websocketServer.send(sid, 'hello');
+wsserver.on('open', function(wssocket) {
+    wssocket.send('Hello you are #' + wssocket.index);
+    wsserver.broadcast('New client has connected.');
 });
 
-websocketServer.on('message', function(message, sid) {
-    websocketServer.send('received message ' + message);
-    websocketServer.send(sid, 'have got yor mess');
+wsserver.on('message', function(message, wssocket) {
+    wssocket.send('You have sent me:' + message);
+    wsserver.broadcast('Client #' + wssocket.index + ' has sent: ' + message);
 });
 
-websocketServer.listen(httpServer);
+wsserver.listen(httpServer);
 
 httpServer.listen(3000);
 
-websocketClient.on('open', function(message) {
-    websocketClient.send('hello here is the client');
+wsclient.on('open', function(wssocket) {
+    wsclient.send('Hello here is a client.');
+    // or
+    wssocket.send('Hello here is a client.');
 });
 
-websocketClient.on('message', function(message) {
-    console.log('client gets:', message);
+wsclient.on('message', function(message, wssocket) {
+    console.log('Incoming message:', message);
 });
 
-websocketClient.open('ws://localhost:3000');
+wsclient.open('ws://localhost:3000');

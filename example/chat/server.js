@@ -41,24 +41,24 @@ httpServer.on('request', function(req, res) {
     });
 });
 
-imageSocketServer.on('message', function(message, sid) {
-    imageSocketServer.send(message);
+imageSocketServer.on('message', function(message, wssocket) {
+    imageSocketServer.broadcast(util.format('#%d: %s', wssocket.index, message));
 });
 
 // informs about new clients connected
-messageSocketServer.on('open', function(sid) {
-    messageSocketServer.send(util.format('Client no. %d has connected', sid));
+messageSocketServer.on('open', function(wssocket) {
+    messageSocketServer.broadcast(util.format('Client #%d has connected', wssocket.index));
 });
 
 // informs about clients left
-messageSocketServer.on('close', function(reason, sid) {
-    messageSocketServer.send(util.format('Client no. %s has left', sid));
+messageSocketServer.on('close', function(reason, wssocket) {
+    messageSocketServer.broadcast(util.format('Client #%d has left', wssocket.index));
 });
 
 // shares a sent message through all clients
-messageSocketServer.on('message', function(message, sid) {
+messageSocketServer.on('message', function(message, wsocket) {
     console.log('message:', message);
-    messageSocketServer.send(message);
+    messageSocketServer.broadcast(message);
 });
 
 imageSocketServer.listen(httpServer);
