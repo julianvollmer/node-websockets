@@ -1,5 +1,3 @@
-var should = require('should');
-
 var MockupSocket = require('../mockup/socket');
 
 var WebSocketFrame = require('../../lib/frame');

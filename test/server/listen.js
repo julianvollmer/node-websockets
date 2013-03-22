@@ -1,5 +1,4 @@
 var http = require('http');
-var should = require('should');
 
 var mockupExtensions = require('../mockup/extensions');
 
@@ -8,11 +7,11 @@ var WebSocketUpgrade = require('../../lib/upgrade');
 
 describe('WebSocketServer', function() {
 
-    var server;
-    var ressource = 'ws://localhost:3000';
+    var server, ressource;
 
     beforeEach(function() {
         server = http.createServer().listen(3000);
+        ressource = 'ws://localhost:3000';
     });
 
     afterEach(function() {
