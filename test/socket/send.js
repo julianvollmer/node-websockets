@@ -1,3 +1,5 @@
+var crypto = require('crypto');
+
 var MockupSocket = require('../mockup/socket');
 var mockupExtensions = require('../mockup/extensions');
 
@@ -26,6 +28,21 @@ describe('WebSocketSocket', function() {
                 done();
             });
             wssocket.send('Hello World.');
+        });
+
+        it('should send large text frames without problems', function(done) {
+            crypto.randomBytes(Math.pow(8, 8), function(err, buf) {
+                msocket.once('data', function(chunk) {
+                    var wsframe = new WebSocketFrame(chunk);
+                    wsframe.fin.should.be.true;
+                    wsframe.mask.should.be.false;
+                    wsframe.opcode.should.equal(0x01);
+                    wsframe.length.should.equal(Math.pow(8, 8));
+                    wsframe.content.toString().should.equal(buf.toString());
+                    done();
+                });
+                wssocket.send(buf.toString());
+            });
         });
 
         it('should send a binary frame if argument is a buffer', function(done) {
