@@ -1,9 +1,6 @@
 var net = require('net');
 var http = require('http');
-var stream = require('stream');
 var should = require('should');
-
-var Socket = net.Socket;
 
 var WebSocketUpgrade = require('../../lib/upgrade');
 
@@ -76,7 +73,7 @@ describe('WebSocketUpgrade', function() {
             });
             WebSocketUpgrade.createUpgradeRequest(url, function(err, socket, settings) {
                 should.not.exist(err);
-                socket.should.be.an.instanceOf(Socket);
+                socket.should.be.an.instanceOf(net.Socket);
                 settings.should.be.an.instanceOf(Object);
                 done();
             });

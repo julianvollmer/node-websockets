@@ -1,5 +1,3 @@
-var should = require('should');
-
 var WebSocketFrame = require('../../lib/frame');
 
 describe('WebSocketFrame', function() {

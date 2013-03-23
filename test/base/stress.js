@@ -1,16 +1,14 @@
 var util = require('util');
-var should = require('should');
 
 var mockupFrames = require('../mockup/frames');
 var MockupSocket = require('../mockup/socket');
-var WebSocketBase = require('../../lib/base');
 
-var format = util.format;
+var WebSocketBase = require('../../lib/base');
 
 describe('WebSocketBase', function() {
 
     mockupFrames.each(function(name, container) {
-        it(format('should handle %s frame properly', name), function(done) {
+        it(util.format('should handle %s frame properly', name), function(done) {
             var wsb = new WebSocketBase();
             var socket = new MockupSocket();
             wsb.masked = container.mask;
