@@ -40,7 +40,7 @@ Example:
     wsclient.send('Hello');
 
 This method is a shortcut to `wssocket.send`.
-Check [wssocket.send](https://github.com/bodokaiser/node-websockets/blob/master/doc/socket.md#wssocketsend)
+Check [wssocket.send](https://github.com/bodokaiser/node-websockets/blob/master/doc/socket.md#wssocketsendmessage)
 for further information.
 
 ### wsclient.ping([message])
@@ -50,7 +50,7 @@ Example:
     wsclient.ping();
 
 This method is a shortcut to `wssocket.ping`.
-Check [wssocket.ping](https://github.com/bodokaiser/node-websockets/blob/master/doc/socket.md#wssocketping)
+Check [wssocket.ping](https://github.com/bodokaiser/node-websockets/blob/master/doc/socket.md#wssocketpingbody)
 for further information.
 
 ### wsclient.close([reason])
@@ -60,7 +60,7 @@ Example:
     wsclient.close();
 
 This method is a shortcut to `wssocket.close`.
-Check [wssocket.close](https://github.com/bodokaiser/node-websockets/blob/master/doc/socket.md#wssocketclose)
+Check [wssocket.close](https://github.com/bodokaiser/node-websockets/blob/master/doc/socket.md#wssocketclosereason)
 
 ### Event: 'open'
 

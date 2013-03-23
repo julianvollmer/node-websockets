@@ -18,7 +18,7 @@ Example:
 * `options`, Object, Optional options hash which overwrites internal parameters.
     * `url`, String, Url which the server will listen on upgrades, Default: `ws://localhost:3000`
     * `timeout`, Number, Timeout in ms for idling sockets, Default: `600000`
-    * `extensions`, Object, See (wsbase.extensions)[https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md#wsbaseextensions] for more, Default: none
+    * `extensions`, Object, See [wsbase.extensions](https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md#wsbaseextensions) for more, Default: none
     * `maxConnections`, Number, Amount of sockets which can be conencted, Default: `10`
 
 Returns an instance of `WebSocketServer`.
@@ -44,16 +44,16 @@ Broadcasts a `String` or `Buffer` as message frame to all connected sockets.
 
 ### Event: 'open'
 
-Check (WebSocketBase: Events: 'open')[https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md#event-open] for more.
+Check [WebSocketBase: Events: 'open'](https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md#event-open) for more.
 
 ### Event: 'close'
 
-Check (WebSocketBase: Events: 'close')[https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md#event-close] for more.
+Check [WebSocketBase: Events: 'close'](https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md#event-close) for more.
 
 ### Event: 'error'
 
-Check (WebSocketBase: Events: 'error')[https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md#event-error] for more.
+Check [WebSocketBase: Events: 'error'](https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md#event-error) for more.
 
 ### Event: 'message'
 
-Check (WebSocketBase: Events: 'message')[https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md#event-message] for more.
+Check [WebSocketBase: Events: 'message'](https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md#event-message) for more.
