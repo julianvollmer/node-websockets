@@ -42,7 +42,7 @@ httpServer.on('request', function(req, res) {
 });
 
 imageSocketServer.on('message', function(message, wssocket) {
-    imageSocketServer.broadcast(util.format('#%d: %s', wssocket.index, message));
+    imageSocketServer.broadcast(message);
 });
 
 // informs about new clients connected

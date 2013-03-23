@@ -31,17 +31,33 @@ describe('WebSocketSocket', function() {
         });
 
         it('should send large text frames without problems', function(done) {
-            crypto.randomBytes(Math.pow(8, 8), function(err, buf) {
+            crypto.randomBytes(0xf, function(err, buf) {
+                var str = buf.toString();
                 msocket.once('data', function(chunk) {
                     var wsframe = new WebSocketFrame(chunk);
                     wsframe.fin.should.be.true;
                     wsframe.mask.should.be.false;
                     wsframe.opcode.should.equal(0x01);
-                    wsframe.length.should.equal(Math.pow(8, 8));
+                    wsframe.length.should.equal(new Buffer(str).length);
+                    wsframe.content.toString().should.equal(str);
+                    done();
+                });
+                wssocket.send(str);
+            });
+        });
+
+        it('should send large binary frames without problems', function(done) {
+            crypto.randomBytes(0xffffff, function(err, buf) {
+                msocket.once('data', function(chunk) {
+                    var wsframe = new WebSocketFrame(chunk);
+                    wsframe.fin.should.be.true;
+                    wsframe.mask.should.be.false;
+                    wsframe.opcode.should.equal(0x02);
+                    wsframe.length.should.equal(0xffffff);
                     wsframe.content.toString().should.equal(buf.toString());
                     done();
                 });
-                wssocket.send(buf.toString());
+                wssocket.send(buf);
             });
         });
 

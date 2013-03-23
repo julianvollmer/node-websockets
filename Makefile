@@ -1,6 +1,6 @@
 check: test
 
-test: test-base test-frame test-socket test-upgrade test-server test-client
+test: test-frame test-socket test-upgrade test-base test-server test-client
 
 MOCHA_FLAGS = --require should
 
