@@ -19,17 +19,19 @@ describe('WebSocketBase', function() {
         it('should close the first added socket if maxConnections reached', function(done) {
             wsbase = new WebSocketBase({ maxConnections: 1 });
             socketOne.once('data', function(data) {
-                var wsf = new WebSocketFrame(data);
-                wsf.opcode.should.equal(0x08);
+                var wsframe = new WebSocketFrame(data);
+                wsframe.opcode.should.equal(0x08);
             });
             socketTwo.once('data', function(data) {
-                var wsf = new WebSocketFrame(data);
-                wsf.opcode.should.equal(0x01);
+                var wsframe = new WebSocketFrame(data);
+                wsframe.opcode.should.equal(0x01);
+                wsframe.length.should.equal(0x05);
+                wsframe.content.toString().should.equal('Hello');
                 done();
             });
             wsbase.assignSocket(socketOne);
             wsbase.assignSocket(socketTwo);
-            wsbase.sockets[1].send('blabla');
+            wsbase.sockets[0].send('Hello');
         });
     });
 
