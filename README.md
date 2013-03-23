@@ -5,6 +5,7 @@ a simple, fundamental implementation of the websocket protocol which supports ea
 ## Snippet
 
 ```
+var util = require('util');
 var http = require('http');
 var websockets = require('websockets');
 
@@ -12,20 +13,21 @@ var websockets = require('websockets');
 var server = http.createServer();
 
 // create websocket server
-var wss = new websockets.Server();
+var wsserver = new websockets.Server();
 
 // send hello when someone connects
-wss.on('open', function() {
-    wss.send('hello');
+wsserver.on('open', function(wssocket) {
+    wssocket.send('Hello new Client!');
+    wsserver.broadcast('New Client has connected!');
 });
 
 // log the received message
-wss.on('message', function(message) {
-    console.log(message);
+wsserver.on('message', function(message, wssocket) {
+    wsserver.broadcast(util.format('Client #%d says: %s', wssocket.index, message));
 });
 
 // bind to http server
-wss.listen(server);
+wsserver.listen(server);
 
 // bind http server to port 3000
 server.listen(3000);
