@@ -6,15 +6,15 @@ var MockupSocket = require('../mockup/socket');
 var mockupFrames = require('../mockup/frames');
 var mockupExtensions = require('../mockup/extensions');
 
-var WebSocketSocket = require('../../lib/socket');
+var WebSocket = require('../../lib/socket');
 
-describe('WebSocketSocket', function() {
+describe('WebSocket', function() {
 
     var msocket, wssocket;
 
     beforeEach(function() {
         msocket = new MockupSocket();
-        wssocket = new WebSocketSocket(msocket, { extensions: mockupExtensions });
+        wssocket = new WebSocket(msocket, { extensions: mockupExtensions });
     });
 
     it('should inherit from EventEmitter', function() {
@@ -27,7 +27,7 @@ describe('WebSocketSocket', function() {
 
         it('should throw an error if argument is not a socket instance', function() {
             (function() {
-                new WebSocketSocket('string');    
+                new WebSocket('string');    
             }).should.throwError();
         });
 
