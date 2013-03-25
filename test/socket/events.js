@@ -1,9 +1,9 @@
 var MockupSocket = require('../mockup/socket');
 var mockupExtensions = require('../mockup/extensions');
 
-var WebSocketSocket = require('../../lib/socket');
+var WebSocket = require('../../lib/socket');
 
-describe('WebSocketSocket', function() {
+describe('WebSocket', function() {
 
     var msocket, wssocket;
 
@@ -11,14 +11,7 @@ describe('WebSocketSocket', function() {
 
         beforeEach(function() {
             msocket = new MockupSocket();
-            wssocket = new WebSocketSocket(msocket);
-        });
-
-        it('should emit an open event', function(done) {
-            wssocket.once('open', function() {
-                done();
-            });
-            wssocket.assign(msocket);
+            wssocket = new WebSocket(msocket);
         });
 
         it('should emit a message event', function(done) {
@@ -59,7 +52,7 @@ describe('WebSocketSocket', function() {
 
         beforeEach(function() {
             msocket = new MockupSocket();
-            wssocket = new WebSocketSocket(msocket, { extensions: mockupExtensions });
+            wssocket = new WebSocket(msocket, { extensions: mockupExtensions });
         });
         
         it('should emit a message event', function(done) {

@@ -6,15 +6,15 @@ var MockupSocket = require('../mockup/socket');
 var mockupFrames = require('../mockup/frames');
 var mockupExtensions = require('../mockup/extensions');
 
-var WebSocketSocket = require('../../lib/socket');
+var WebSocket = require('../../lib/socket');
 
-describe('WebSocketSocket', function() {
+describe('WebSocket', function() {
 
     var msocket, wssocket;
 
     beforeEach(function() {
         msocket = new MockupSocket();
-        wssocket = new WebSocketSocket(msocket, { extensions: mockupExtensions });
+        wssocket = new WebSocket(msocket, { extensions: mockupExtensions });
     });
 
     it('should inherit from EventEmitter', function() {
@@ -27,12 +27,12 @@ describe('WebSocketSocket', function() {
 
         it('should throw an error if argument is not a socket instance', function() {
             (function() {
-                new WebSocketSocket('string');    
+                new WebSocket('string');    
             }).should.throwError();
         });
 
         it('should store socket in property', function() {
-            wssocket.should.have.property('_socket', msocket);
+            wssocket.should.have.property('socket', msocket);
         });
 
         it('should create a read and write chain if extensions set in options', function() {
@@ -42,21 +42,6 @@ describe('WebSocketSocket', function() {
             wssocket.readChain.should.include(mockupExtensions['x-concat-taja'].read);
             wssocket.writeChain.should.include(mockupExtensions['x-concat-bubu'].write);
             wssocket.writeChain.should.include(mockupExtensions['x-concat-taja'].write);
-        });
-
-    });
-
-    describe('#assign(socket)', function() {
-   
-        it('should throw an error if argument is not a socket instance', function() {
-            (function() {
-                wssocket.assign('string');    
-            }).should.throwError();
-        });
-
-        it('should store socket in property', function() {
-            wssocket.assign(msocket);
-            wssocket.should.have.property('_socket', msocket);
         });
 
     });
