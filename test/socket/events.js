@@ -14,13 +14,6 @@ describe('WebSocketSocket', function() {
             wssocket = new WebSocketSocket(msocket);
         });
 
-        it('should emit an open event', function(done) {
-            wssocket.once('open', function() {
-                done();
-            });
-            wssocket.assign(msocket);
-        });
-
         it('should emit a message event', function(done) {
             wssocket.once('message', function(message) {
                 message.should.equal('Hello');
