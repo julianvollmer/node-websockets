@@ -1,18 +1,18 @@
-# WebSocketSocket
+# WebSocket
 
     Stability: 2 - Unstable
     
-## Class: WebSocketSocket
+## Class: WebSocket
 
-The WebSocketSocket class wraps around a `Socket` instance and provides WebSocket 
+The WebSocket class wraps around a `Socket` instance and provides WebSocket 
 specific method and event support. An instance of it is passed around on all events
 of `WebSocketBase` to handle direct endpoint communication.
 
-### new WebSocketSocket(socket, [options])
+### new WebSocket(socket, [options])
 
 Example:
 
-    var wssocket = new WebSocketSocket(socket, { mask: true });
+    var wssocket = new WebSocket(socket, { mask: true });
 
 * `socket`, Socket, Instance of a node socket (for example from http `upgrade` event)
 * `options`, Object, Optional
@@ -20,7 +20,7 @@ Example:
     * `timeout`, Number, Time in ms when an idling socket is closed, Default: `600000`
     * `extensions`, Object, Collection of WebSocket extensions added to the parse chain
 
-Will return a new instance of `WebSocketSocket`. In most use-cases there will be no
+Will return a new instance of `WebSocket`. In most use-cases there will be no
 need to create an instance manuel. An instance is automatically created on upgrade
 process and passed to all common events of `WebSocketBase`.
 
@@ -75,6 +75,13 @@ A `custom` event can be used by extensions to tunnel custom events to the parent
 class (e.g. `WebSocketBase`). The first parameter is the real event name which
 will be emitted on the parent class with the following arguments.
 
+### Event: 'pong'
+
+    function(body) { }
+
+Each time a ping frame is received we will sent a pong frame as response and emit
+a `pong` event.
+
 ### Event: 'close'
 
     function(reason) { }
@@ -91,10 +98,3 @@ An `error` event is emitted when an error occours. The idea is that you can do y
 error handling (either strict or loose) but until now the `error` event is not supported
 through the whole application. Also sometimes the passed `err` is either a `String` or
 a `Error` object. Here is a lot to do in feature.
-
-### Event: 'pong'
-
-    function(body) { }
-
-Each time a ping frame is received we will sent a pong frame as response and emit
-a `pong` event.
