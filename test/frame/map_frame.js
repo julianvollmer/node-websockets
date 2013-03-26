@@ -176,6 +176,25 @@ describe('WebSocketFrame', function() {
                 done();
             });
         });
+        
+        it('should map the first fragment of an unmasked text frame', function() {
+            wsFrame.mapFrame(new Buffer([0x01, 0x03, 0x48, 0x65, 0x6c]));
+            wsFrame.fin.should.be.false;
+            wsFrame.mask.should.be.false;
+            wsFrame.opcode.should.equal(0x01);
+            wsFrame.length.should.equal(0x03);
+            wsFrame.content.toString().should.equal('Hel');
+        });
+
+        it('should map the first fragment of an unmasked text frame', function() {
+            wsFrame.mapFrame(new Buffer([0x80, 0x02, 0x6c, 0x6f]));
+            wsFrame.fin.should.be.true;
+            wsFrame.mask.should.be.false;
+            wsFrame.opcode.should.equal(0x00);
+            wsFrame.length.should.equal(0x02);
+            wsFrame.content.toString().should.equal('lo');
+        });
+
         mockupFrames.each(function(name, mock) {
            
             it('should actually have such a method', function() {

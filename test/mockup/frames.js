@@ -85,26 +85,6 @@ var mockupFrames = {
         payload: new Buffer(lorem),
         content: new Buffer(lorem),
         frame: Buffer.concat([new Buffer([0x81, 0x7e, 0x1, 0xad]), new Buffer(lorem)])
-    },
-
-    // contains "Hel"
-    "firstFragmentedUnmaskedTextFrame": {
-        fin: false, mask: false,
-        opcode: 0x01, length: 0x03,
-        masking: new Buffer([]),
-        payload: new Buffer([0x48, 0x65, 0x6c]),
-        content: new Buffer([0x48, 0x65, 0x6c]),
-        frame: new Buffer([0x01, 0x03, 0x48, 0x65, 0x6c])
-    },
-
-    // contains "lo"
-    "secondFragmentedUnmaskedTextFrame": {
-        fin: true, mask: false,
-        opcode: 0x00, length: 0x02,
-        masking: new Buffer([]),
-        payload: new Buffer([0x6c, 0x6f]),
-        content: new Buffer([0x6c, 0x6f]),
-        frame: new Buffer([0x80, 0x02, 0x6c, 0x6f])
     }
 
 };
