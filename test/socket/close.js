@@ -32,7 +32,7 @@ describe('WebSocketSocket', function() {
                 wsframe.mask.should.be.true;
                 wsframe.opcode.should.equal(0x08);
                 wsframe.length.should.equal(0x0c);
-                wsframe.content.toString().should.equal('Hello World.');
+                wsframe.getContent().toString().should.equal('Hello World.');
                 done();
             });
             wssocket.close('Hello World.');

@@ -23,7 +23,7 @@ describe('WebSocketServer', function() {
                 wsframe.mask.should.be.false;
                 wsframe.opcode.should.equal(0x01);
                 wsframe.length.should.equal(0x0d);
-                wsframe.content.toString().should.equal('Hello Sockets');
+                wsframe.getContent().toString().should.equal('Hello Sockets');
             });
             msocketTwo.once('data', function(data) {
                 var wsframe = new WebSocketFrame(data);
@@ -31,7 +31,7 @@ describe('WebSocketServer', function() {
                 wsframe.mask.should.be.false;
                 wsframe.opcode.should.equal(0x01);
                 wsframe.length.should.equal(0x0d);
-                wsframe.content.toString().should.equal('Hello Sockets');
+                wsframe.getContent().toString().should.equal('Hello Sockets');
                 done();
             });
             wsserver.broadcast('Hello Sockets');
@@ -43,7 +43,7 @@ describe('WebSocketServer', function() {
                 wsframe.mask.should.be.false;
                 wsframe.opcode.should.equal(0x02);
                 wsframe.length.should.equal(0x03);
-                wsframe.content.toString().should.equal('\u0001\u0002\u0003');
+                wsframe.getContent().toString().should.equal('\u0001\u0002\u0003');
             });
             msocketTwo.once('data', function(data) {
                 var wsframe = new WebSocketFrame(data);
@@ -51,7 +51,7 @@ describe('WebSocketServer', function() {
                 wsframe.mask.should.be.false;
                 wsframe.opcode.should.equal(0x02);
                 wsframe.length.should.equal(0x03);
-                wsframe.content.toString().should.equal('\u0001\u0002\u0003');
+                wsframe.getContent().toString().should.equal('\u0001\u0002\u0003');
                 done();
             });
             wsserver.broadcast(new Buffer([0x01, 0x02, 0x03]));

@@ -24,7 +24,7 @@ describe('WebSocketSocket', function() {
                 frame.mask.should.be.false;
                 frame.opcode.should.equal(0x01);
                 frame.length.should.equal(0x0c);
-                frame.content.toString().should.equal('Hello World.');
+                frame.getContent().toString().should.equal('Hello World.');
                 done();
             });
             wssocket.send('Hello World.');
@@ -39,7 +39,7 @@ describe('WebSocketSocket', function() {
                     wsframe.mask.should.be.false;
                     wsframe.opcode.should.equal(0x01);
                     wsframe.length.should.equal(new Buffer(str).length);
-                    wsframe.content.toString().should.equal(str);
+                    wsframe.getContent().toString().should.equal(str);
                     done();
                 });
                 wssocket.send(str);
@@ -54,7 +54,7 @@ describe('WebSocketSocket', function() {
                     wsframe.mask.should.be.false;
                     wsframe.opcode.should.equal(0x02);
                     wsframe.length.should.equal(0xffffff);
-                    wsframe.content.toString().should.equal(buf.toString());
+                    wsframe.getContent().toString().should.equal(buf.toString());
                     done();
                 });
                 wssocket.send(buf);
@@ -68,7 +68,7 @@ describe('WebSocketSocket', function() {
                 frame.mask.should.be.false;
                 frame.opcode.should.equal(0x02);
                 frame.length.should.equal(0x03);
-                frame.content.toString().should.equal('\u0001\u0002\u0003');
+                frame.getContent().toString().should.equal('\u0001\u0002\u0003');
                 done();
             });
             wssocket.send(new Buffer([0x01, 0x02, 0x03]));
@@ -88,7 +88,7 @@ describe('WebSocketSocket', function() {
                 frame.fin.should.be.true;
                 frame.opcode.should.equal(0x01);
                 frame.length.should.equal(0x0c + 8);
-                frame.content.toString().should.equal('Hello World.bubutaja');
+                frame.getContent().toString().should.equal('Hello World.bubutaja');
                 done();
             });
             wssocket.send('Hello World.');

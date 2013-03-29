@@ -39,7 +39,7 @@ describe('WebSocketSocket', function() {
                     wsframe.mask.should.be.true;
                     wsframe.opcode.should.equal(0x09);
                     wsframe.length.should.equal(0x05);
-                    wsframe.content.toString().should.equal('pongy');
+                    wsframe.getContent().toString().should.equal('pongy');
                     done();
                 }
             });

@@ -1,7 +1,6 @@
 # WebSocketFrame
 
-    Stability: 2 - Unstable; Can be that we split the WebSocketFrame down to IncomingFrame 
-    and OutgoingFrame and/or the support of concating fragmented frame payloads together.
+    Stability: 3 - Stable;
 
 Use `require('websockets').Frame` to access this module.
 
@@ -54,18 +53,13 @@ Example:
 or is masked. Per standard client frames should be masked whereas server frames
 should be unmasked.
 
-### wsframe.glued
-
-`glued` contains a `Boolean` which determinates if the chunk is actually a collection
-of glued together WebSocket frames. `glued` is read-only and will not have any affect
-on encoding the frame.
-
 ### wsframe.opcode
 
 Example:
 
-    if (wsframe.opcode == 0x01)
-        console.log('text frame with payload:', wsframe.content.toString());
+    if (wsframe.opcode == 0x01) {
+        console.log('text frame with payload:', wsframe.getContent().toString());
+    }
 
 `opcode` contains a `Number` which represents the frame type.
 Currently there are `0x00` (fragment), `0x01` (string), `0x02` (binary), `0x08` (close),
@@ -76,26 +70,13 @@ allows using reserved opcodes on extensions but I personally would not recommend
 
 `length` contains the payload length as `Number`.
 
-### wsframe.frameLength
-
-`frameLength` contains the total length of the whole frame as `Number`.
-
 ### wsframe.masking
 
-If `wsframe.mask` is set to `true` this will contain four random bytes else `null`.
+If `wsframe.mask` is set to `true` this will contain four random bytes else an empty `Buffer.
 
 ### wsframe.payload
 
-Contains the raw unmasked payload as `Buffer` with size of `wsframe.length`.
-
-### wsframe.content
-
-Example:
-
-    // will return the message as string
-    wsframe.content.toString();
-
-Contains the unmasked payload as `Buffer`.
+Contains the raw payload as `Buffer` with size of `wsframe.length` (can be masked).
 
 ### wsframe.remnant
 
@@ -103,57 +84,70 @@ If `wsframe.glued` is `true` the frame contains more bytes than defined in the
 frame header. In this case the overlapping bytes are cut and written to `wsframe.remnant`
 in order to be reparsed if they where just glued together else it is set to `null`.
 
-### wsframe.get(key)
+### wsframe.addFragment(fragframe);
+
+* `fragframe`, WebSocketFrame, WebSocketFrame instance of a fragmented frame.
 
 Example:
 
-    var masked = wsframe.get('mask');
-    var content = wsframe.get('content');
+    fragframe = new WebSocketFrame(new Buffer([0x00, 0x01, 0x6f]));
+    wsframe.addFragment(fragframe);
 
-* `key`, String, Contains the property name.
+To improve handling of fragmented frames you can use `wsframe.addFragment` to 
+add fragmented frames which then will be threated as one frame when using `wsframe.getContent()`.
 
-This method is only an alternative to accessing direclty the properties for those who prefer getters.
-
-### wsframe.set(key, value)
-
-Example:
-
-    wsframe.set('fin', true);
-    wsframe.set('content', new Buffer('Hello.'));
-
-Alternative to setting properties directly.
-
-### wsframe.mapFrame(chunk)
+### wsframe.getContent()
 
 Example:
 
-    socket.on('data', function(chunk) {
-            wsframe.mapFrame(chunk);
-    });
+    wsframe.getContent();
 
-Maps a binary encoded frame to the object (is actually called by the constructor).
+Returns a `Buffer` which contains the actual data of the frame - the unmasked payload.
+If you have used `wsframe.addFragment` than `wsframe.getContent()` will return all payloads
+concated together.
+
+### wsframe.setContent(buf)
+
+* `buf`, Buffer, a `Buffer` containing the data you want to set to the frame.
+
+Example:
+
+    wsframe.setContent(new Buffer('Hello'));
+
+Sets the payload to `buf`. If `wsframe.mask` is `true` and there is no masking key
+it will create one and immediatly mask the payload and update the `wsframe.length`.
 
 ### wsframe.toBuffer()
 
 Example:
 
-    wsframe.set('fin', true);
-    wsframe.set('mask', false);
-    wsframe.set('opcode', 0x01);
-    wsframe.set('content', new Buffer('Hi'));
+    wsframe.fin = true;
+    wsframe.mask = false;
+    wsframe.opcode = 0x01;
+    wsframe.setContent(new Buffer('Hi'));
     // will return <Buffer 0x81 0x02 0x48 0x69>
     wsframe.toBuffer();
 
-Returns the wsframe object encoded as WebSocket frame buffer.
+Returns the wsframe object encoded as WebSocket frame.
 
 ### wsframe.isValid()
 
 Example:
 
-    wsframe.set('rsv1', true);
+    wsframe.rsv1 = true;
     // will return false
     wsframe.isValid();
 
 Returns `true` if wsframe properties match the WebSocket standard.
 *Note*: This method will not work on some extensions and does not cover
 all requirements of the standard.
+
+### wsframe.validate()
+
+Example:
+
+    if (!wsframe.isValid()) {
+        throw wsframe.validate();
+    }
+
+Will return an `Error` object with the validation message.
