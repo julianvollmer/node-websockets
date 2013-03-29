@@ -26,7 +26,7 @@ describe('WebSocketBase', function() {
                 var wsframe = new WebSocketFrame(data);
                 wsframe.opcode.should.equal(0x01);
                 wsframe.length.should.equal(0x05);
-                wsframe.content.toString().should.equal('Hello');
+                wsframe.getContent().toString().should.equal('Hello');
                 done();
             });
             wsbase.assignSocket(socketOne);

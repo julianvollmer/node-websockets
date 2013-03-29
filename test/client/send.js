@@ -19,7 +19,7 @@ describe('WebSocketClient', function() {
                 var wsframe = new WebSocketFrame(data);
                 wsframe.fin.should.be.true;
                 wsframe.mask.should.be.true;
-                wsframe.content.toString().should.equal('Hello');
+                wsframe.getContent().toString().should.equal('Hello');
                 done();
             });
             wsclient.send('Hello');
