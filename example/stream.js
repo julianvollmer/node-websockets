@@ -13,9 +13,9 @@ server.on('request', function(request, response) {
 server.on('upgrade', function(request, socket) {
     WebSocketUpgrade.handleUpgradeRequest(request, socket, function(err, socket) {
         var wsstream = new WebSocketStream(socket);
-        
-        wsstream.on('data', function(chunk) {
-            console.log(chunk.toString());
+
+        wsstream.on('readable', function() {
+            console.log(wsstream.read().toString());
         });
     });
 });
