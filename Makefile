@@ -4,9 +4,9 @@ test: test-frame test-socket test-upgrade test-base test-server test-client
 
 MOCHA_FLAGS = --require should
 
-test-base:
+test-stream:
 	./node_modules/.bin/mocha \
-        $(MOCHA_FLAGS) test/base/*.js
+        $(MOCHA_FLAGS) test/stream/*.js
 
 test-frame:
 	./node_modules/.bin/mocha  \
@@ -19,6 +19,10 @@ test-socket:
 test-upgrade:
 	./node_modules/.bin/mocha \
         $(MOCHA_FLAGS) test/upgrade/*.js
+
+test-base:
+	./node_modules/.bin/mocha \
+        $(MOCHA_FLAGS) test/base/*.js
 
 test-server: 
 	./node_modules/.bin/mocha \
