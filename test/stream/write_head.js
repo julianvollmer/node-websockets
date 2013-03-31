@@ -1,5 +1,4 @@
-var stream = require('stream');
-
+var MockupSocket = require('./msocket');
 var WebSocketStream = require('../../lib/stream');
 
 describe('WebSocketStream', function() {
@@ -7,13 +6,7 @@ describe('WebSocketStream', function() {
     var msocket, wsstream;
 
     beforeEach(function() {
-        msocket = new stream.Duplex();
-        msocket._read = function() {};
-        msocket._write = function(chunk, encoding, done) {
-            this.emit('data', chunk);
-
-            done(null);
-        };
+        msocket = new MockupSocket();
         wsstream = new WebSocketStream(msocket);
     });
 
@@ -114,7 +107,7 @@ describe('WebSocketStream', function() {
                 var length = chunk[1] & 0x7f;
                 
                 length.should.equal(125);
-                chunk.length.should.equal(2);
+                chunk.length.should.equal(127);
                 
                 done();
             });
@@ -128,7 +121,7 @@ describe('WebSocketStream', function() {
 
                 hlength.should.equal(126);
                 plength.should.equal(126);
-                chunk.length.should.equal(4);
+                chunk.length.should.equal(130);
                 
                 done();
             });
@@ -142,7 +135,7 @@ describe('WebSocketStream', function() {
 
                 hlength.should.equal(126);
                 plength.should.equal(127);
-                chunk.length.should.equal(4);
+                chunk.length.should.equal(131);
                 
                 done();
             });
@@ -156,7 +149,7 @@ describe('WebSocketStream', function() {
 
                 hlength.should.equal(126);
                 plength.should.equal(65535);
-                chunk.length.should.equal(4);
+                chunk.length.should.equal(65539);
                 
                 done();
             });
@@ -170,7 +163,7 @@ describe('WebSocketStream', function() {
 
                 hlength.should.equal(127);
                 plength.should.equal(65536);
-                chunk.length.should.equal(10);
+                chunk.length.should.equal(65546);
                 
                 done();
             });
@@ -193,12 +186,12 @@ describe('WebSocketStream', function() {
             wsstream.write(new Buffer(4294967295));
         });
 
-        it('should have masking bytes, length > 126', function(done) {
+        it('should have masking bytes, length == 125', function(done) {
             msocket.once('data', function(chunk) {
                 var length = chunk[1] & 0x7f;
 
                 length.should.equal(125);
-                chunk.length.should.equal(6);
+                chunk.length.should.equal(131);
                 
                 done();
             });
@@ -206,14 +199,14 @@ describe('WebSocketStream', function() {
             wsstream.write(new Buffer(125));
         });
 
-        it('should have masking bytes, length > 65536', function(done) {
+        it('should have masking bytes, length == 65535', function(done) {
             msocket.once('data', function(chunk) {
                 var hlength = chunk[1] & 0x7f;
                 var plength = chunk.readUInt16BE(2);
 
                 hlength.should.equal(126);
                 plength.should.equal(65535);
-                chunk.length.should.equal(8);
+                chunk.length.should.equal(65543);
                 
                 done();
             });
@@ -221,14 +214,14 @@ describe('WebSocketStream', function() {
             wsstream.write(new Buffer(65535));
         });
 
-        it('should have masking bytes, length > 65537', function(done) {
+        it('should have masking bytes, length == 65536', function(done) {
             msocket.once('data', function(chunk) {
                 var hlength = chunk[1] & 0x7f;
                 var plength = chunk.readUInt32BE(6);
 
                 hlength.should.equal(127);
                 plength.should.equal(65536);
-                chunk.length.should.equal(14);
+                chunk.length.should.equal(65550);
                 
                 done();
             });
