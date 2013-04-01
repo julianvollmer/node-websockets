@@ -20,7 +20,7 @@ describe('WebSocket', function() {
             var opcode = chunk[0] & 0x0f;
             var length = chunk[1] & 0x7f;
 
-            fin.should.equal(0x80);
+            fin.should.equal(0x00);
             mask.should.equal(0x00);
             rsv1.should.equal(0x00);
             rsv2.should.equal(0x00);
