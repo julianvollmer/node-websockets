@@ -1,18 +1,18 @@
 var crypto = require('crypto');
 
 var MockupSocket = require('./msocket');
-var WebSocketStream = require('../../lib/stream');
+var WebSocket = require('../../lib/stream');
 
-describe('WebSocketStream', function() {
+describe('WebSocket', function() {
 
-    var msocket, wsstream, head, masking, content, frame;
+    var msocket, wssocket, head, masking, content, frame;
 
     beforeEach(function() {
         msocket = new MockupSocket();
-        wsstream = new WebSocketStream(msocket);
+        wssocket = new WebSocket(msocket);
     });
 
-    describe('writing frame body', function() {
+    describe('writing frame bodies', function() {
 
         it('should write unmasked binary frame, length == 125', function(done) {
             head = new Buffer([0x82, 0x7d]);
@@ -25,8 +25,8 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeHead({ fin: true, opcode: 0x02 });;
-            wsstream.write(content);
+            wssocket.writeHead({ fin: true, opcode: 0x02 });;
+            wssocket.write(content);
         });
 
         it('should write unmasked binary frame, length == 126', function(done) {
@@ -40,8 +40,8 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeHead({ fin: true, opcode: 0x02 });;
-            wsstream.write(content);
+            wssocket.writeHead({ fin: true, opcode: 0x02 });;
+            wssocket.write(content);
         });
 
         it('should write unmasked binary frame, length == 127', function(done) {
@@ -55,8 +55,8 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeHead({ fin: true, opcode: 0x02 });;
-            wsstream.write(content);
+            wssocket.writeHead({ fin: true, opcode: 0x02 });;
+            wssocket.write(content);
         });
 
         it('should write unmasked binary frame, length == 65535', function(done) {
@@ -70,8 +70,8 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeHead({ fin: true, opcode: 0x02 });;
-            wsstream.write(content);
+            wssocket.writeHead({ fin: true, opcode: 0x02 });;
+            wssocket.write(content);
         });
 
         it('should write unmasked binary frame, length == 65536', function(done) {
@@ -85,8 +85,8 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeHead({ fin: true, opcode: 0x02 });;
-            wsstream.write(content);
+            wssocket.writeHead({ fin: true, opcode: 0x02 });;
+            wssocket.write(content);
         });
 
         it('should write masked binary frame, length == 125', function(done) {
@@ -101,9 +101,9 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeHead({ fin: true, mask: true });;
-            wsstream.writeHead({ opcode: 0x02, masking: masking });;
-            wsstream.write(content);
+            wssocket.writeHead({ fin: true, mask: true });;
+            wssocket.writeHead({ opcode: 0x02, masking: masking });;
+            wssocket.write(content);
         });
 
         it('should write masked binary frame, length == 126', function(done) {
@@ -118,9 +118,9 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeHead({ fin: true, mask: true });;
-            wsstream.writeHead({ opcode: 0x02, masking: masking });;
-            wsstream.write(content);
+            wssocket.writeHead({ fin: true, mask: true });;
+            wssocket.writeHead({ opcode: 0x02, masking: masking });;
+            wssocket.write(content);
         });
 
         it('should write masked binary frame, length == 127', function(done) {
@@ -135,9 +135,9 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeHead({ fin: true, mask: true });;
-            wsstream.writeHead({ opcode: 0x02, masking: masking });;
-            wsstream.write(content);
+            wssocket.writeHead({ fin: true, mask: true });;
+            wssocket.writeHead({ opcode: 0x02, masking: masking });;
+            wssocket.write(content);
         });
 
         it('should write masked binary frame, length == 65535', function(done) {
@@ -152,9 +152,9 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeHead({ fin: true, mask: true });;
-            wsstream.writeHead({ opcode: 0x02, masking: masking });;
-            wsstream.write(content);
+            wssocket.writeHead({ fin: true, mask: true });;
+            wssocket.writeHead({ opcode: 0x02, masking: masking });;
+            wssocket.write(content);
         });
 
         it('should write masked binary frame, length == 65536', function(done) {
@@ -169,9 +169,9 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeHead({ fin: true, mask: true });;
-            wsstream.writeHead({ opcode: 0x02, masking: masking });;
-            wsstream.write(content);
+            wssocket.writeHead({ fin: true, mask: true });;
+            wssocket.writeHead({ opcode: 0x02, masking: masking });;
+            wssocket.write(content);
         });
 
     });

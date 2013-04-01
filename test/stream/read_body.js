@@ -1,24 +1,24 @@
 var crypto = require('crypto');
 var stream = require('stream');
 
-var WebSocketStream = require('../../lib/stream');
+var WebSocket = require('../../lib/stream');
 
-describe('WebSocketStream', function() {
+describe('WebSocket', function() {
 
-    var msocket, wsstream, content;
+    var msocket, wssocket, content;
 
     beforeEach(function() {
         msocket = new stream.Readable();
         msocket._read = function() {};
 
-        wsstream = new WebSocketStream(msocket);
+        wssocket = new WebSocket(msocket);
     });
 
-    describe('reading frame body', function() {
+    describe('wssocket.read() on "readable"', function() {
 
         it('should read body of unmasked text frame containing "Hello"', function(done) {
-            wsstream.on('readable', function() {
-                content = wsstream.read();
+            wssocket.on('readable', function() {
+                content = wssocket.read();
                 content.toString().should.equal('Hello');
                 
                 done();
@@ -28,8 +28,8 @@ describe('WebSocketStream', function() {
         });
 
         it('should read body of masked text frame containing "Hello"', function(done) {
-            wsstream.on('readable', function() {
-                content = wsstream.read();
+            wssocket.on('readable', function() {
+                content = wssocket.read();
                 content.toString().should.equal('Hello');
                 
                 done();
@@ -43,8 +43,8 @@ describe('WebSocketStream', function() {
             var masking = crypto.randomBytes(4);
             var payload = crypto.randomBytes(125);
 
-            wsstream.on('readable', function() {
-                content = wsstream.read();
+            wssocket.on('readable', function() {
+                content = wssocket.read();
                 content.toString('base64').should.equal(payload.toString('base64'));
 
                 done();
@@ -58,8 +58,8 @@ describe('WebSocketStream', function() {
             var masking = crypto.randomBytes(4);
             var payload = crypto.randomBytes(126);
 
-            wsstream.on('readable', function() {
-                content = wsstream.read();
+            wssocket.on('readable', function() {
+                content = wssocket.read();
                 content.toString('base64').should.equal(payload.toString('base64'));
 
                 done();
@@ -73,8 +73,8 @@ describe('WebSocketStream', function() {
             var masking = crypto.randomBytes(4);
             var payload = crypto.randomBytes(127);
 
-            wsstream.on('readable', function() {
-                content = wsstream.read();
+            wssocket.on('readable', function() {
+                content = wssocket.read();
                 content.toString('base64').should.equal(payload.toString('base64'));
 
                 done();
@@ -88,8 +88,8 @@ describe('WebSocketStream', function() {
             var masking = crypto.randomBytes(4);
             var payload = crypto.randomBytes(65535);
 
-            wsstream.on('readable', function() {
-                content = wsstream.read();
+            wssocket.on('readable', function() {
+                content = wssocket.read();
                 content.toString('base64').should.equal(payload.toString('base64'));
 
                 done();
@@ -103,8 +103,8 @@ describe('WebSocketStream', function() {
             var masking = crypto.randomBytes(4);
             var payload = crypto.randomBytes(65536);
 
-            wsstream.on('readable', function() {
-                content = wsstream.read();
+            wssocket.on('readable', function() {
+                content = wssocket.read();
                 content.toString('base64').should.equal(payload.toString('base64'));
 
                 done();
@@ -125,10 +125,10 @@ describe('WebSocketStream', function() {
             payloads.push(crypto.randomBytes(0x4000));
 
             var index = 0;
-            wsstream.on('readable', function() {
+            wssocket.on('readable', function() {
                 if (index == 4) done();
 
-                content = wsstream.read();
+                content = wssocket.read();
                 content.toString('base64').should.equal(payloads[index].toString('base64'));
                 index++;
             });

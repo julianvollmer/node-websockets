@@ -1,22 +1,22 @@
 var stream = require('stream');
 
-var WebSocketStream = require('../../lib/stream');
+var WebSocket = require('../../lib/stream');
 
-describe('WebSocketStream', function() {
+describe('WebSocket', function() {
 
-    var msocket, wsstream;
+    var msocket, wssocket;
 
     beforeEach(function() {
         msocket = new stream.Readable();
         msocket._read = function() {};
 
-        wsstream = new WebSocketStream(msocket);
+        wssocket = new WebSocket(msocket);
     });
 
-    describe('reading frame heads', function() {
+    describe('Event: "head"', function() {
         
         it('should parse fin as true', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.fin.should.be.true;
                 done();
             });
@@ -24,7 +24,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse fin as false', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.fin.should.be.false;
                 done();
             });
@@ -32,7 +32,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse rsv one to three as true', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.rsv1.should.be.true;
                 head.rsv2.should.be.true;
                 head.rsv3.should.be.true;
@@ -42,7 +42,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse rsv one to three as false', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.rsv1.should.be.false;
                 head.rsv2.should.be.false;
                 head.rsv3.should.be.false;
@@ -52,7 +52,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse opcode as 0x00', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.opcode.should.equal(0x00);
                 done();
             });
@@ -60,7 +60,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse opcode as 0x0a', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.opcode.should.equal(0x0a);
                 done();
             });
@@ -68,7 +68,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse mask as true', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.mask.should.be.true;
                 done();
             });
@@ -76,7 +76,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse mask as false', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.mask.should.be.false;
                 done();
             });
@@ -84,7 +84,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse length as 0', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.length.should.equal(0);
                 done();
             });
@@ -92,7 +92,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse length as 125', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.length.should.equal(125);
                 done();
             });
@@ -100,7 +100,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse length as 126', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.length.should.equal(126);
                 done();
             });
@@ -108,7 +108,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse length as 127', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.length.should.equal(127);
                 done();
             });
@@ -116,7 +116,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse length as 65535', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.length.should.equal(65535);
                 done();
             });
@@ -124,7 +124,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse length as 65536', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.length.should.equal(65536);
                 done();
             });
@@ -132,7 +132,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse length as 4294967295', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.length.should.equal(4294967295);
                 done();
             });
@@ -140,7 +140,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should set masking to null if no mask is present', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.mask.should.be.false;
                 head.masking.length.should.equal(0);
                 done();
@@ -149,7 +149,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse masking bytes when length < 126', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.mask.should.be.true;
                 head.masking.toString('base64').should.equal('WKK+dA==');
                 done();
@@ -158,7 +158,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse masking bytes when length < 65536', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.mask.should.be.true;
                 head.masking.toString('base64').should.equal('MMJBKA==');
                 done();
@@ -167,7 +167,7 @@ describe('WebSocketStream', function() {
         });
 
         it('should parse masking bytes when length < 4294967296', function(done) {
-            wsstream.once('head', function(head) {
+            wssocket.once('head', function(head) {
                 head.mask.should.be.true;
                 head.masking.toString('base64').should.equal('zU4iCA==');
                 done();
