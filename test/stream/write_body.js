@@ -14,8 +14,8 @@ describe('WebSocketStream', function() {
 
     describe('writing frame body', function() {
 
-        it('should write unmasked text frame, length == 125', function(done) {
-            head = new Buffer([0x81, 0x7d]);
+        it('should write unmasked binary frame, length == 125', function(done) {
+            head = new Buffer([0x82, 0x7d]);
             content = crypto.randomBytes(125);
             frame = Buffer.concat([head, content]);
             
@@ -25,14 +25,12 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeFrameState.fin = true;
-            wsstream.writeFrameState.mask = false;
-            wsstream.writeFrameState.opcode = 0x01;
+            wsstream.writeHead({ fin: true, opcode: 0x02 });;
             wsstream.write(content);
         });
 
-        it('should write unmasked text frame, length == 126', function(done) {
-            head = new Buffer([0x81, 0x7e, 0x00, 0x7e]);
+        it('should write unmasked binary frame, length == 126', function(done) {
+            head = new Buffer([0x82, 0x7e, 0x00, 0x7e]);
             content = crypto.randomBytes(126);
             frame = Buffer.concat([head, content]);
             
@@ -42,9 +40,7 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeFrameState.fin = true;
-            wsstream.writeFrameState.mask = false;
-            wsstream.writeFrameState.opcode = 0x01;
+            wsstream.writeHead({ fin: true, opcode: 0x02 });;
             wsstream.write(content);
         });
 
@@ -59,9 +55,7 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeFrameState.fin = true;
-            wsstream.writeFrameState.mask = false;
-            wsstream.writeFrameState.opcode = 0x02;
+            wsstream.writeHead({ fin: true, opcode: 0x02 });;
             wsstream.write(content);
         });
 
@@ -76,9 +70,7 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeFrameState.fin = true;
-            wsstream.writeFrameState.mask = false;
-            wsstream.writeFrameState.opcode = 0x02;
+            wsstream.writeHead({ fin: true, opcode: 0x02 });;
             wsstream.write(content);
         });
 
@@ -93,9 +85,7 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeFrameState.fin = true;
-            wsstream.writeFrameState.mask = false;
-            wsstream.writeFrameState.opcode = 0x02;
+            wsstream.writeHead({ fin: true, opcode: 0x02 });;
             wsstream.write(content);
         });
 
@@ -111,10 +101,8 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeFrameState.fin = true;
-            wsstream.writeFrameState.mask = true;
-            wsstream.writeFrameState.opcode = 0x02;
-            wsstream.writeFrameState.masking = masking;
+            wsstream.writeHead({ fin: true, mask: true });;
+            wsstream.writeHead({ opcode: 0x02, masking: masking });;
             wsstream.write(content);
         });
 
@@ -130,10 +118,8 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeFrameState.fin = true;
-            wsstream.writeFrameState.mask = true;
-            wsstream.writeFrameState.opcode = 0x02;
-            wsstream.writeFrameState.masking = masking;
+            wsstream.writeHead({ fin: true, mask: true });;
+            wsstream.writeHead({ opcode: 0x02, masking: masking });;
             wsstream.write(content);
         });
 
@@ -149,10 +135,8 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeFrameState.fin = true;
-            wsstream.writeFrameState.mask = true;
-            wsstream.writeFrameState.opcode = 0x02;
-            wsstream.writeFrameState.masking = masking;
+            wsstream.writeHead({ fin: true, mask: true });;
+            wsstream.writeHead({ opcode: 0x02, masking: masking });;
             wsstream.write(content);
         });
 
@@ -168,10 +152,8 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeFrameState.fin = true;
-            wsstream.writeFrameState.mask = true;
-            wsstream.writeFrameState.opcode = 0x02;
-            wsstream.writeFrameState.masking = masking;
+            wsstream.writeHead({ fin: true, mask: true });;
+            wsstream.writeHead({ opcode: 0x02, masking: masking });;
             wsstream.write(content);
         });
 
@@ -187,10 +169,8 @@ describe('WebSocketStream', function() {
 
                 done();
             });
-            wsstream.writeFrameState.fin = true;
-            wsstream.writeFrameState.mask = true;
-            wsstream.writeFrameState.opcode = 0x02;
-            wsstream.writeFrameState.masking = masking;
+            wsstream.writeHead({ fin: true, mask: true });;
+            wsstream.writeHead({ opcode: 0x02, masking: masking });;
             wsstream.write(content);
         });
 

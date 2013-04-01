@@ -12,6 +12,30 @@ describe('WebSocketStream', function() {
 
     describe('writing head bytes', function() {
 
+        it('should use common settings as default', function(done) {
+            msocket.once('data', function(chunk) {
+                var fin = chunk[0] & 0x80;
+                var mask = chunk[1] & 0x80;
+                var rsv1 = chunk[0] & 0x40;
+                var rsv2 = chunk[0] & 0x20;
+                var rsv3 = chunk[0] & 0x10;
+                var opcode = chunk[0] & 0x0f;
+                var length = chunk[1] & 0x7f;
+
+                fin.should.equal(0x80);
+                mask.should.equal(0x00);
+                rsv1.should.equal(0x00);
+                rsv2.should.equal(0x00);
+                rsv3.should.equal(0x00);
+                opcode.should.equal(0x01);
+                length.should.equal(0x00);
+                chunk.length.should.equal(2);
+                
+                done();
+            });
+            wsstream.write(new Buffer(0));
+        });
+
         it('should set fin bit', function(done) {
             msocket.once('data', function(chunk) {
                 var fin = chunk[0] & 0x80;
