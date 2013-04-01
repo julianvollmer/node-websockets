@@ -1,6 +1,6 @@
 var stream = require('stream');
 
-var WebSocket = require('../../lib/stream');
+var WebSocket = require('../../lib/socket');
 
 describe('WebSocket', function() {
 

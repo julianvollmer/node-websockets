@@ -1,5 +1,6 @@
-var WebSocket = require('../../lib/stream');
 var MockupSocket = require('./msocket');
+
+var WebSocket = require('../../lib/socket');
 
 describe('WebSocket', function() {
 
@@ -22,7 +23,7 @@ describe('WebSocket', function() {
                 head.opcode.should.equal(0x01);
                 head.length.should.equal(0x05);
             });
-            wssocket.once('fend', function() {
+            wssocket.once('done', function() {
                 body = wssocket.read();
                 body.toString().should.equal('Hello');
 
