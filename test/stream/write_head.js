@@ -21,7 +21,7 @@ describe('WebSocketStream', function() {
                 
                 done();
             });
-            wsstream.writeFrameState.fin = true;
+            wsstream.writeHead({ fin: true });
             wsstream.write(new Buffer(0));
         });
 
@@ -34,7 +34,7 @@ describe('WebSocketStream', function() {
                 
                 done();
             });
-            wsstream.writeFrameState.fin = false;
+            wsstream.writeHead({ fin: false });
             wsstream.write(new Buffer(0));
         });
 
@@ -47,7 +47,7 @@ describe('WebSocketStream', function() {
                 
                 done();
             });
-            wsstream.writeFrameState.mask = true;
+            wsstream.writeHead({ mask: true });
             wsstream.write(new Buffer(0));
         });
 
@@ -60,7 +60,7 @@ describe('WebSocketStream', function() {
                 
                 done();
             });
-            wsstream.writeFrameState.mask = false;
+            wsstream.writeHead({ mask: false });
             wsstream.write(new Buffer(0));
         });
 
@@ -73,7 +73,7 @@ describe('WebSocketStream', function() {
                 
                 done();
             });
-            wsstream.writeFrameState.opcode = 0x00;
+            wsstream.writeHead({ opcode: 0x00 });
             wsstream.write(new Buffer(0));
         });
 
@@ -86,7 +86,7 @@ describe('WebSocketStream', function() {
                 
                 done();
             });
-            wsstream.writeFrameState.opcode = 0x0a;
+            wsstream.writeHead({ opcode: 0x0a });
             wsstream.write(new Buffer(0));
         });
     
@@ -99,6 +99,7 @@ describe('WebSocketStream', function() {
                 
                 done();
             });
+            wsstream.writeHead({ length: 0 });
             wsstream.write(new Buffer(0));
         });
     
@@ -107,11 +108,12 @@ describe('WebSocketStream', function() {
                 var length = chunk[1] & 0x7f;
                 
                 length.should.equal(125);
-                chunk.length.should.equal(127);
+                chunk.length.should.equal(2);
                 
                 done();
             });
-            wsstream.write(new Buffer(125));
+            wsstream.writeHead({ length: 125 });
+            wsstream.write(new Buffer(0));
         });
 
         it('should set length to 126', function(done) {
@@ -121,11 +123,12 @@ describe('WebSocketStream', function() {
 
                 hlength.should.equal(126);
                 plength.should.equal(126);
-                chunk.length.should.equal(130);
+                chunk.length.should.equal(4);
                 
                 done();
             });
-            wsstream.write(new Buffer(126));
+            wsstream.writeHead({ length: 126 });
+            wsstream.write(new Buffer(0));
         });
     
         it('should set length to 127', function(done) {
@@ -135,11 +138,12 @@ describe('WebSocketStream', function() {
 
                 hlength.should.equal(126);
                 plength.should.equal(127);
-                chunk.length.should.equal(131);
+                chunk.length.should.equal(4);
                 
                 done();
             });
-            wsstream.write(new Buffer(127));
+            wsstream.writeHead({ length: 127 });
+            wsstream.write(new Buffer(0));
         });
         
         it('should set length to 65535', function(done) {
@@ -149,11 +153,12 @@ describe('WebSocketStream', function() {
 
                 hlength.should.equal(126);
                 plength.should.equal(65535);
-                chunk.length.should.equal(65539);
+                chunk.length.should.equal(4);
                 
                 done();
             });
-            wsstream.write(new Buffer(65535));
+            wsstream.writeHead({ length: 65535 });
+            wsstream.write(new Buffer(0));
         });
     
         it('should set length to 65536', function(done) {
@@ -163,16 +168,17 @@ describe('WebSocketStream', function() {
 
                 hlength.should.equal(127);
                 plength.should.equal(65536);
-                chunk.length.should.equal(65546);
+                chunk.length.should.equal(10);
                 
                 done();
             });
-            wsstream.write(new Buffer(65536));
+            wsstream.writeHead({ length: 65536 });
+            wsstream.write(new Buffer(0));
         });
 
         // exceeds v8 object limit (the buffer)
         // TODO: throw error check
-        xit('should set length to 4294967295', function(done) {
+        it('should set length to 4294967295', function(done) {
             msocket.once('data', function(chunk) {
                 var hlength = chunk[1] & 0x7f;
                 var plength = chunk.readUInt32BE(6);
@@ -183,7 +189,8 @@ describe('WebSocketStream', function() {
                 
                 done();
             });
-            wsstream.write(new Buffer(4294967295));
+            wsstream.writeHead({ length: 4294967295 });
+            wsstream.write(new Buffer(0));
         });
 
         it('should have masking bytes, length == 125', function(done) {
@@ -191,12 +198,12 @@ describe('WebSocketStream', function() {
                 var length = chunk[1] & 0x7f;
 
                 length.should.equal(125);
-                chunk.length.should.equal(131);
+                chunk.length.should.equal(6);
                 
                 done();
             });
-            wsstream.writeFrameState.mask = true;
-            wsstream.write(new Buffer(125));
+            wsstream.writeHead({ mask: true, length: 125 });
+            wsstream.write(new Buffer(0));
         });
 
         it('should have masking bytes, length == 65535', function(done) {
@@ -206,12 +213,12 @@ describe('WebSocketStream', function() {
 
                 hlength.should.equal(126);
                 plength.should.equal(65535);
-                chunk.length.should.equal(65543);
+                chunk.length.should.equal(8);
                 
                 done();
             });
-            wsstream.writeFrameState.mask = true;
-            wsstream.write(new Buffer(65535));
+            wsstream.writeHead({ mask: true, length: 65535 });
+            wsstream.write(new Buffer(0));
         });
 
         it('should have masking bytes, length == 65536', function(done) {
@@ -221,12 +228,26 @@ describe('WebSocketStream', function() {
 
                 hlength.should.equal(127);
                 plength.should.equal(65536);
-                chunk.length.should.equal(65550);
+                chunk.length.should.equal(14);
                 
                 done();
             });
-            wsstream.writeFrameState.mask = true;
-            wsstream.write(new Buffer(65536));
+            wsstream.writeHead({ mask: true, length: 65536 });
+            wsstream.write(new Buffer(0));
+        });
+
+        it('should use masking bytes from head', function(done) {
+            msocket.once('data', function(chunk) {
+                var length = chunk[1] & 0x7f;
+                var masking = chunk.slice(2);
+
+                chunk.length.should.equal(6);
+                masking.toString('base64').should.equal('cyrADw==');
+
+                done();
+            });
+            wsstream.writeHead({ mask: true, masking: new Buffer([0x73, 0x2a, 0xc0, 0x0f]) });
+            wsstream.write(new Buffer(0));
         });
 
     });
