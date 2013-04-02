@@ -1,8 +1,12 @@
 check: test
 
-test: test-frame test-socket test-upgrade test-base test-server test-client
+test: test-parser test-socket test-upgrade test-base test-server test-client
 
 MOCHA_FLAGS = --require should
+
+test-parser:
+	./node_modules/.bin/mocha \
+        $(MOCHA_FLAGS) test/parser/*.js
 
 test-socket:
 	./node_modules/.bin/mocha \

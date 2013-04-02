@@ -9,7 +9,7 @@ describe('WebSocketParser', function() {
         chunk = null;
     });
 
-    describe('#writeHeadBytes(state, [chunk])', function() {
+    describe('#writeHeadBytes(state)', function() {
  
         it('should set fin flag', function() {
             state.fin = true;
@@ -44,11 +44,6 @@ describe('WebSocketParser', function() {
             state.opcode = 0x0a;
             chunk = parser.writeHeadBytes(state);
             chunk.toString('base64').should.equal('CgA=');
-        });
-
-        it('should use chunk.length if defined', function() {
-            chunk = parser.writeHeadBytes(state, new Buffer(8));
-            chunk.toString('base64').should.equal('AAg=');
         });
 
         it('should set length to 125', function() {
