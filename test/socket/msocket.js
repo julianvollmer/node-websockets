@@ -12,7 +12,6 @@ MockupSocket.prototype._read = function() {
 };
 
 MockupSocket.prototype._write = function(chunk, encoding, done) {
-    this.push(chunk);
     this.emit('data', chunk);
 
     done(null);
