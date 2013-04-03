@@ -90,6 +90,33 @@ describe('WebSocket', function() {
 
         describe('Event: "done"', function() {
 
+            it('should be emitted after frame body', function(done) {
+                var frameHead = new Buffer([0x82, 0x7e, 0x01, 0x00]);
+                var frameBody = crypto.randomBytes(0xff);
+
+                msocket.push(frameHead);
+                msocket.push(frameBody);
+
+                wssocket.once('done', function() {
+                    done();
+                });
+
+                msocket.push(new Buffer('z'));
+            });
+
+            it('should be emitted after frame stream', function(done) {
+                var frameOne = new Buffer([0x01, 0x02, 0x48, 0x65]);
+                var frameTwo = new Buffer([0x80, 0x03, 0x6c, 0x6c, 0x6f]);
+
+                msocket.push(frameOne);
+
+                wssocket.once('done', function() {
+                    done();
+                });
+
+                msocket.push(frameTwo);
+            });
+
         });
 
         describe('Event: "readable"', function() {
