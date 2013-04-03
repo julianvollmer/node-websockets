@@ -83,8 +83,10 @@ describe('WebSocket', function() {
             });
 
         });
-        
+
         it('should stream some randomBytes', function(done) {
+            wssocket = new WebSocket(msocket, { opcode: 0x02 });
+
             var counter = 0;
             var payload = crypto.randomBytes(2000);
 
@@ -116,15 +118,10 @@ describe('WebSocket', function() {
                 counter++;
             });
 
-            wssocket.opcode = 0x02;
             wssocket.write(new Buffer(payload.slice(000, 500)));
             wssocket.write(new Buffer(payload.slice(500, 1000)));
             wssocket.write(new Buffer(payload.slice(1000, 1500)));
-            // BUG/TODO: calling wssocket writeEnd without setTimeout  send 
-            // the frame as second so the frame order gets messed up
-            setTimeout(function() {
-                wssocket.writeEnd(new Buffer(payload.slice(1500, 2000)));
-            }, 0);
+            wssocket.writeEnd(new Buffer(payload.slice(1500, 2000)));
         });
 
     });
