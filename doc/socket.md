@@ -1,100 +1,94 @@
 # WebSocket
 
-    Stability: 2 - Unstable
-    
+    Stability: 1 - Experimental; 
+    There will be changes in the internal architecture and in the behavior of 
+    some methods in the future (especially around the reading part).
+
+Access this module with `require('websockets').Socket`
+
 ## Class: WebSocket
 
-The WebSocket class wraps around a `Socket` instance and provides WebSocket 
-specific method and event support. An instance of it is passed around on all events
-of `WebSocketBase` to handle direct endpoint communication.
+The WebSocket class inherits from `stream.Duplex`. It wraps an instance of 
+`net.Socket` or similar source and will parse all incoming data on each 
+`readable` event of the source. You also can write data to the stream which
+is decoded as WebSocketFrame and sent through the source.
 
-### new WebSocket(socket, [options])
-
-Example:
-
-    var wssocket = new WebSocket(socket, { mask: true });
-
-* `socket`, Socket, Instance of a node socket (for example from http `upgrade` event)
-* `options`, Object, Optional
-    * `mask`, Boolean, Determinates if frames should be masked, Default: `false`
-    * `timeout`, Number, Time in ms when an idling socket is closed, Default: `600000`
-    * `extensions`, Object, Collection of WebSocket extensions added to the parse chain
-
-Will return a new instance of `WebSocket`. In most use-cases there will be no
-need to create an instance manuel. An instance is automatically created on upgrade
-process and passed to all common events of `WebSocketBase`.
-
-### wssocket.send(message)
+### new WebSocket(source, [options])
 
 Example:
 
-    wssocket.send('Hello World.');
-    wssocket.send(new Buffer([0x01, 0x02, 0x03]));
+    var wsserver = new WebSocket(source, { mask: true });
 
-* `message`, String or Buffer
+* `source`, Duplex, preferable a `socket`    
+* `options`, Object, option hash
+    * `mask`, Boolean, overwrites the default value of `false`
+    * `opcode`, Number, `0x01` for utf8 and `0x02` for binary mode
 
-This will send a text frame if argument is a `String` or a binary frame if argument
-is a `Buffer` through the socket.
+Will bind to the source`s `readable` and `end` event and set
+up some internal flags, instances.
 
-### wssocket.ping([body])
+### wssocket.read()
 
 Example:
 
-    wssocket.ping();
-    // or
-    wssocket.ping('abc');
+    wssocket.on('readable', function() {
+        console.log(wssocket.read().toString());
+    });
 
-Will send a ping frame through the socket. On proper implementation a pong frame
-should emediatly be sent as response. The pong frame is registered as `pong` event.
+`read()` will pull all available body chunk out of `wssocket`. The `readable` 
+event tells us when there is chunk to read.
 
-### wssocket.close([reason])
+### wssocket.writeHead({ mask: true, opcode: 0x02 })
 
 Example:
     
-    wssocket.close();
-    // or
-    wssocket.close('session expired');
+    wssocket.writeHead({ fin: true, mask: true });
+        wssocket.writeHead({ opcode: 0x02, length: 0x05 });
 
-Will close the socket after a close frame was sent. The close frame may contain
-a reason description in payload. This method will trigger a `close` Event.
+* `options`, Object
+    * `fin`, Boolean, final frame (default: false)
+    * `mask`, Boolean, masked frame (default: false or options.mask)
+    * `opcode`, Number, frame opcode (default: 0x01)
+    * `length`, Number, frame length (default: chunk.length)
+    * `masking`, Buffer, masking buffer (default: random)
 
-### Event: 'message'
+Sets the head of the frame we are currently writting. NOTE: If you set
+`masking` to a four-byte buffer it will set `mask` automatically to `true`.
 
-    function(message) { }
+### wsserver.write(chunk)
 
-A `message` event is emitted each time a text or binary frame is received.
-On text frames the payload is passed as string whereas on binary frames the
-payload is passed as a `Buffer`. As you see it can be hard to handle both
-binary and text frame over one event so there may be an api change in feature.
+Example:
 
-### Event: 'custom'
+    wssocket.on('readable', function() {
+        wssocket.writeHead({ fin: true, opcode: 0x02 });
+        wssocket.write(wssocket.read());
+    });
 
-    function(name, [arguments...]) { }
+* `chunk`, Buffer, chunk you want to write to socket
 
-A `custom` event can be used by extensions to tunnel custom events to the parent
-class (e.g. `WebSocketBase`). The first parameter is the real event name which
-will be emitted on the parent class with the following arguments.
+The above example pipes all incoming frame bodies to the socket.
+When the frame has been fully parsed it will also end the write stream.
+This can be useful if you handle large data streams which are chunked by the 
+socket.
 
-### Event: 'pong'
+### Event: 'head'
 
-    function(body) { }
+Example:
+    
+    wssocket.on('head', function(head) {
+        if (head.opcode == 0x02)
+            console.log('we are getting some binaries');
+        if (head.stream)
+            console.log('this is a stream of frames');
+    });
 
-Each time a ping frame is received we will sent a pong frame as response and emit
-a `pong` event.
+The `head` event gives you basic information about what we are receiving but
+more than that it tells us when a new frame is incoming.
 
-### Event: 'close'
+### Event: 'done'
 
-    function(reason) { }
+Is emitted when the stream has fully parsed the payload of a final frame.
 
-Each time the socket closes a `close` Event is emitted. This can be when receiving
-a close frame or when closing the connection with `wssocket.close()`. If the received
-close frame contains a payload this will be interpreted as reason and passed as argument.
+### Event: 'readable'
 
-### Event: 'error'
-
-    function(err) { }
-
-An `error` event is emitted when an error occours. The idea is that you can do you own
-error handling (either strict or loose) but until now the `error` event is not supported
-through the whole application. Also sometimes the passed `err` is either a `String` or
-a `Error` object. Here is a lot to do in feature.
+Is emitted when there is new payload chunk to read.

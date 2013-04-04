@@ -1,7 +1,7 @@
 var http = require('http');
 var websockets = require('../lib');
 
-var httpServer = new http.createServer();
+var httpServer = http.createServer();
 var wsserver = new websockets.Server();
 
 httpServer.on('request', function(req, res) {
@@ -10,17 +10,16 @@ httpServer.on('request', function(req, res) {
 });
 
 wsserver.on('open', function(wssocket) {
-    wssocket.send('Hello new Socket.');
-    wsserver.broadcast('Let us greet the new Socket.');
+    wssocket.writeHead({ fin: true, opcode: 0x01 });
+    wssocket.write(new Buffer('Hello new Socket.'));
+    wsserver.broadcast(
+        { fin: true, opcode: 0x01 }, 
+        new Buffer('Let us greet the new Socket.')
+    );
 });
 
-wsserver.on('close', function(reason, wssocket) {
-    wsserver.broadcast(wssocket.index + ' has left us.');
-});
-
-wsserver.on('message', function(message, wssocket) {
-    wssocket.send('Have received your message:' + message);
-    wsserver.broadcast(wssocket.index + ' has sent ' + message);
+wsserver.on('message', function(chunk, wssocket) {
+    console.log(chunk.toString());
 });
 
 wsserver.listen(httpServer);

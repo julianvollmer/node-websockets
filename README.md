@@ -1,6 +1,11 @@
 # node-websockets
 
-a simple, fundamental implementation of the websocket protocol which supports easy extension handling
+a simple, fundamental implementation of the websocket protocol (RFC 6455) which
+is built stream based in order to take advantage of nodejs async event loop.
+
+*NOTE*: There will be a lot of changes going on the next few days for example
+I will code a `WebSocketRequest` and `WebSocketResponse` object to simplify
+writing frame streams. Also you can very easily pipe incoming data around.
 
 ## Snippet
 
@@ -17,13 +22,17 @@ var wsserver = new websockets.Server();
 
 // send hello when someone connects
 wsserver.on('open', function(wssocket) {
-    wssocket.send('Hello new Client!');
-    wsserver.broadcast('New Client has connected!');
+    wssocket.writeHead({ fin: true, opcode: 0x01 }));
+    wssocket.write(new Buffer('Hello new Client ' + wssocket.id));
+    wsserver.broadcast({ fin: true, opcode: 0x01 }, 'New Client has connected!');
 });
 
 // log the received message
 wsserver.on('message', function(message, wssocket) {
-    wsserver.broadcast(util.format('Client #%d says: %s', wssocket.index, message));
+    wsserver.broadcast(
+        { fin: true, opcode: 0x01 },
+        util.format('Client #%d says: %s', wssocket.index, message)
+    );
 });
 
 // bind to http server
