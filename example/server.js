@@ -10,8 +10,12 @@ httpServer.on('request', function(req, res) {
 });
 
 wsserver.on('open', function(wssocket) {
-    wssocket.writeEnd(new Buffer('Hello new Socket.'));
-    wsserver.broadcast(new Buffer('Let us greet the new Socket.'));
+    wssocket.writeHead({ fin: true, opcode: 0x01 });
+    wssocket.write(new Buffer('Hello new Socket.'));
+    wsserver.broadcast(
+        { fin: true, opcode: 0x01 }, 
+        new Buffer('Let us greet the new Socket.')
+    );
 });
 
 wsserver.on('message', function(chunk, wssocket) {
