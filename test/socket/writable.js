@@ -14,162 +14,138 @@ describe('WebSocket', function() {
 
     describe('Writable', function() {
 
-        describe('#setOpcode(opcode)', function() {
-        
-            it('should change the opcode', function(done) {
-                msocket.once('data', function(chunk) {
-                    chunk[0].should.equal(0x82);
-                    chunk[1].should.equal(0x32);
-                    done();
-                });
-                
-                wssocket.setOpcode(0x02);
-                wssocket.writeEnd(crypto.randomBytes(50));
+        describe('#writeHead(options)', function() {
+
+            it('should set fin flag', function() {
+                wssocket.writeHead({ fin: true });
+                wssocket._frameWriteState.fin.should.be.true;
             });
 
-            it('should not change opcode if reserved', function(done) {
-                msocket.once('data', function(chunk) {
-                    chunk[0].should.equal(0x81);
-                    chunk[1].should.equal(0x32);
-                    done();
-                });
-                
-                wssocket.setOpcode(0x04);
-                wssocket.writeEnd(crypto.randomBytes(50));
+            it('should set rsv1 flag', function() {
+                wssocket.writeHead({ rsv1: true });
+                wssocket._frameWriteState.rsv1.should.be.true;
             });
 
-            it('should not change opcode while in a stream', function(done) {
-                var counter = 0;
-                msocket.on('data', function(chunk) {
-                    switch (counter) {
-                        case 0:
-                            chunk[0].should.equal(0x01);
-                            chunk[1].should.equal(0x32);
-                            break;
-                        case 1:
-                            chunk[0].should.equal(0x80);
-                            chunk[1].should.equal(0x32);
-                            done();
-                            break;
-                    }
-                    counter++;
-                });
-                
-                wssocket.write(crypto.randomBytes(50));
-                wssocket.setOpcode(0x04);
-                wssocket.writeEnd(crypto.randomBytes(50));
+            it('should set rsv2 flag', function() {
+                wssocket.writeHead({ rsv2: true });
+                wssocket._frameWriteState.rsv2.should.be.true;
+            });
+
+            it('should set rsv3 flag', function() {
+                wssocket.writeHead({ rsv3: true });
+                wssocket._frameWriteState.rsv3.should.be.true;
+            });
+
+            it('should set mask flag', function() {
+                wssocket.writeHead({ mask: true });
+                wssocket._frameWriteState.mask.should.be.true;
+            });
+
+            it('should set opcode to 0x00', function() {
+                wssocket.writeHead({ opcode: 0x00 });
+                wssocket._frameWriteState.opcode.should.equal(0x00);
+            });
+            
+            it('should set opcode to 0x0a', function() {
+                wssocket.writeHead({ opcode: 0x0a });
+                wssocket._frameWriteState.opcode.should.equal(0x0a);
+            });
+
+            it('should set masking to 0x7e 0xdf 0x20 0xf5', function() {
+                var masking = new Buffer([0x7e, 0xdf, 0x20, 0xf5]);
+                wssocket.writeHead({ masking: masking });
+                wssocket._frameWriteState.mask.should.be.true;
+                wssocket._frameWriteState.masking.should.eql(masking);
             });
 
         });
 
         describe('#write(chunk)', function() {
 
-            it('should write first part of a frame stream', function(done) {
-                msocket.once('data', function(frame) {
-                    frame[0].should.equal(0x01);
-                    frame[1].should.equal(0x01);
-                    frame[2].should.equal(0x48);
-
+            it('should send an empty text frame', function(done) {
+                msocket.once('data', function(chunk) {
+                    chunk[0].should.equal(0x81);
+                    chunk[1].should.equal(0x00);
+                    chunk.length.should.equal(2);
                     done();
                 });
-                wssocket.write(new Buffer('H'));
+                wssocket.writeHead({ fin: true, opcode: 0x01 });
+                wssocket.write(new Buffer(0));
             });
 
-            it('should write some fragment of a frame stream', function(done) {
-                var counter = -1;
-                msocket.on('data', function(frame) {
+            it('should send a text frame with "Hello"', function(done) {
+                msocket.once('data', function(chunk) {
+                    chunk[0].should.equal(0x81);
+                    chunk[1].should.equal(0x05);
+                    chunk[2].should.equal(0x48);
+                    chunk[3].should.equal(0x65);
+                    chunk[4].should.equal(0x6c);
+                    chunk[5].should.equal(0x6c);
+                    chunk[6].should.equal(0x6f);
+                    chunk.length.should.equal(7);
+                    done();
+                });
+                wssocket.writeHead({ fin: true, opcode: 0x01 });
+                wssocket.write(new Buffer('Hello'));
+            });
+
+            it('should send a large binary frame', function(done) {
+                var payload = crypto.randomBytes(127);
+                msocket.once('data', function(chunk) {
+                    chunk[0].should.equal(0x82);
+                    chunk[1].should.equal(0x7e);
+                    chunk[2].should.equal(0x00);
+                    chunk[3].should.equal(0x7f);
+                    chunk.length.should.equal(131);
+                    chunk.slice(4).should.eql(payload);
+                    done();
+                });
+                wssocket.writeHead({ fin: true, opcode: 0x02 });
+                wssocket.write(payload);
+            });
+
+            it('should send a stream of text frames', function(done) {
+                var counter = 0;
+                msocket.on('data', function(chunk) {
                     switch (counter) {
                         case 0:
-                            frame[0].should.equal(0x00);
-                            frame[1].should.equal(0x02);
-                            frame[2].should.equal(0x65);
-                            frame[3].should.equal(0x6c);
+                            chunk[0].should.equal(0x01);
+                            chunk[1].should.equal(0x05);
+                            chunk.slice(2).should.eql(new Buffer('Hello'));
                             break;
                         case 1:
-                            frame[0].should.equal(0x00);
-                            frame[1].should.equal(0x02);
-                            frame[2].should.equal(0x6c);
-                            frame[3].should.equal(0x6f);
+                            chunk[0].should.equal(0x00);
+                            chunk[1].should.equal(0x05);
+                            chunk.slice(2).should.eql(new Buffer('World'));
+                            break;
+                        case 2:
+                            chunk[0].should.equal(0x00);
+                            chunk[1].should.equal(0x05);
+                            chunk.slice(2).should.eql(new Buffer('Sugar'));
+                            break;
+                        case 3:
+                            chunk[0].should.equal(0x80);
+                            chunk[1].should.equal(0x04);
+                            chunk.slice(2).should.eql(new Buffer('Salt'));
                             done();
                             break;
                     }
                     counter++;
                 });
 
-                wssocket.write(new Buffer('H'));
-                wssocket.write(new Buffer('el'));
-                wssocket.write(new Buffer('lo'));
+                wssocket.writeHead({ fin: false, opcode: 0x01 });
+                wssocket.write(new Buffer('Hello'));
+
+                wssocket.writeHead({ fin: false, opcode: 0x00 });
+                wssocket.write(new Buffer('World'));
+                
+                wssocket.writeHead({ fin: false, opcode: 0x00 });
+                wssocket.write(new Buffer('Sugar'));
+                
+                wssocket.writeHead({ fin: true, opcode: 0x00 });
+                wssocket.write(new Buffer('Salt'));
             });
 
-        });
-
-        describe('#writeEnd([chunk])', function() {
-
-            it('should write an empty fin frame', function(done) {
-                msocket.once('data', function(frame) {
-                    frame[0].should.equal(0x81);
-                    frame[1].should.equal(0x00);
-
-                    done();
-                });
-                wssocket.writeEnd();
-            });
-
-            it('should write an simple text fin frame', function(done) {
-                msocket.once('data', function(frame) {
-                    frame[0].should.equal(0x81);
-                    frame[1].should.equal(0x05);
-                    frame[2].should.equal(0x48);
-                    frame[3].should.equal(0x65);
-                    frame[4].should.equal(0x6c);
-                    frame[5].should.equal(0x6c);
-                    frame[6].should.equal(0x6f);
-
-                    done();
-                });
-                wssocket.writeEnd(new Buffer('Hello'));
-            });
-
-        });
-
-        it('should stream some randomBytes', function(done) {
-            wssocket = new WebSocket(msocket, { opcode: 0x02 });
-
-            var counter = 0;
-            var payload = crypto.randomBytes(2000);
-
-            msocket.on('data', function(frame) { 
-                var offset = counter * 500;
-                var length = offset + 500;
-                var body = payload.slice(offset, length);
-
-                switch (counter) {
-                    case 0:
-                        var head = new Buffer([0x02, 0x7e, 0x01, 0xf4]);
-                        frame.should.eql(Buffer.concat([head, body]));
-                        break;
-                    case 1:
-                        var head = new Buffer([0x00, 0x7e, 0x01, 0xf4]);
-                        frame.should.eql(Buffer.concat([head, body]));
-                        break;
-                    case 2:
-                        var head = new Buffer([0x00, 0x7e, 0x01, 0xf4]);
-                        frame.should.eql(Buffer.concat([head, body]));
-                        break;
-                    case 3:
-                        var head = new Buffer([0x80, 0x7e, 0x01, 0xf4]);
-                        frame.should.eql(Buffer.concat([head, body]));
-                        done();
-                        break;
-                }
-
-                counter++;
-            });
-
-            wssocket.write(new Buffer(payload.slice(000, 500)));
-            wssocket.write(new Buffer(payload.slice(500, 1000)));
-            wssocket.write(new Buffer(payload.slice(1000, 1500)));
-            wssocket.writeEnd(new Buffer(payload.slice(1500, 2000)));
         });
 
     });
