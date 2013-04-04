@@ -20,4 +20,6 @@ MockupSocket.prototype._write = function(chunk, encoding, done) {
     done(null);
 };
 
+MockupSocket.prototype.setTimeout = function() {};
+
 module.exports = MockupSocket;

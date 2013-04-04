@@ -1,6 +1,4 @@
 var MockupSocket = require('../mockup/socket');
-
-var WebSocketFrame = require('../../lib/frame');
 var WebSocketServer = require('../../lib/server');
 
 describe('WebSocketServer', function() {
@@ -16,46 +14,43 @@ describe('WebSocketServer', function() {
     });
 
     describe('#broadcast(message)', function() {
+
         it('should send a text frame to both assigned sockets', function(done) {
-            msocketOne.once('data', function(data) {
-                var wsframe = new WebSocketFrame(data);
-                wsframe.fin.should.be.true;
-                wsframe.mask.should.be.false;
-                wsframe.opcode.should.equal(0x01);
-                wsframe.length.should.equal(0x0d);
-                wsframe.getContent().toString().should.equal('Hello Sockets');
+            msocketOne.once('data', function(chunk) {
+                chunk[0].should.equal(0x81);
+                chunk[1].should.equal(0x03);
+                chunk[2].should.equal(0x48);
+                chunk[3].should.equal(0x65);
+                chunk[4].should.equal(0x79);
             });
-            msocketTwo.once('data', function(data) {
-                var wsframe = new WebSocketFrame(data);
-                wsframe.fin.should.be.true;
-                wsframe.mask.should.be.false;
-                wsframe.opcode.should.equal(0x01);
-                wsframe.length.should.equal(0x0d);
-                wsframe.getContent().toString().should.equal('Hello Sockets');
+            msocketTwo.once('data', function(chunk) {
+                chunk[0].should.equal(0x81);
+                chunk[1].should.equal(0x03);
+                chunk[2].should.equal(0x48);
+                chunk[3].should.equal(0x65);
+                chunk[4].should.equal(0x79);
                 done();
             });
-            wsserver.broadcast('Hello Sockets');
+            wsserver.broadcast({ fin: true, opcode: 0x01 }, new Buffer('Hey'));
         });
+
         it('should send a binary frame to both assinged sockets', function(done) {
-            msocketOne.once('data', function(data) {
-                var wsframe = new WebSocketFrame(data);
-                wsframe.fin.should.be.true;
-                wsframe.mask.should.be.false;
-                wsframe.opcode.should.equal(0x02);
-                wsframe.length.should.equal(0x03);
-                wsframe.getContent().toString().should.equal('\u0001\u0002\u0003');
+            msocketOne.once('data', function(chunk) {
+                chunk[0].should.equal(0x82);
+                chunk[1].should.equal(0x02);
+                chunk[2].should.equal(0x01);
+                chunk[3].should.equal(0x02);
             });
-            msocketTwo.once('data', function(data) {
-                var wsframe = new WebSocketFrame(data);
-                wsframe.fin.should.be.true;
-                wsframe.mask.should.be.false;
-                wsframe.opcode.should.equal(0x02);
-                wsframe.length.should.equal(0x03);
-                wsframe.getContent().toString().should.equal('\u0001\u0002\u0003');
+            msocketTwo.once('data', function(chunk) {
+                chunk[0].should.equal(0x82);
+                chunk[1].should.equal(0x02);
+                chunk[2].should.equal(0x01);
+                chunk[3].should.equal(0x02);
                 done();
             });
-            wsserver.broadcast(new Buffer([0x01, 0x02, 0x03]));
+            wsserver.broadcast({ fin: true, opcode: 0x02 }, new Buffer([0x01, 0x02]));
         });
+    
     });
 
 });

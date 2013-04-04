@@ -1,13 +1,15 @@
 # WebSocketServer
 
-    Stability: 3 - Stable; 
-    There will only be small api changes in future.
+    Stability: 1 - Experimental; 
+    Theere will be changes about the message event.
 
 Access this module with `require('websockets').Server`
 
 ## Class: WebSocketServer
 
-Extends `WebSocketBase` with `WebSocketUpgrade` to server WebSocket connections.
+The `WebSocketServer` class handles multiple WebSocket connections. It uses
+internally `WebSocketUpgrade` for http upgrade process and `WebSocket` for
+parsing and reading WebSocket frames.
 
 ### new WebSocketServer([options])
 
@@ -15,13 +17,71 @@ Example:
 
     var wsserver = new WebSocketServer({ maxConnections: 4 });
 
-* `options`, Object, Optional options hash which overwrites internal parameters.
-    * `url`, String, Url which the server will listen on upgrades, Default: `ws://localhost:3000`
-    * `timeout`, Number, Timeout in ms for idling sockets, Default: `600000`
-    * `extensions`, Object, See [wsbase.extensions](https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md#wsbaseextensions) for more, Default: none
-    * `maxConnections`, Number, Amount of sockets which can be conencted, Default: `10`
+* `options`, Object, Options hash.
+    * `url`, String, Url server will listen to, Default: `ws://localhost:3000`.
+    * `timeout`, Number, Timeout in ms for idling sockets, Default: `600000`.
+    * `maxConnections`, Number, Max amount of concurrent connections, Default: `10`.
 
 Returns an instance of `WebSocketServer`.
+
+### Event: 'open'
+
+Example:
+
+    wsserver.on('open', function(wssocket) {
+        wssocket.send('Hello new WebSocket.');
+    });
+
+Emitted each time a new socket is assigned. The invoked `WebSocket` instance is 
+passed as parameter for direct communication.
+
+### Event: 'pong'
+
+Example:
+
+    wsserver.on('pong', function(message, wssocket) {
+        wssocket.send('You have pinged me?');
+    });
+
+Emitted when a pong frame is send (after a ping request). `message` is the 
+frame payload as string and `wssocket` the instance of the endpoint.
+
+### Event: 'close'
+
+Example:
+
+    wsserver.on('close', function(code, wssocket) {
+        console.log(wssocket.id + ':' + code);
+    });
+
+Emitted when a WebSocket connection closes. Passes a closing code and the 
+leaving `wssocket` instance as arguments. `wssocket` will be removed out of 
+socket storage.
+
+### Event: 'error'
+
+Example:
+
+    wsserver.on('error', function(error) {
+        // just log it
+        console.log(error);
+    });
+
+Emitted when an error happens (e.g. too big frame, invalid frame encoding).
+`error` should be an instance of `Error` the developer can decided how to 
+proceed.
+
+### Event: 'message'
+
+Example:
+
+    wsbase.on('message', function(message, wssocket) {
+        wssocket.send('You have sent me ' + message);
+    });
+
+Emitted each time a text frame is received. `message` is the payload as string 
+if we have a text frame or a buffer if we have a binary frame. `wssocket` is the 
+instance of `WebSocketSocket` which has sent us the messsage.
 
 ### wsserver.listen(server)
 
@@ -34,26 +94,14 @@ Example:
 
 Uses an instance of `http.Server` to bind to upgrade requests.
 
-### wsserver.broadcast(message)
+### wsserver.broadcast(head, message)
 
 Example:
 
-    wsserver.broadcast('This message is for all my clients.');
+    wsserver.broadcast(
+            { fin: true, opcode: 0x01 }, 
+            new Buffer('This message is for all my clients.')
+    );
 
-Broadcasts a `String` or `Buffer` as message frame to all connected sockets.
-
-### Event: 'open'
-
-Check [WebSocketBase: Events: 'open'](https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md#event-open) for more.
-
-### Event: 'close'
-
-Check [WebSocketBase: Events: 'close'](https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md#event-close) for more.
-
-### Event: 'error'
-
-Check [WebSocketBase: Events: 'error'](https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md#event-error) for more.
-
-### Event: 'message'
-
-Check [WebSocketBase: Events: 'message'](https://github.com/bodokaiser/node-websockets/blob/master/doc/base.md#event-message) for more.
+Broadcasts a `message` buffer through all connected sockets. In the `head` we
+define the flag we set in the head bytes. This is strictly required.
