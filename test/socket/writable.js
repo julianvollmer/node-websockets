@@ -1,18 +1,66 @@
 var crypto = require('crypto');
 
-var MSocket = require('./msocket');
 var WebSocket = require('../../lib/socket');
+var MockupSocket = require('../mockup/socket');
 
 describe('WebSocket', function() {
 
     var msocket, wssocket;
 
     beforeEach(function() {
-        msocket = new MSocket();
+        msocket = new MockupSocket();
         wssocket = new WebSocket(msocket);
     });
 
     describe('Writable', function() {
+
+        describe('#setOpcode(opcode)', function() {
+        
+            it('should change the opcode', function(done) {
+                msocket.once('data', function(chunk) {
+                    chunk[0].should.equal(0x82);
+                    chunk[1].should.equal(0x32);
+                    done();
+                });
+                
+                wssocket.setOpcode(0x02);
+                wssocket.writeEnd(crypto.randomBytes(50));
+            });
+
+            it('should not change opcode if reserved', function(done) {
+                msocket.once('data', function(chunk) {
+                    chunk[0].should.equal(0x81);
+                    chunk[1].should.equal(0x32);
+                    done();
+                });
+                
+                wssocket.setOpcode(0x04);
+                wssocket.writeEnd(crypto.randomBytes(50));
+            });
+
+            it('should not change opcode while in a stream', function(done) {
+                var counter = 0;
+                msocket.on('data', function(chunk) {
+                    switch (counter) {
+                        case 0:
+                            chunk[0].should.equal(0x01);
+                            chunk[1].should.equal(0x32);
+                            break;
+                        case 1:
+                            chunk[0].should.equal(0x80);
+                            chunk[1].should.equal(0x32);
+                            done();
+                            break;
+                    }
+                    counter++;
+                });
+                
+                wssocket.write(crypto.randomBytes(50));
+                wssocket.setOpcode(0x04);
+                wssocket.writeEnd(crypto.randomBytes(50));
+            });
+
+        });
 
         describe('#write(chunk)', function() {
 
@@ -27,23 +75,23 @@ describe('WebSocket', function() {
                 wssocket.write(new Buffer('H'));
             });
 
-            it('should write some between part of a frame stream', function(done) {
-                var counter = 0;
-
+            it('should write some fragment of a frame stream', function(done) {
+                var counter = -1;
                 msocket.on('data', function(frame) {
-                    if (counter == 1) {
-                        frame[0].should.equal(0x00);
-                        frame[1].should.equal(0x02);
-                        frame[2].should.equal(0x65);
-                        frame[3].should.equal(0x6c);
-                    }
-                    if (counter == 2) {
-                        frame[0].should.equal(0x00);
-                        frame[1].should.equal(0x02);
-                        frame[2].should.equal(0x6c);
-                        frame[3].should.equal(0x6f);
-
-                        done();
+                    switch (counter) {
+                        case 0:
+                            frame[0].should.equal(0x00);
+                            frame[1].should.equal(0x02);
+                            frame[2].should.equal(0x65);
+                            frame[3].should.equal(0x6c);
+                            break;
+                        case 1:
+                            frame[0].should.equal(0x00);
+                            frame[1].should.equal(0x02);
+                            frame[2].should.equal(0x6c);
+                            frame[3].should.equal(0x6f);
+                            done();
+                            break;
                     }
                     counter++;
                 });
