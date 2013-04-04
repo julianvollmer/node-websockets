@@ -38,55 +38,30 @@ Example:
 `read()` will pull all available body chunk out of `wssocket`. The `readable` 
 event tells us when there is chunk to read.
 
-### wssocket.setOpcode(0x02)
+### wssocket.writeHead({ mask: true, opcode: 0x02 })
 
 Example:
     
-    wssocket.setOpcode(0x02);
-    wssocket.writeEnd(new Buffer([0xfa, 0xce]));
+    wssocket.writeHead({ fin: true, mask: true });
+        wssocket.writeHead({ opcode: 0x02, length: 0x05 });
 
-This method allows you changing the opcode.
+* `options`, Object
+    * `fin`, Boolean, final frame (default: false)
+    * `mask`, Boolean, masked frame (default: false or options.mask)
+    * `opcode`, Number, frame opcode (default: 0x01)
+    * `length`, Number, frame length (default: chunk.length)
+    * `masking`, Buffer, masking buffer (default: random)
 
-### wssocket.ping([chunk])
-
-Example:
-
-    wssocket.ping();
-    wssocket.ping(new Buffer('How fast are u?'));
-
-Sends a `ping` frame through the socket. If the endpoint answers proberly with
-a `pong` frame a `pong` event with the origin body will be emitted.
-
-### wssocket.close([code])
-
-Example:
-
-    wssocket.close();
-    wssocket.close(1001);
-
-Will send a `close` frame to the endpoint which may contain a status code.
-
-### wsserver.writeEnd([chunk])
-
-Example:
-
-    wssocket.writeEnd(new Buffer('Hello'));
-
-* `chunk`, Buffer, chunk you want to write to socket
-
-Will write a final frame to the source. This is useful when you want to end 
-a stream of fragmented frame (which is used by `wssocket.write()` or just
-write a simple single frame.
+Sets the head of the frame we are currently writting. NOTE: If you set
+`masking` to a four-byte buffer it will set `mask` automatically to `true`.
 
 ### wsserver.write(chunk)
 
 Example:
 
     wssocket.on('readable', function() {
+        wssocket.writeHead({ fin: true, opcode: 0x02 });
         wssocket.write(wssocket.read());
-    });
-    wssocket.on('done', function() {
-        wssocket.write(wssocket.writeEnd());
     });
 
 * `chunk`, Buffer, chunk you want to write to socket
@@ -108,7 +83,7 @@ Example:
     });
 
 The `head` event gives you basic information about what we are receiving but
-more than that it tells us when a new data frame is incoming.
+more than that it tells us when a new frame is incoming.
 
 ### Event: 'done'
 
