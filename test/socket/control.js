@@ -57,6 +57,56 @@ describe('WebSocket', function() {
             msocket.write(new Buffer([0x89, 0x03, 0x59, 0x61, 0x70]));
         });
 
+        describe('#ping([chunk])', function() {
+
+            it('should send a ping frame', function(done) {
+                msocket.once('data', function(chunk) {
+                    chunk[0].should.equal(0x89);
+                    chunk[1].should.equal(0x00);
+                    done();
+                });
+                wssocket.ping();
+            });
+
+            it('should send a ping frame with body', function(done) {
+                msocket.once('data', function(chunk) {
+                    chunk[0].should.equal(0x89);
+                    chunk[1].should.equal(0x04);
+                    chunk[2].should.equal(0x70);
+                    chunk[3].should.equal(0x69);
+                    chunk[4].should.equal(0x6e);
+                    chunk[5].should.equal(0x67);
+                    done();
+                });
+                wssocket.ping(new Buffer('ping'));
+            });
+
+        });
+
+        describe('#close([code])', function() {
+
+            it('should send a close frame', function(done) {
+                msocket.once('data', function(chunk) {
+                    chunk[0].should.equal(0x88);
+                    chunk[1].should.equal(0x00);
+                    done();
+                });
+                wssocket.close();
+            });
+
+            it('should send a close frame with code', function(done) {
+                msocket.once('data', function(chunk) {
+                    chunk[0].should.equal(0x88);
+                    chunk[1].should.equal(0x02);
+                    chunk[2].should.equal(0x03);
+                    chunk[3].should.equal(0xe9);
+                    done();
+                });
+                wssocket.close(1001);
+            });
+
+        });
+
     });
 
 });
