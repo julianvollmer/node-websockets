@@ -1,35 +1,21 @@
 var util = require('util');
 var stream = require('stream');
 
-var eachFrame = require('./frames');
+util.inherits(MockupSocket, stream.Duplex);
 
-function MockupSocket() {
-    this.open = true;
-    this.readable = true;
-    this.writable = true;
+function MockupSocket(options) {
+       
+    stream.Duplex.call(this, options);
 }
 
-util.inherits(MockupSocket, stream.Stream);
-
-MockupSocket.prototype.end = function() {
-    this.open = false;
+MockupSocket.prototype._read = function() {
+        
 };
 
-MockupSocket.prototype.write = function(frame) {
-    if (this.open)
-        this.emit('data', frame);
-};
+MockupSocket.prototype._write = function(chunk, encoding, done) {
+    this.push(chunk);
 
-MockupSocket.prototype.beginTest = function() {
-    var self = this;
-    
-    eachFrame(function(name, fin, mask, opcode, length, masking, payload, content, frame) {
-        self.write(frame);    
-    });
-};
-
-MockupSocket.prototype.setTimeout = function() {
-    // dummy method
+    done(null);
 };
 
 module.exports = MockupSocket;

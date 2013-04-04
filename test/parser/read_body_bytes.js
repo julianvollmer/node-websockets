@@ -13,7 +13,7 @@ describe('WebSocketParser', function() {
         
         it('should return chunk', function() {
             chunk = new Buffer('Hello');
-            parser.readBodyBytes(state, chunk).should.equal(chunk);
+            parser.readBodyBytes(state, chunk).should.eql(chunk);
             state.index.should.equal(5);
         });
 
