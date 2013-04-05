@@ -1,7 +1,8 @@
 # WebSocketUpgrade
 
     Stability: 3 - Stable; 
-    There are no changes suggested in feature except some improved options support.
+    There are no changes suggested in feature except some improved options 
+    support.
 
 Use `require('websockets').upgrade` to access this module.
 
@@ -22,10 +23,13 @@ Example:
 
 * `url`, String, Contains the WebSocket url.
 * `options`, Object, Contains options (e.g. Sec-WebSocket headers), Optional.
-* `callback`, Function, Called on response with `Error` argument (null if no error), `Socket` object and synced `options`, Optional.
+* `callback`, Function, Executed on response, Optional.
 
-This will send a http upgrade request to the specified `url`. The response is validated and the callback will
-contain the socket object and the settings like `Sec-WebSocket-Extensions` or `Sec-WebSocket-Protocol`.
+This will send a http upgrade request to the specified `url`. The response is 
+validated and the callback will contain the socket object and synced header 
+settings like `Sec-WebSocket-Extensions` or `Sec-WebSocket-Protocol`. In case
+of an error you need to handle the passed error object. If no error occoured
+err will be `null`.
 
 ## upgrade.handleUpgradeRequest(request, socket, [options], [callback])
 
@@ -38,7 +42,7 @@ Example:
         if (err)
             throw err;
 
-        upgrade.handleUpgradeRequest(req, socket, { extensions: ['x-test'] }, function(err, socket, options) {
+        upgrade.handleUpgradeRequest(req, socket, { extensions: ['x-test'] }, function(err, options) {
             if (err)
                 throw err;
 
@@ -58,7 +62,8 @@ Example:
 * `options`, Object, Contains options (e.g. for headers), Optional.
 * `callback`, Function, Contains callback on request validation, Optional.
 
-This function has to be executed in a server upgrade callback.
-It will parse and validate all incoming upgrade requests and will send a upgrade or error response to the client.
-If a handshake went successful it will call the supplied callback with passing an `Error`, `Socket` instance and 
-synced settings (e.g. from both side supported extensions.
+This function has to be executed in a server upgrade callback. It will parse 
+and validate all incoming upgrade requests and will send a upgrade or error 
+response to the client. If a handshake went successful it will call the 
+supplied callback with passing an `Error` and synced settings (e.g. from both 
+side supported extensions).

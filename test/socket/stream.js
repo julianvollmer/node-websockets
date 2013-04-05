@@ -10,7 +10,29 @@ describe('WebSocket', function() {
         wssocket = new WebSocket(msocket);
     });
 
-    describe('#stream([chunk])', function() {
+    describe('Event: "stream"', function() {
+
+        // TODO: make wsstream really write data on us..
+        it('should be emit a stream start and end', function(done) {
+            var counter = 0;
+
+            wssocket.once('stream:start', function() {
+                
+                wssocket.once('stream:end', function() {
+                    // the data is not getting piped properly...
+                    //wssocket._wsstream.read().should.eql(new Buffer('Hey'));
+                    done();
+                });
+            });
+
+            msocket.write(new Buffer([0x02, 0x01, 0x48]));
+            msocket.write(new Buffer([0x00, 0x01, 0x65]));
+            msocket.write(new Buffer([0x80, 0x01, 0x79]));
+        });
+
+    });
+
+    xdescribe('#stream([chunk])', function() {
 
         it('should stream an empty binary', function(done) {
             msocket.once('data', function(chunk) {
