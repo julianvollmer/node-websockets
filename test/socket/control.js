@@ -26,8 +26,8 @@ describe('WebSocket', function() {
         });
 
         it('should emit a "close" event on a close frame', function(done) {
-            wssocket.once('close', function(code) {
-                code.should.equal(1000);
+            wssocket.once('close', function(payload) {
+                payload.should.eql(new Buffer([0x03, 0x0e8]));
                 done();
             });
             msocket.write(new Buffer([0x88, 0x02]));
@@ -46,7 +46,6 @@ describe('WebSocket', function() {
             var counter = 0;
             msocket.on('data', function(chunk) {
                 if (!counter) return counter++;
-                
                 chunk[0].should.equal(0x8a);
                 chunk[1].should.equal(0x03);
                 chunk[2].should.equal(0x59);

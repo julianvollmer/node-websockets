@@ -42,9 +42,9 @@ describe('WebSocketServer', function() {
     describe('event: "close"', function() {
 
         it('should emit a close event when connection is closed', function(done) {    
-            wsserver.once('close', function(code, wssocket) {
+            wsserver.once('close', function(message, wssocket) {
                 wssocket.should.be.an.instanceOf(WebSocket);
-                code.should.equal(1001);
+                message.should.eql(new Buffer([0x03, 0xe9]));
                 done();
             });
             wsserver.assignSocket(msocket);

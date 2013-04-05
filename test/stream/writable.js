@@ -1,15 +1,15 @@
 var crypto = require('crypto');
 
-var WebSocket = require('../../lib/socket');
 var MockupSocket = require('../mockup/socket');
+var WebSocketStream = require('../../lib/stream');
 
-describe('WebSocket', function() {
+describe('WebSocketStream', function() {
 
     var msocket, wssocket;
 
     beforeEach(function() {
         msocket = new MockupSocket();
-        wssocket = new WebSocket(msocket);
+        wssocket = new WebSocketStream(msocket);
     });
 
     describe('Writable', function() {

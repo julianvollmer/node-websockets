@@ -13,7 +13,8 @@ var messageSocketServer = new websockets.Server({ url: "ws://localhost:3000/mess
 
 var first = true;
 
-imageSocketServer.on('message', function(message, wssocket) {
+/*
+imageSocketServer.on('stream', function(message, wssocket) {
     opcode = (first) ? 0x01 : 0x00;
     imageSocketServer.broadcast({ opcode: opcode }, message);
     first = false;
@@ -22,28 +23,23 @@ imageSocketServer.on('message', function(message, wssocket) {
 imageSocketServer.on('done', function(wssocket) {
     first = true;
     imageSocketServer.broadcast({ fin: true, opcode: 0x00 }, new Buffer(0));
-});
+});*/
 
 // informs about new clients connected
 messageSocketServer.on('open', function(wssocket) {
-    messageSocketServer.broadcast(
-        { fin: true, opcode: 0x01 }, 
-        util.format('Client #%d has connected', wssocket.id)
-    );
+    wssocket.send(util.format('Welcome client #%d', wssocket.id));
+    messageSocketServer.broadcast(util.format('Client #%d has connected', wssocket.id));
 });
 
 // informs about clients left
 messageSocketServer.on('close', function(code, wssocket) {
-    messageSocketServer.broadcast(
-        { fin: true, opcode: 0x01 }, 
-        util.format('Client #%d has left', wssocket.id)
-    );
+    messageSocketServer.broadcast(util.format('Client #%d has left', wssocket.id));
 });
 
 // shares a sent message through all clients
 messageSocketServer.on('message', function(message, wsocket) {
     console.log('message:', message);
-    messageSocketServer.broadcast({ fin: true, opcode: 0x01 }, message);
+    messageSocketServer.broadcast(message);
 });
 
 imageSocketServer.listen(httpServer);
