@@ -32,7 +32,7 @@ wsserver.on('stream:start', function(wssocket) {
 });
 
 // remove stream listeners
-wsserver.on('stream:stop', function(wssocket) {
+wsserver.on('stream:end', function(wssocket) {
     wssocket.unpipe(wsserver);
 });
 
