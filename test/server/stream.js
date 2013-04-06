@@ -18,13 +18,28 @@ describe('WebSocketServer', function() {
         it('should be emitted on begin of frame stream', function(done) {
             wsserver.assignSocket(msocket);
 
-            wsserver.once('stream:start', function(message, wssocket) {
-                message.should.equal('Hello');
+            wsserver.once('stream:start', function(wssocket) {
                 wssocket.should.be.an.instanceOf(WebSocket);
                 done();
             });
 
-            msocket.write(new Buffer([0x81, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f]));
+            msocket.write(new Buffer([0x02, 0x01, 0xff]));
+        });
+
+    });
+
+    describe('Event: "stream:stop"', function() {
+
+        it('should be emitted on end of frame stream', function(done) {
+            wsserver.assignSocket(msocket);
+
+            wsserver.once('stream:start', function(wssocket) {
+                wssocket.should.be.an.instanceOf(WebSocket);
+                done();
+            });
+
+            msocket.write(new Buffer([0x02, 0x01, 0xff]));
+            msocket.write(new Buffer([0x80, 0x01, 0xbb]));
         });
 
     });

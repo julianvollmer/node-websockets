@@ -1,10 +1,7 @@
 var http = require('http');
 var should = require('should');
 
-var WebSocketUpgrade = require('../../lib/upgrade');
-var MockupExtensions = require('../mockup/extensions');
-
-var handleUpgradeRequest = WebSocketUpgrade.handleUpgradeRequest;
+var upgrade = require('../../lib/upgrade');
 
 describe('WebSocketUpgrade', function() {
    
@@ -23,7 +20,7 @@ describe('WebSocketUpgrade', function() {
  
         it('should send an upgrade response to the client', function(done) {
             server.once('upgrade', function(req, socket) {
-                handleUpgradeRequest(req, socket);
+                upgrade.handleUpgradeRequest(req, socket);
             });
             http.get({
                 port: "3000",
@@ -48,7 +45,7 @@ describe('WebSocketUpgrade', function() {
  
         it('should set extension header if no extension on server but on client', function(done) {
             server.once('upgrade', function(req, socket) {
-                handleUpgradeRequest(req, socket, function(err, options) {
+                upgrade.handleUpgradeRequest(req, socket, function(err, options) {
                     should.not.exist(err);
                     options.should.not.have.property('extensions');
                 });
@@ -78,7 +75,7 @@ describe('WebSocketUpgrade', function() {
         it('should set extension header if client and server support same extension', function(done) {
             server.once('upgrade', function(req, socket) {
                 var options = { extensions: ['x-test'] };
-                handleUpgradeRequest(req, socket, options, function(err, options) {
+                upgrade.handleUpgradeRequest(req, socket, options, function(err, options) {
                     should.not.exist(err);
                     options.should.have.property('extensions');
                     options.extensions.should.include('x-test');
@@ -109,7 +106,7 @@ describe('WebSocketUpgrade', function() {
         it('should set extension header if client and server support same extensions', function(done) {
             server.once('upgrade', function(req, socket) {
                 var options = { extensions: ['x-test-one', 'x-test-two'] };
-                handleUpgradeRequest(req, socket, options, function(err, options) {
+                upgrade.handleUpgradeRequest(req, socket, options, function(err, options) {
                     should.not.exist(err);
                     options.should.have.property('extensions');
                     options.extensions.should.include('x-test-one');
@@ -141,7 +138,7 @@ describe('WebSocketUpgrade', function() {
 
         it('should handle invalid upgrade request', function(done) {
             server.once('upgrade', function(req, socket) {
-                handleUpgradeRequest(req, socket, function(err, options) {
+                upgrade.handleUpgradeRequest(req, socket, function(err, options) {
                     (function() {
                         throw err;
                     }).should.throwError();
