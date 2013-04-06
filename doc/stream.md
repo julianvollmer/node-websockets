@@ -5,7 +5,7 @@
     There must be an algorithm to detect invalid frames and some improvements
     around how reads are handled.
 
-    Access this module with `require('websockets').Stream`
+Access this module with `require('websockets').Stream`
 
 ## Class: WebSocketStream
 
@@ -45,8 +45,8 @@ event tells us when there is chunk to read.
 
 Example:
     
-wsstream.writeHead({ fin: true, mask: true });
-wsstream.writeHead({ opcode: 0x02, length: 0x05 });
+    wsstream.writeHead({ fin: true, mask: true });
+    wsstream.writeHead({ opcode: 0x02, length: 0x05 });
 
 * `options`, Object
     * `fin`, Boolean, final frame (default: false)
@@ -55,38 +55,44 @@ wsstream.writeHead({ opcode: 0x02, length: 0x05 });
     * `length`, Number, frame length (default: chunk.length)
     * `masking`, Buffer, masking buffer (default: random)
 
-Sets the head of the frame we are currently writting. NOTE: If you set 
-`masking` to a four-byte buffer it will set `mask` automatically to `true`.
+Sets the head of the frame we are currently writting. If you set `masking` to a 
+four-byte buffer it will set `mask` automatically to `true`. **Note:** If you
+have called `writeHead()` it will immediately write the head bytes to the
+socket so you will have no chance of changing them when called.
 
-### wsserver.write(chunk)
+### wsstream.write(chunk)
 
 Example:
 
-    wsstream.on('readable', function() {
-        wsstream.writeHead({ fin: true, opcode: 0x02 });
-        wsstream.write(wsstream.read());
-    });
+    // start writing a big frame
+    wsstream.writeHead({ fin: true, opcode: 0x02, length: 0x09 });
+    wsstream.write(new Buffer([0x01, 0x02, 0x03, 0x04]));
+    wsstream.write(new Buffer([0x05, 0x06, 0x07, 0x08, 0x09]));
 
-* `chunk`, Buffer, chunk you want to write to socket
+* `chunk`, Buffer, chunk you want to write to socket.
 
-The above example pipes all incoming frame bodies to the socket.
-When the frame has been fully parsed it will also end the write stream.
-This can be useful if you handle large data streams which are chunked by the 
-socket.
+Writes `chunk` to the payload of a frame. If you want `write()` to add chunk to
+the same frame then you **must** define its length in the head else it will be
+send as a new frame with some default head settings.
 
 ### Event: 'head'
 
 Example:
     
     wsstream.on('head', function(head) {
-        if (head.opcode == 0x02)
-            console.log('we are getting some binaries');
-            if (head.stream)
-                console.log('this is a stream of frames');
-        });
+        if (head.opcode == 0x09) {
+            wsstream.once('done', function() {
+                var payload = wsstream.read() || new Buffer(0);
 
-The `head` event gives you basic information about what we are receiving but
-more than that it tells us when a new frame is incoming.
+                wsstream.writeHead({ fin: true, opcode: 0x0a });
+                wsstream.write(payload);
+            });
+        }
+    });
+
+The `head` event is emitted when the head of a new frame has been parsed. It is
+used to add opcode specific frame handling on top of the WebSocketStream by the
+WebSocket module.
 
 ### Event: 'done'
 

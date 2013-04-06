@@ -10,7 +10,7 @@ Access this module with `require('websockets').Socket`
 The `WebSocket` class uses `WebSocketStream` as back-end for reading and
 writing WebSocket frames. But it adds control frame managment and a high-level
 api to it. In connection with `WebSocketUpgrade.createUpgradeRequest` it can be
-used as WebSocket client.
+used as a WebSocket client.
 
 ### new WebSocket(socket, [options])
 
@@ -21,7 +21,6 @@ Example:
 * `source`, Duplex, preferable a `socket`    
 * `options`, Object, option hash
     * `mask`, Boolean, overwrites the default value of `false`
-    * `opcode`, Number, `0x01` for utf8 and `0x02` for binary mode
 
 The constructor is wrapping the `source` into a `WebSocketStream` instance and
 then binding to its `head` event.
@@ -107,11 +106,7 @@ When we receive a close frame or the socket itself closes then we emit a
 
 Example:
 
-    wssocket.on('stream:start', function() {
-        // parse traditionally
-        wssocket.on('readable', parseIncome);
-    });
-
+    // lets echo everything back from the stream
     wssocket.on('stream:start', function() {
         // pipe back to socket
         wssocket.pipe(wssocket);
@@ -126,9 +121,9 @@ the `wssocket`) or to repipe chunk somewhere else.
 Example:
 
     wssocket.on('stream:stop', function() {
-        // remove listeners
-        wssocket.removeListener(parseIncome);
+        // unpipe from the socket
+        wssocket.unpipe(wssocket);
     });
 
 Is emitted when frame stream is finished. Can be used to remove listeners or
-unpipe from stream.
+to unpipe from stream.

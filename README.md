@@ -1,45 +1,43 @@
 # node-websockets
 
-a simple, fundamental implementation of the websocket protocol (RFC 6455) which
-is built stream based in order to take advantage of nodejs async event loop.
+a simple implementation of the websocket protocol (RFC 6455) which is totally 
+built stream based in order to take advantage of nodejs async behavior
 
-*NOTE*: There will be a lot of changes going on the next few days for example
-I will code a `WebSocketRequest` and `WebSocketResponse` object to simplify
-writing frame streams. Also you can very easily pipe incoming data around.
+*Note:* The streaming api is not fully operable at the moment I hope I fix this
+till the 7. of april.
 
 ## Snippet
 
 ```
-var util = require('util');
-var http = require('http');
-var websockets = require('websockets');
-
-// create http server
-var server = http.createServer();
-
-// create websocket server
-var wsserver = new websockets.Server();
-
-// send hello when someone connects
+// greet the connected client and broadcast that
+// we have a new client connected
 wsserver.on('open', function(wssocket) {
-    wssocket.writeHead({ fin: true, opcode: 0x01 }));
-    wssocket.write(new Buffer('Hello new Client ' + wssocket.id));
-    wsserver.broadcast({ fin: true, opcode: 0x01 }, 'New Client has connected!');
+    wssocket.send('Hello new Client ' + wssocket.id);
+    wsserver.broadcast('New Client ' + wssocket.id + ' has connected!');
 });
 
-// log the received message
+// broadcast that a client has left
+wsserver.on('close', function(wssocket) {
+    wsserver.broadcast('Client ' + wssocket.id + ' has left us.');
+});
+
+// broadcast around messages which are incoming
 wsserver.on('message', function(message, wssocket) {
-    wsserver.broadcast(
-        { fin: true, opcode: 0x01 },
-        util.format('Client #%d says: %s', wssocket.index, message)
-    );
+    wsserver.broadcast(wssocket.id ' says: ' + message);
+});
+
+// share streamed images around all clients
+wsserver.on('stream:start', function(wssocket) {
+    wssocket.pipe(wsserver);
+});
+
+// remove stream listeners
+wsserver.on('stream:stop', function(wssocket) {
+    wssocket.unpipe(wsserver);
 });
 
 // bind to http server
 wsserver.listen(server);
-
-// bind http server to port 3000
-server.listen(3000);
 ```
 
 ## Documentation
@@ -56,15 +54,18 @@ Example:
 
 Access following modules through `websockets` namespace:
 
-* [WebSocketSocket]
-(https://github.com/bodokaiser/node-websockets/blob/master/doc/socket.md)
-handles a single WebSocket connection by reading and writing frames
 * [WebSocketServer]
-(https://github.com/bodokaiser/node-websockets/blob/master/doc/server.md)
+(https://github.com/bodokaiser/node-websockets/blob/master/doc/socket.md)
 handles multiple WebSocket connections providing a high-level api
+* [WebSocketSocket]
+(https://github.com/bodokaiser/node-websockets/blob/master/doc/server.md)
+handles a single WebSocket connection by reading and writing frames
 * [WebSocketUpgrade]
 (https://github.com/bodokaiser/node-websockets/blob/master/doc/upgrade.md)
 handles http upgrade process for WebSockets
+* [WebSocketStream]
+(https://github.com/bodokaiser/node-websockets/blob/master/doc/stream.md)
+basic stream layer which parses and writes WebSocket frames
 
 ## License (MIT)
 

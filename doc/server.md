@@ -1,14 +1,14 @@
 # WebSocketServer
 
-    Stability: 1 - Experimental; 
-    Theere will be changes about the message event.
+    Stability: 2 - Unstable; 
+    Theere will be changes around the streaming api.
 
 Access this module with `require('websockets').Server`
 
 ## Class: WebSocketServer
 
 The `WebSocketServer` class handles multiple WebSocket connections. It uses
-internally `WebSocketUpgrade` for http upgrade process and `WebSocket` for
+internally `WebSocketUpgrade` for the http upgrade process and `WebSocket` for
 parsing and reading WebSocket frames.
 
 ### new WebSocketServer([options])
@@ -75,7 +75,7 @@ proceed.
 
 Example:
 
-    wsbase.on('message', function(message, wssocket) {
+    wsserver.on('message', function(message, wssocket) {
         wssocket.send('You have sent me ' + message);
     });
 
@@ -83,16 +83,34 @@ Emitted each time a text frame is received. `message` is the payload as string
 if we have a text frame or a buffer if we have a binary frame. `wssocket` is the 
 instance of `WebSocketSocket` which has sent us the messsage.
 
-### wsserver.listen(server)
+### Event: 'stream:start'
 
 Example:
 
-    var server = http.createServer();
-    var wsserver = new websockets.Server({ url: "ws://localhost" });
-    
-    wsserver.listen(server);
+    // a wssocket wants to stream a big image to other clients
+    wsserver.on('stream:start', function(wssocket) {
+        wssocket.pipe(wsserver);
+    });
 
-Uses an instance of `http.Server` to bind to upgrade requests.
+Emitted when a stream of fragmented frames or chunked payload starts. You can
+set up you listeners on this event.
+
+### Event: 'stream:stop'
+
+    // unpipe from the wssocket
+    wsserver.on('stream:stop', function(wssocket) {
+        wssocket.unpipe(wsserver);
+    });
+
+Emitted when a stream of fragmented frames or a chunked payload finishes. It
+should be used to remove listeners in order to not disturb other channels.
+
+### wsserver.pipe(destination)
+
+This method inherits from the `stream.Writable` base class of WebSocketServer.
+The difference to a standard stream is that the server writes chunk to all
+clients by looping through the socket storage. This method is really nice for
+forwarding data streams which is a common task for websockets.
 
 ### wsserver.broadcast(head, message)
 
@@ -105,3 +123,14 @@ Example:
 
 Broadcasts a `message` buffer through all connected sockets. In the `head` we
 define the flag we set in the head bytes. This is strictly required.
+
+### wsserver.listen(server)
+
+Example:
+
+    var server = http.createServer();
+    var wsserver = new websockets.Server({ url: "ws://localhost" });
+    
+    wsserver.listen(server);
+
+Uses an instance of `http.Server` to bind to upgrade requests.
