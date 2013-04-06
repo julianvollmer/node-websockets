@@ -35,7 +35,7 @@ describe('WebSocketServer', function() {
                 done(); 
             });
             
-            msocket.write(new Buffer([0x8a, 0x03, 0x48, 0x65, 0x79]));
+            msocket.push(new Buffer([0x8a, 0x03, 0x48, 0x65, 0x79]));
         });
 
     });
@@ -51,7 +51,7 @@ describe('WebSocketServer', function() {
                 done();
             });
             
-            msocket.write(new Buffer([0x88, 0x02, 0x03, 0xe9]));
+            msocket.push(new Buffer([0x88, 0x02, 0x03, 0xe9]));
         });
 
     });

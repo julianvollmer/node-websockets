@@ -25,7 +25,7 @@ describe('WebSocketStream', function() {
                     done();
                 });
 
-                msocket.write(frame);
+                msocket.push(frame);
             });
             
             it('should be triggered at two frame heads', function(done) {
@@ -48,8 +48,8 @@ describe('WebSocketStream', function() {
                     counter++;
                 });
 
-                msocket.write(frameOne);
-                msocket.write(frameTwo);
+                msocket.push(frameOne);
+                msocket.push(frameTwo);
             });
 
             it('should be triggered at a byted frame head', function(done) {
@@ -65,7 +65,7 @@ describe('WebSocketStream', function() {
                 var frameBytes = Buffer.concat([frameHead, frameBody]);
                 
                 for (var i = 0; i < frameBytes.length; i++)
-                    msocket.write(new Buffer([frameBytes[i]]));
+                    msocket.push(new Buffer([frameBytes[i]]));
             });
 
             it('should be triggered at a chunked frame head', function(done) {
@@ -82,7 +82,7 @@ describe('WebSocketStream', function() {
                     });
                 });
 
-                msocket.write(Buffer.concat([frameOne, frameTwo]));
+                msocket.push(Buffer.concat([frameOne, frameTwo]));
             });
 
         });
@@ -90,24 +90,24 @@ describe('WebSocketStream', function() {
         describe('Event: "done"', function() {
 
             it('should be emitted after frame body', function(done) {
-                msocket.write(new Buffer([0x82, 0x7e, 0x01, 0x00]));
-                msocket.write(crypto.randomBytes(0xff));
+                msocket.push(new Buffer([0x82, 0x7e, 0x01, 0x00]));
+                msocket.push(crypto.randomBytes(0xff));
 
                 wssocket.once('done', function() {
                     done();
                 });
 
-                msocket.write(new Buffer('z'));
+                msocket.push(new Buffer('z'));
             });
 
             it('should be emitted after frame stream', function(done) {
-                msocket.write(new Buffer([0x01, 0x02, 0x48, 0x65]));
+                msocket.push(new Buffer([0x01, 0x02, 0x48, 0x65]));
 
                 wssocket.once('done', function() {
                     done();
                 });
 
-                msocket.write(new Buffer([0x80, 0x03, 0x6c, 0x6c, 0x6f]));
+                msocket.push(new Buffer([0x80, 0x03, 0x6c, 0x6c, 0x6f]));
             });
 
         });
@@ -115,18 +115,18 @@ describe('WebSocketStream', function() {
         describe('Event: "readable"', function() {
 
             it('should be emitted on frame body', function(done) {
-                msocket.write(new Buffer([0x81, 0x03]));
+                msocket.push(new Buffer([0x81, 0x03]));
 
                 wssocket.once('readable', function() {
                     wssocket.read().should.eql(new Buffer('Hey'));
                     done();
                 });
 
-                msocket.write(new Buffer([0x48, 0x65, 0x79]));
+                msocket.push(new Buffer([0x48, 0x65, 0x79]));
             });
 
             it('should be emitted on body chunk', function(done) {
-                msocket.write(new Buffer([0x82, 0x05]));
+                msocket.push(new Buffer([0x82, 0x05]));
 
                 wssocket.once('readable', function() {
                     var chunk = wssocket.read();
@@ -134,9 +134,9 @@ describe('WebSocketStream', function() {
                     done();
                 });
 
-                msocket.write(new Buffer('H'));
-                msocket.write(new Buffer('e'));
-                msocket.write(new Buffer('y'));
+                msocket.push(new Buffer('H'));
+                msocket.push(new Buffer('e'));
+                msocket.push(new Buffer('y'));
             });
 
             it('should be emitted with frame stream', function(done) {
@@ -147,8 +147,8 @@ describe('WebSocketStream', function() {
                     done();
                 });
 
-                msocket.write(new Buffer([0x01, 0x02, 0x48, 0x65]));
-                msocket.write(new Buffer([0x80, 0x03, 0x6c, 0x6c, 0x6f]));
+                msocket.push(new Buffer([0x01, 0x02, 0x48, 0x65]));
+                msocket.push(new Buffer([0x80, 0x03, 0x6c, 0x6c, 0x6f]));
             });
         });
 

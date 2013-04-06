@@ -53,19 +53,33 @@ Example:
 Closes a WebSocket connection by sending a close frame with optional payload
 which either can be a status code or a string implying the reason.
 
-### wssocket.stream([chunk])
+### wssocket.read()
+
+Example:
+
+    wssocket.on('stream:start', function() {
+        wssocket.on('readable', function() {
+            console.log('chunk', wssocket.read());
+        });
+    });
+
+Will read out cached payload. You should use this method only in combination
+with the `stream` events otherwise it can be that you steel the payload from
+other frame channels (e.g. message).
+
+### wssocket.write(chunk)
 
 Example:
 
     // lets stream a lot of random stuff
-    wssocket.stream(crypto.randomBytes(200));
-    wssocket.stream(crypto.randomBytes(200));
-    wssocket.stream(crypto.randomBytes(200));
-    wssocket.stream(crypto.randomBytes(200));
-    wssocket.stream(); // sends the final frame
+    wssocket.write(crypto.randomBytes(200));
+    wssocket.write(crypto.randomBytes(200));
+    wssocket.write(crypto.randomBytes(200));
+    wssocket.write(crypto.randomBytes(200));
+    wssocket.write(new Buffer(0)); // sends the final frame
 
-This will start a stream of frames. You end the stream by calling `stream()`
-without any parameters.
+This will start a stream of frames. You end the stream by calling `write()` 
+with an empty buffer.
 
 ### Event: "message"
 
@@ -116,11 +130,11 @@ Is emitted when a frame stream begins. It can be used to set up listeners on
 the sockets `readable` event (internally `wsstream` pipes all stream data to
 the `wssocket`) or to repipe chunk somewhere else.
 
-### Event: "stream:stop"
+### Event: "stream:end"
 
 Example:
 
-    wssocket.on('stream:stop', function() {
+    wssocket.on('stream:end', function() {
         // unpipe from the socket
         wssocket.unpipe(wssocket);
     });

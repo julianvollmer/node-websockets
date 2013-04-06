@@ -23,23 +23,23 @@ describe('WebSocketServer', function() {
                 done();
             });
 
-            msocket.write(new Buffer([0x02, 0x01, 0xff]));
+            msocket.push(new Buffer([0x02, 0x01, 0xff]));
         });
 
     });
 
-    describe('Event: "stream:stop"', function() {
+    describe('Event: "stream:end"', function() {
 
         it('should be emitted on end of frame stream', function(done) {
             wsserver.assignSocket(msocket);
 
-            wsserver.once('stream:start', function(wssocket) {
+            wsserver.once('stream:end', function(wssocket) {
                 wssocket.should.be.an.instanceOf(WebSocket);
                 done();
             });
 
-            msocket.write(new Buffer([0x02, 0x01, 0xff]));
-            msocket.write(new Buffer([0x80, 0x01, 0xbb]));
+            msocket.push(new Buffer([0x02, 0x01, 0xff]));
+            msocket.push(new Buffer([0x80, 0x01, 0xbb]));
         });
 
     });

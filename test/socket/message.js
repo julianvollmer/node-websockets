@@ -20,7 +20,7 @@ describe('WebSocket', function() {
                 done();
             });
 
-            msocket.write(new Buffer([0x81, 0x00]));
+            msocket.push(new Buffer([0x81, 0x00]));
         });
         
         it('should be emitted on simple text message', function(done) {
@@ -30,7 +30,7 @@ describe('WebSocket', function() {
                 done();
             });
 
-            msocket.write(new Buffer([0x81, 0x03, 0x48, 0x65, 0x79]));
+            msocket.push(new Buffer([0x81, 0x03, 0x48, 0x65, 0x79]));
         });
 
         it('should be emitted on extended text message', function(done) {
@@ -42,7 +42,7 @@ describe('WebSocket', function() {
                 done();
             });
 
-            msocket.write(Buffer.concat([frameHead, frameBody]));
+            msocket.push(Buffer.concat([frameHead, frameBody]));
         });
 
     });

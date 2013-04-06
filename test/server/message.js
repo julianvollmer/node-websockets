@@ -22,7 +22,7 @@ describe('WebSocketServer', function() {
                 done();
             });
 
-            msocket.write(new Buffer([0x81, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f]));
+            msocket.push(new Buffer([0x81, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f]));
         });
 
     });

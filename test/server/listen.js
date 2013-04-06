@@ -19,25 +19,31 @@ describe('WebSocketServer', function() {
     describe('#listen()', function() {
 
         it('should listen on the defined url for upgrade requests', function(done) {
-            var wss = new WebSocketServer({ url: ressource });
-            wss.once('open', function() {
+            var wsserver = new WebSocketServer({ url: ressource });
+            
+            wsserver.once('open', function() {
                 done();
             });
-            wss.listen(server);
+            
+            wsserver.listen(server);
             WebSocketUpgrade.createUpgradeRequest(ressource);
         });
 
         it('should only listen to upgrades on the defined url', function(done) {
-            var wssOne = new WebSocketServer({ url: "ws://localhost:3000/images" });
-            var wssTwo = new WebSocketServer({ url: "ws://localhost:3000/messages" });
-            wssOne.once('open', function() {
+            var wsserverOne = new WebSocketServer({ url: "ws://localhost:3000/images" });
+            var wsserverTwo = new WebSocketServer({ url: "ws://localhost:3000/messages" });
+            
+            wsserverOne.once('open', function() {
                throw new Error('first ws server one should not listen on upgrade of ws server two');
             });
-            wssTwo.once('open', function() {
+            
+            wsserverTwo.once('open', function() {
                 done();
             });
-            wssOne.listen(server);
-            wssTwo.listen(server);
+
+            wsserverOne.listen(server);
+            wsserverTwo.listen(server);
+            
             WebSocketUpgrade.createUpgradeRequest("ws://localhost:3000/messages");
         });
     });

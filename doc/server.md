@@ -9,7 +9,8 @@ Access this module with `require('websockets').Server`
 
 The `WebSocketServer` class handles multiple WebSocket connections. It uses
 internally `WebSocketUpgrade` for the http upgrade process and `WebSocket` for
-parsing and reading WebSocket frames.
+parsing and reading WebSocket frames. The class itself is a `Writable` stream
+which can write streams to all connected sockets.
 
 ### new WebSocketServer([options])
 
@@ -20,9 +21,47 @@ Example:
 * `options`, Object, Options hash.
     * `url`, String, Url server will listen to, Default: `ws://localhost:3000`.
     * `timeout`, Number, Timeout in ms for idling sockets, Default: `600000`.
-    * `maxConnections`, Number, Max amount of concurrent connections, Default: `10`.
+    * `maxConnections`, Number, Max amount of connections, Default: `10`.
 
 Returns an instance of `WebSocketServer`.
+
+### wsserver.write(chunk)
+
+Example:
+
+    // write first frame stream fragment
+    wsserver.write(new Buffer([0x01, 0x02, 0x03]));
+    // write second frame stream fragment
+    wsserver.write(new Buffer([0x04, 0x05, 0x06]));
+    // write last frame stream fragment
+    wsserver.write(new Buffer(0));
+
+Will write frame stream to all connected sockets. In the background it just
+loops through the sockets array and and calls the `WebSocket` instances
+`write()`. You need to end the stream by writting an empty buffer.
+
+### wsserver.listen(server)
+
+Example:
+
+    var server = http.createServer();
+    var wsserver = new websockets.Server({ url: "ws://localhost" });
+    
+    wsserver.listen(server);
+
+Uses an instance of `http.Server` to bind to upgrade requests.
+
+### wsserver.broadcast(head, message)
+
+Example:
+
+    wsserver.broadcast(
+            { fin: true, opcode: 0x01 }, 
+            new Buffer('This message is for all my clients.')
+    );
+
+Broadcasts a `message` buffer through all connected sockets. In the `head` we
+define the flag we set in the head bytes. This is strictly required.
 
 ### Event: 'open'
 
@@ -95,7 +134,7 @@ Example:
 Emitted when a stream of fragmented frames or chunked payload starts. You can
 set up you listeners on this event.
 
-### Event: 'stream:stop'
+### Event: 'stream:end'
 
     // unpipe from the wssocket
     wsserver.on('stream:stop', function(wssocket) {
@@ -104,33 +143,3 @@ set up you listeners on this event.
 
 Emitted when a stream of fragmented frames or a chunked payload finishes. It
 should be used to remove listeners in order to not disturb other channels.
-
-### wsserver.pipe(destination)
-
-This method inherits from the `stream.Writable` base class of WebSocketServer.
-The difference to a standard stream is that the server writes chunk to all
-clients by looping through the socket storage. This method is really nice for
-forwarding data streams which is a common task for websockets.
-
-### wsserver.broadcast(head, message)
-
-Example:
-
-    wsserver.broadcast(
-            { fin: true, opcode: 0x01 }, 
-            new Buffer('This message is for all my clients.')
-    );
-
-Broadcasts a `message` buffer through all connected sockets. In the `head` we
-define the flag we set in the head bytes. This is strictly required.
-
-### wsserver.listen(server)
-
-Example:
-
-    var server = http.createServer();
-    var wsserver = new websockets.Server({ url: "ws://localhost" });
-    
-    wsserver.listen(server);
-
-Uses an instance of `http.Server` to bind to upgrade requests.

@@ -13,7 +13,7 @@ describe('WebSocket', function() {
     describe('Control Frame Handling', function() {
 
         it('should close the connection on a close frame', function() {
-            msocket.write(new Buffer([0x88, 0x00]));
+            msocket.push(new Buffer([0x88, 0x00]));
 
             wssocket.once('close', function() {
                 (function() {
@@ -30,8 +30,9 @@ describe('WebSocket', function() {
                 payload.should.eql(new Buffer([0x03, 0x0e8]));
                 done();
             });
-            msocket.write(new Buffer([0x88, 0x02]));
-            msocket.write(new Buffer([0x03, 0xe8]));
+            
+            msocket.push(new Buffer([0x88, 0x02]));
+            msocket.push(new Buffer([0x03, 0xe8]));
         });
 
         it('should emit a "pong" event when receiving a pong', function(done) {
@@ -39,13 +40,12 @@ describe('WebSocket', function() {
                 body.should.eql(new Buffer('Hey'));
                 done();
             });
-            msocket.write(new Buffer([0x8a, 0x03, 0x48, 0x65, 0x79]));
+
+            msocket.push(new Buffer([0x8a, 0x03, 0x48, 0x65, 0x79]));
         });
 
         it('should send back a pong frame with ping payload', function(done) {
-            var counter = 0;
-            msocket.on('data', function(chunk) {
-                if (!counter) return counter++;
+            msocket.once('data', function(chunk) {
                 chunk[0].should.equal(0x8a);
                 chunk[1].should.equal(0x03);
                 chunk[2].should.equal(0x59);
@@ -53,7 +53,8 @@ describe('WebSocket', function() {
                 chunk[4].should.equal(0x70);
                 done();
             });
-            msocket.write(new Buffer([0x89, 0x03, 0x59, 0x61, 0x70]));
+            
+            msocket.push(new Buffer([0x89, 0x03, 0x59, 0x61, 0x70]));
         });
 
     });
