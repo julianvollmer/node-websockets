@@ -1,7 +1,8 @@
 # WebSocket
 
     Stability: 2 - Unstable;
-    There only may be changes around the stream apis.
+    There may be changes on the stream apis but there definetly will be changes
+    around the internal bindings to WebSocketStream.
 
 Access this module with `require('websockets').Socket`
 

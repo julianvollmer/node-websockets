@@ -1,9 +1,11 @@
 # WebSocketStream
 
-    Stability: 1 - Experimental; 
-    There will be no api changes but changes in the behavior of the stream.
-    There must be an algorithm to detect invalid frames and some improvements
-    around how reads are handled.
+    Stability: 2 - Unstable; 
+    The feature of the WebSocketStream is not quite sure. We definetly need a
+    socket wrapper which knows when a frame starts and end but how we publish
+    these stats to the outside and how we take write operations is not good
+    yet. So there will be some redesign in this direction. Also we need a
+    better fitting name and some error detection.
 
 Access this module with `require('websockets').Stream`
 
@@ -22,10 +24,11 @@ Example:
 
     var wsserver = new WebSocketStream(source, { mask: true });
 
-* `source`, Duplex, preferable a `socket`    
-* `options`, Object, option hash
-    * `mask`, Boolean, overwrites the default value of `false`
-    * `opcode`, Number, `0x01` for utf8 and `0x02` for binary mode
+* `source`, Duplex, preferable a `socket`.    
+* `options`, Object, options hash.
+    * `mask`, Boolean, overwrites the default value of `false`.
+    * `opcode`, Number, `0x01` for utf8 and `0x02` for binary mode.
+    * `useRequest`, Boolean, See `request` event.
 
 Will bind to the source`s `readable` and `end` event and set up some internal 
 flags.
@@ -75,12 +78,12 @@ Writes `chunk` to the payload of a frame. If you want `write()` to add chunk to
 the same frame then you **must** define its length in the head else it will be
 send as a new frame with some default head settings.
 
-### Event: 'head'
+### Event: 'request'
 
 Example:
     
-    wsstream.on('head', function(head) {
-        if (head.opcode == 0x09) {
+    wsstream.on('request', function(request) {
+        if (request.opcode == 0x09) {
             wsstream.once('done', function() {
                 var payload = wsstream.read() || new Buffer(0);
 
@@ -90,16 +93,21 @@ Example:
         }
     });
 
-The `head` event is emitted when the head of a new frame has been parsed. It is
-used to add opcode specific frame handling on top of the WebSocketStream by the
-WebSocket module.
+The `request` event is emitted when the head of a new frame has been parsed. It 
+is used to add opcode specific frame handling on top of the WebSocketStream by 
+setting up listeners to the `readable` event. If `useRequest` flag is `true` 
+the event will not pass an object hash but an instance of `WebSocketIncoming`.
+The benefit on using `WebSocketIncoming` is that all payload is written on 
+`WebSocketIncoming` and that a frame end is signaled by an `end` event which is
+currently the only safe way to detect stream ends.
 
 ### Event: 'done'
 
 Is emitted when the stream has fully parsed the payload of a large frame or
 when the last part of a frame stream was parsed. It can be used to either pull
 out the payload as one piece (useful for small messages) or to unbind from
-listeners on streams.
+listeners on streams. Note: If you have set `useRequest` then there this event
+will not be emitted.
 
 ### Event: 'readable'
 
