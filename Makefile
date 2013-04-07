@@ -1,6 +1,6 @@
 check: test
 
-test: test-parser test-stream test-socket test-upgrade test-server
+test: test-parser test-stream test-request test-socket test-upgrade test-server
 
 MOCHA_FLAGS = --require should
 
@@ -11,6 +11,10 @@ test-parser:
 test-stream:
 	./node_modules/.bin/mocha \
         $(MOCHA_FLAGS) test/stream/*.js
+
+test-request:
+	./node_modules/.bin/mocha \
+        $(MOCHA_FLAGS) test/request/*.js
 
 test-socket:
 	./node_modules/.bin/mocha \
