@@ -1,5 +1,4 @@
 var WebSocket = require('../../lib/socket');
-var WebSocketRequest = require('../../lib/request');
 var MockupSocket = require('../mockup/socket');
 
 describe('WebSocket', function() {
