@@ -1,15 +1,15 @@
 var MockupSocket = require('../mockup/socket');
-var WebSocketStream = require('../../lib/stream');
+var WebSocketCore = require('../../lib/core');
 var WebSocketOutgoing = require('../../lib/outgoing');
 
 describe('WebSocketOutgoing', function() {
 
-    var msocket, wsstream, wsoutgoing;
+    var msocket, wscore, wsoutgoing;
 
     beforeEach(function() {
         msocket = new MockupSocket();
-        wsstream = new WebSocketStream(msocket);
-        wsoutgoing = new WebSocketOutgoing(wsstream);
+        wscore = new WebSocketCore(msocket);
+        wsoutgoing = new WebSocketOutgoing(wscore);
     });
 
     describe('#end([chunk])', function() {

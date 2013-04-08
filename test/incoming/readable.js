@@ -1,19 +1,19 @@
 var MockupSocket = require('../mockup/socket');
-var WebSocketStream = require('../../lib/stream');
+var WebSocketCore = require('../../lib/core');
 
 describe('WebSocketIncoming', function() {
 
-    var msocket, wsstream, wssrequest;
+    var msocket, wscore, wssrequest;
 
     beforeEach(function() {
         msocket = new MockupSocket();
-        wsstream = new WebSocketStream(msocket, { useRequest: true });
+        wscore = new WebSocketCore(msocket, { useRequest: true });
     });
 
     describe('Event: "readable"', function() {
 
         it('should be emitted on body chunk', function(done) {
-            wsstream.once('request', function(request) {
+            wscore.once('request', function(request) {
                 request.on('readable', function() {
                     request.read().should.eql(new Buffer('Hey'));
                     done();

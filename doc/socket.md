@@ -2,13 +2,13 @@
 
     Stability: 2 - Unstable;
     There may be changes on the stream apis but there definetly will be changes
-    around the internal bindings to WebSocketStream.
+    around the internal bindings to WebSocketCore.
 
 Access this module with `require('websockets').Socket`
 
 ## Class: WebSocket
 
-The `WebSocket` class uses `WebSocketStream` as back-end for reading and
+The `WebSocket` class uses `WebSocketCore` as back-end for reading and
 writing WebSocket frames. But it adds control frame managment and a high-level
 api to it. In connection with `WebSocketUpgrade.createUpgradeRequest` it can be
 used as a WebSocket client.
@@ -23,7 +23,7 @@ Example:
 * `options`, Object, option hash
     * `mask`, Boolean, overwrites the default value of `false`
 
-The constructor is wrapping the `source` into a `WebSocketStream` instance and
+The constructor is wrapping the `source` into a `WebSocketCore` instance and
 then binding to its `head` event.
 
 ### wssocket.send([message])
@@ -128,7 +128,7 @@ Example:
     });
 
 Is emitted when a frame stream begins. It can be used to set up listeners on
-the sockets `readable` event (internally `wsstream` pipes all stream data to
+the sockets `readable` event (internally `wscore` pipes all stream data to
 the `wssocket`) or to repipe chunk somewhere else.
 
 ### Event: "stream:end"

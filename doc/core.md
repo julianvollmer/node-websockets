@@ -1,7 +1,7 @@
-# WebSocketStream
+# WebSocketCore
 
     Stability: 2 - Unstable; 
-    The feature of the WebSocketStream is not quite sure. We definetly need a
+    The feature of the WebSocketCore is not quite sure. We definetly need a
     socket wrapper which knows when a frame starts and end but how we publish
     these stats to the outside and how we take write operations is not good
     yet. So there will be some redesign in this direction. Also we need a
@@ -9,20 +9,20 @@
 
 Access this module with `require('websockets').Stream`
 
-## Class: WebSocketStream
+## Class: WebSocketCore
 
-The WebSocketStream class inherits from `stream.Duplex`. It wraps an instance 
+The WebSocketCore class inherits from `stream.Duplex`. It wraps an instance 
 of `net.Socket` or similar source and will parse all incoming data as WebSocket
 frames. The head and payload of each parsed frame is made public through a low-
 level api to allow other modules to use them. Same is true for writing
 WebSocket frames. Because the stream only parses and sets frames it is not
 scheduled to be used on high-level stage.
 
-### new WebSocketStream(source, [options])
+### new WebSocketCore(source, [options])
 
 Example:
 
-    var wsserver = new WebSocketStream(source, { mask: true });
+    var wsserver = new WebSocketCore(source, { mask: true });
 
 * `source`, Duplex, preferable a `socket`.    
 * `options`, Object, options hash.
@@ -33,23 +33,23 @@ Example:
 Will bind to the source`s `readable` and `end` event and set up some internal 
 flags.
 
-### wsstream.read()
+### wscore.read()
 
 Example:
 
-    wsstream.on('readable', function() {
-        console.log(wsstream.read().toString());
+    wscore.on('readable', function() {
+        console.log(wscore.read().toString());
     });
 
-`read()` will pull all available body chunk out of `wsstream`. The `readable` 
+`read()` will pull all available body chunk out of `wscore`. The `readable` 
 event tells us when there is chunk to read.
 
-### wsstream.writeHead({ mask: true, opcode: 0x02 })
+### wscore.writeHead({ mask: true, opcode: 0x02 })
 
 Example:
     
-    wsstream.writeHead({ fin: true, mask: true });
-    wsstream.writeHead({ opcode: 0x02, length: 0x05 });
+    wscore.writeHead({ fin: true, mask: true });
+    wscore.writeHead({ opcode: 0x02, length: 0x05 });
 
 * `options`, Object
     * `fin`, Boolean, final frame (default: false)
@@ -63,14 +63,14 @@ four-byte buffer it will set `mask` automatically to `true`. **Note:** If you
 have called `writeHead()` it will immediately write the head bytes to the
 socket so you will have no chance of changing them when called.
 
-### wsstream.write(chunk)
+### wscore.write(chunk)
 
 Example:
 
     // start writing a big frame
-    wsstream.writeHead({ fin: true, opcode: 0x02, length: 0x09 });
-    wsstream.write(new Buffer([0x01, 0x02, 0x03, 0x04]));
-    wsstream.write(new Buffer([0x05, 0x06, 0x07, 0x08, 0x09]));
+    wscore.writeHead({ fin: true, opcode: 0x02, length: 0x09 });
+    wscore.write(new Buffer([0x01, 0x02, 0x03, 0x04]));
+    wscore.write(new Buffer([0x05, 0x06, 0x07, 0x08, 0x09]));
 
 * `chunk`, Buffer, chunk you want to write to socket.
 
@@ -82,19 +82,19 @@ send as a new frame with some default head settings.
 
 Example:
     
-    wsstream.on('request', function(request) {
+    wscore.on('request', function(request) {
         if (request.opcode == 0x09) {
-            wsstream.once('done', function() {
-                var payload = wsstream.read() || new Buffer(0);
+            wscore.once('done', function() {
+                var payload = wscore.read() || new Buffer(0);
 
-                wsstream.writeHead({ fin: true, opcode: 0x0a });
-                wsstream.write(payload);
+                wscore.writeHead({ fin: true, opcode: 0x0a });
+                wscore.write(payload);
             });
         }
     });
 
 The `request` event is emitted when the head of a new frame has been parsed. It 
-is used to add opcode specific frame handling on top of the WebSocketStream by 
+is used to add opcode specific frame handling on top of the WebSocketCore by 
 setting up listeners to the `readable` event. If `useRequest` flag is `true` 
 the event will not pass an object hash but an instance of `WebSocketIncoming`.
 The benefit on using `WebSocketIncoming` is that all payload is written on 

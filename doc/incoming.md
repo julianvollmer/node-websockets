@@ -9,22 +9,22 @@ Access this module with `require('websockets').Socket`
 ## Class: WebSocketIncoming
 
 This class was introduced because there is no safe way to signal frame ends. It
-is only possible to end a whole stream. Because of this the `WebSocketStream`
+is only possible to end a whole stream. Because of this the `WebSocketCore`
 can pass an instance of `WebSocketIncoming` which represents a streamed frame.
 The head information is available through properties and the payload is written
 in time.
 
-### new WebSocketIncoming(wsstream, [options])
+### new WebSocketIncoming(wscore, [options])
 
 Example:
 
-    var wsincoming = new WebSocketIncoming(wsstream);
+    var wsincoming = new WebSocketIncoming(wscore);
 
-* `source`, WebSocketStream, (actually not required)    
+* `source`, WebSocketCore, (actually not required)    
 
-The constructor does nothing than setting some dummy head flags. `wsstream` is
+The constructor does nothing than setting some dummy head flags. `wscore` is
 actually meant to directly use `wsincoming.push(buf)` to write the payload. 
-But because there will be changes around the bindings to `WebSocketStream` I do
+But because there will be changes around the bindings to `WebSocketCore` I do
 not remove this till later.
 
 ### wsincoming.read()
@@ -41,7 +41,7 @@ Example:
 
     wsincoming.push(chunk);
 
-Is currently used by `WebSocketStream` to push body chunk onto the instance.
+Is currently used by `WebSocketCore` to push body chunk onto the instance.
 This actually should not be used directly but I currently see no way around to
 signal a end of data than through `wsincoming.push(null)`.
 

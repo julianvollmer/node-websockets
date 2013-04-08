@@ -54,15 +54,15 @@ Access following modules through `websockets` namespace:
 * [WebSocketServer]
 (https://github.com/bodokaiser/node-websockets/blob/master/doc/socket.md)
 handles multiple WebSocket connections providing a high-level api
-* [WebSocketSocket]
-(https://github.com/bodokaiser/node-websockets/blob/master/doc/server.md)
-handles a single WebSocket connection by reading and writing frames
 * [WebSocketUpgrade]
 (https://github.com/bodokaiser/node-websockets/blob/master/doc/upgrade.md)
 handles http upgrade process for WebSockets
-* [WebSocketStream]
-(https://github.com/bodokaiser/node-websockets/blob/master/doc/stream.md)
-basic stream layer which parses and writes WebSocket frames
+* [WebSocketSocket]
+(https://github.com/bodokaiser/node-websockets/blob/master/doc/server.md)
+handles a single WebSocket connection by reading and writing frames
+* [WebSocketCore]
+(https://github.com/bodokaiser/node-websockets/blob/master/doc/core.md)
+core stream layer which parses and writes WebSocket frames
 
 ## License (MIT)
 

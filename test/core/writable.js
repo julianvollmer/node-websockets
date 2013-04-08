@@ -1,15 +1,15 @@
 var crypto = require('crypto');
 
 var MockupSocket = require('../mockup/socket');
-var WebSocketStream = require('../../lib/stream');
+var WebSocketCore = require('../../lib/core');
 
-describe('WebSocketStream', function() {
+describe('WebSocketCore', function() {
 
-    var msocket, wssocket;
+    var msocket, wscore;
 
     beforeEach(function() {
         msocket = new MockupSocket();
-        wssocket = new WebSocketStream(msocket);
+        wscore = new WebSocketCore(msocket);
     });
 
     describe('Writable', function() {
@@ -17,45 +17,45 @@ describe('WebSocketStream', function() {
         describe('#writeHead(options)', function() {
 
             it('should set fin flag', function() {
-                wssocket.writeHead({ fin: true });
-                wssocket._frameWriteState.fin.should.be.true;
+                wscore.writeHead({ fin: true });
+                wscore._frameWriteState.fin.should.be.true;
             });
 
             it('should set rsv1 flag', function() {
-                wssocket.writeHead({ rsv1: true });
-                wssocket._frameWriteState.rsv1.should.be.true;
+                wscore.writeHead({ rsv1: true });
+                wscore._frameWriteState.rsv1.should.be.true;
             });
 
             it('should set rsv2 flag', function() {
-                wssocket.writeHead({ rsv2: true });
-                wssocket._frameWriteState.rsv2.should.be.true;
+                wscore.writeHead({ rsv2: true });
+                wscore._frameWriteState.rsv2.should.be.true;
             });
 
             it('should set rsv3 flag', function() {
-                wssocket.writeHead({ rsv3: true });
-                wssocket._frameWriteState.rsv3.should.be.true;
+                wscore.writeHead({ rsv3: true });
+                wscore._frameWriteState.rsv3.should.be.true;
             });
 
             it('should set mask flag', function() {
-                wssocket.writeHead({ mask: true });
-                wssocket._frameWriteState.mask.should.be.true;
+                wscore.writeHead({ mask: true });
+                wscore._frameWriteState.mask.should.be.true;
             });
 
             it('should set opcode to 0x00', function() {
-                wssocket.writeHead({ opcode: 0x00 });
-                wssocket._frameWriteState.opcode.should.equal(0x00);
+                wscore.writeHead({ opcode: 0x00 });
+                wscore._frameWriteState.opcode.should.equal(0x00);
             });
             
             it('should set opcode to 0x0a', function() {
-                wssocket.writeHead({ opcode: 0x0a });
-                wssocket._frameWriteState.opcode.should.equal(0x0a);
+                wscore.writeHead({ opcode: 0x0a });
+                wscore._frameWriteState.opcode.should.equal(0x0a);
             });
 
             it('should set masking to 0x7e 0xdf 0x20 0xf5', function() {
                 var masking = new Buffer([0x7e, 0xdf, 0x20, 0xf5]);
-                wssocket.writeHead({ masking: masking });
-                wssocket._frameWriteState.mask.should.be.true;
-                wssocket._frameWriteState.masking.should.eql(masking);
+                wscore.writeHead({ masking: masking });
+                wscore._frameWriteState.mask.should.be.true;
+                wscore._frameWriteState.masking.should.eql(masking);
             });
 
         });
@@ -69,8 +69,8 @@ describe('WebSocketStream', function() {
                     chunk.length.should.equal(2);
                     done();
                 });
-                wssocket.writeHead({ fin: true, opcode: 0x01 });
-                wssocket.write(new Buffer(0));
+                wscore.writeHead({ fin: true, opcode: 0x01 });
+                wscore.write(new Buffer(0));
             });
 
             it('should send a text frame with "Hello"', function(done) {
@@ -85,8 +85,8 @@ describe('WebSocketStream', function() {
                     chunk.length.should.equal(7);
                     done();
                 });
-                wssocket.writeHead({ fin: true, opcode: 0x01 });
-                wssocket.write(new Buffer('Hello'));
+                wscore.writeHead({ fin: true, opcode: 0x01 });
+                wscore.write(new Buffer('Hello'));
             });
 
             it('should send a large binary frame', function(done) {
@@ -100,8 +100,8 @@ describe('WebSocketStream', function() {
                     chunk.slice(4).should.eql(payload);
                     done();
                 });
-                wssocket.writeHead({ fin: true, opcode: 0x02 });
-                wssocket.write(payload);
+                wscore.writeHead({ fin: true, opcode: 0x02 });
+                wscore.write(payload);
             });
 
             it('should send a stream of text frames', function(done) {
@@ -133,17 +133,17 @@ describe('WebSocketStream', function() {
                     counter++;
                 });
 
-                wssocket.writeHead({ fin: false, opcode: 0x01 });
-                wssocket.write(new Buffer('Hello'));
+                wscore.writeHead({ fin: false, opcode: 0x01 });
+                wscore.write(new Buffer('Hello'));
 
-                wssocket.writeHead({ fin: false, opcode: 0x00 });
-                wssocket.write(new Buffer('World'));
+                wscore.writeHead({ fin: false, opcode: 0x00 });
+                wscore.write(new Buffer('World'));
                 
-                wssocket.writeHead({ fin: false, opcode: 0x00 });
-                wssocket.write(new Buffer('Sugar'));
+                wscore.writeHead({ fin: false, opcode: 0x00 });
+                wscore.write(new Buffer('Sugar'));
                 
-                wssocket.writeHead({ fin: true, opcode: 0x00 });
-                wssocket.write(new Buffer('Salt'));
+                wscore.writeHead({ fin: true, opcode: 0x00 });
+                wscore.write(new Buffer('Salt'));
             });
 
         });
