@@ -3,9 +3,6 @@
 a simple implementation of the websocket protocol (RFC 6455) which is totally 
 built stream based in order to take advantage of nodejs async behavior
 
-*Note:* The streaming api is not fully operable at the moment I hope I fix this
-till the 7. of april.
-
 ## Snippet
 
 ```
