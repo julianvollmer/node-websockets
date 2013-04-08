@@ -37,6 +37,13 @@ wsserver.on('stream:end', function(wssocket) {
 wsserver.listen(server);
 ```
 
+## Full Example
+
+View a [simple chat server]
+(https://github.com/bodokaiser/node-websockets/blob/master/example/chat/server.js)
+which allows connected browsers to send small text messages or to send images
+by using the HTML5 File API (move an image into the input field).
+
 ## Documentation
 
 ### Installation
