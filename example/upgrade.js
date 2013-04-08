@@ -1,12 +1,14 @@
 var http = require('http');
-var websockets = require('../lib/index');
+var upgrade = require('../lib/index').upgrade;
 
 var server = http.createServer();
 
 server.on('upgrade', function(req, socket) {
-    websockets.Upgrade.handleUpgradeRequest(req, socket, function() {
-        socket.on('data', function(data) {
-            console.log(data);
+    upgrade.handleUpgradeRequest(req, socket, function() {
+        socket.on('readable', function() {
+            var chunk = socket.read();
+
+            console.log('chunk', chunk);
         });
         socket.write(new Buffer([0x81, 0x05, 0x68, 0x65, 0x6c, 0x6c, 0x6f]));
     });

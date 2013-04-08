@@ -120,6 +120,51 @@ describe('WebSocketStream', function() {
                 msocket.push(new Buffer([0x80, 0x03, 0x6c, 0x6c, 0x6f]));
             });
 
+            it('should be emitted on large frame', function(done) {
+                var body = crypto.randomBytes(65535);
+                    
+                var buffer = [];
+                wsstream.on('readable', function() {
+                    buffer.push(wsstream.read());
+                });
+                wsstream.on('end', function() {
+                    Buffer.concat(buffer).should.eql(body);
+                    done();
+                });
+
+                msocket.push(new Buffer([0x82, 0x7e, 0xff, 0xff]));
+                msocket.push(body.slice(0, 0xff));
+                msocket.push(body.slice(0xff));
+                msocket.push(null);
+            });
+
+            it('should be emitted on large masked frame', function(done) {
+                var head = new Buffer([0x82, 0xfe, 0xff, 0xff]);
+                var mask = new Buffer([0xa9, 0x56, 0x4d, 0xf0]);
+                var body = new Buffer(65535);
+                var data = crypto.randomBytes(65535);
+
+                // manuell mask
+                for (var i = 0; i < data.length; i++)
+                    body[i] = data[i] ^ mask[i % 4];
+
+                var buffer = [];
+                wsstream.on('readable', function() {
+                    var chunk = wsstream.read();
+                    buffer.push(chunk);
+                });
+                wsstream.on('end', function() {
+                    Buffer.concat(buffer).should.eql(data);
+                    done();
+                });
+
+                msocket.push(head);
+                msocket.push(mask);
+                msocket.push(body.slice(0, 0xff));
+                msocket.push(body.slice(0xff));
+                msocket.push(null);
+            });
+
         });
 
     });
