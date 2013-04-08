@@ -5,13 +5,13 @@
 
     "author": "Bodo Kaiser <bodo.kaiser@enabre.com>",
 
-    "version": "0.1.0",
+    "version": "0.0.9",
 
     "license": "MIT",
 
     "keywords": ["websockets", "network"],
 
-    "description": "a simple, fundamental implementation of the websocket protocol which supports easy extension handling",
+    "description": "a stream-based implementation of the websocket protocol",
 
     "repository": {
         "type": "git",
@@ -19,8 +19,8 @@
     },
     
     "devDependencies": {
-        "mocha": "1.8.1",
-        "should": "1.2.1"
+        "mocha": "1.9.0",
+        "should": "1.2.2"
     },
     
     "script": {
