@@ -13,8 +13,7 @@ describe('WebSocket', function() {
     describe('Event: "close"', function() {
 
         it('should be emitted on empty close', function(done) {
-            wssocket.once('close', function(payload) {
-                payload.length.should.equal(0);
+            wssocket.once('close', function() {
                 done();
             });
 

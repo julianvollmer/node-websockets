@@ -7,23 +7,21 @@ var http = require('http');
 var websockets = require('../../lib/index');
 
 // create servers
-var httpServer = http.createServer();
-var imageSocketServer = new websockets.Server({ url: "ws://localhost:3000/images", timeout: 0 });
+var httpServer = new http.Server();
+var imageSocketServer = new websockets.Server({ url: "ws://localhost:3000/images", opcode: 0x01, timeout: 0 });
 var messageSocketServer = new websockets.Server({ url: "ws://localhost:3000/messages", timeout: 0 });
 
 var first = true;
 
-/*
-imageSocketServer.on('stream', function(message, wssocket) {
-    opcode = (first) ? 0x01 : 0x00;
-    imageSocketServer.broadcast({ opcode: opcode }, message);
-    first = false;
+imageSocketServer.on('stream:start', function(wssocket) {
+    console.log('starting stream');
+    wssocket.pipe(imageSocketServer);
 });
 
-imageSocketServer.on('done', function(wssocket) {
-    first = true;
-    imageSocketServer.broadcast({ fin: true, opcode: 0x00 }, new Buffer(0));
-});*/
+imageSocketServer.on('stream:end', function(wssocket) {
+    console.log('ending stream');
+    wssocket.unpipe(imageSocketServer);
+});
 
 // informs about new clients connected
 messageSocketServer.on('open', function(wssocket) {

@@ -5,60 +5,55 @@ var WebSocketStream = require('../../lib/stream');
 
 describe('WebSocketStream', function() {
 
-    var frame, msocket, wssocket;
+    var frame, msocket, wsstream;
 
     beforeEach(function() {
         msocket = new MockupSocket();
-        wssocket = new WebSocketStream(msocket);
+        wsstream = new WebSocketStream(msocket);
     });
 
     describe('Readable', function() {
         
-        describe('Event: "head"', function() {
+        describe('Event: "request"', function() {
 
-            it('should be triggered at on single frame head', function(done) {
-                frame = new Buffer([0x81, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f]);
-
-                wssocket.once('head', function(head) {
-                    head.should.have.property('opcode', 0x01);
-                    head.should.have.property('stream', false);
+            it('should be emitted on single frame head', function(done) {
+                wsstream.once('request', function(request) {
+                    request.should.have.property('opcode', 0x01);
+                    request.should.have.property('stream', false);
                     done();
                 });
 
-                msocket.push(frame);
+                msocket.push(new Buffer([0x81, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f]));
             });
             
-            it('should be triggered at two frame heads', function(done) {
-                var frameOne = new Buffer([0x81, 0x03, 0x48, 0x65, 0x78]);
-                var frameTwo = new Buffer([0x82, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f]);
-
+            it('should be emitted on two frame heads', function(done) {
                 var counter = 0;
-                wssocket.on('head', function(head) {
+                wsstream.on('request', function(request) {
                     switch (counter) {
                         case 0:
-                            head.should.have.property('opcode', 0x01);
-                            head.should.have.property('stream', false);
+                            request.should.have.property('opcode', 0x01);
+                            request.should.have.property('stream', false);
                             break;
                         case 1:
-                            head.should.have.property('opcode', 0x02);
-                            head.should.have.property('stream', false);
+                            request.should.have.property('opcode', 0x02);
+                            request.should.have.property('stream', false);
                             done();
                             break;
                     }
                     counter++;
                 });
 
-                msocket.push(frameOne);
-                msocket.push(frameTwo);
+                msocket.push(new Buffer([0x81, 0x03, 0x48, 0x65, 0x78]));
+                msocket.push(new Buffer([0x82, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f]));
             });
 
-            it('should be triggered at a byted frame head', function(done) {
+            it('should be emitted on a byted frame head', function(done) {
                 var frameHead = new Buffer([0x82, 0x7e, 0x00, 0x7f]);
                 var frameBody = crypto.randomBytes(127);
                 
-                wssocket.once('head', function(head) {
-                    head.should.have.property('opcode', 0x02);
-                    head.should.have.property('stream', false);
+                wsstream.once('request', function(request) {
+                    request.should.have.property('opcode', 0x02);
+                    request.should.have.property('stream', false);
                     done();
                 });
 
@@ -68,16 +63,16 @@ describe('WebSocketStream', function() {
                     msocket.push(new Buffer([frameBytes[i]]));
             });
 
-            it('should be triggered at a chunked frame head', function(done) {
+            it('should be emitted on a chunked frame head', function(done) {
                 var frameOne = new Buffer([0x81, 0x03, 0x48, 0x65, 0x79]);
                 var frameTwo = new Buffer([0x81, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f]);
             
-                wssocket.once('head', function(head) {
-                    head.should.have.property('opcode', 0x01);
-                    head.should.have.property('stream', false);
-                    wssocket.once('head', function(head) {
-                        head.should.have.property('opcode', 0x01);
-                        head.should.have.property('stream', false);
+                wsstream.once('request', function(request) {
+                    request.should.have.property('opcode', 0x01);
+                    request.should.have.property('stream', false);
+                    wsstream.once('request', function(request) {
+                        request.should.have.property('opcode', 0x01);
+                        request.should.have.property('stream', false);
                         done();   
                     });
                 });
@@ -87,38 +82,13 @@ describe('WebSocketStream', function() {
 
         });
 
-        describe('Event: "done"', function() {
-
-            it('should be emitted after frame body', function(done) {
-                msocket.push(new Buffer([0x82, 0x7e, 0x01, 0x00]));
-                msocket.push(crypto.randomBytes(0xff));
-
-                wssocket.once('done', function() {
-                    done();
-                });
-
-                msocket.push(new Buffer('z'));
-            });
-
-            it('should be emitted after frame stream', function(done) {
-                msocket.push(new Buffer([0x01, 0x02, 0x48, 0x65]));
-
-                wssocket.once('done', function() {
-                    done();
-                });
-
-                msocket.push(new Buffer([0x80, 0x03, 0x6c, 0x6c, 0x6f]));
-            });
-
-        });
-
         describe('Event: "readable"', function() {
 
             it('should be emitted on frame body', function(done) {
                 msocket.push(new Buffer([0x81, 0x03]));
 
-                wssocket.once('readable', function() {
-                    wssocket.read().should.eql(new Buffer('Hey'));
+                wsstream.on('readable', function() {
+                    wsstream.read().should.eql(new Buffer('Hey'));
                     done();
                 });
 
@@ -128,9 +98,8 @@ describe('WebSocketStream', function() {
             it('should be emitted on body chunk', function(done) {
                 msocket.push(new Buffer([0x82, 0x05]));
 
-                wssocket.once('readable', function() {
-                    var chunk = wssocket.read();
-                    chunk.should.eql(new Buffer('Hey'));
+                wsstream.once('readable', function() {
+                    wsstream.read().should.eql(new Buffer('Hey'));
                     done();
                 });
 
@@ -140,8 +109,8 @@ describe('WebSocketStream', function() {
             });
 
             it('should be emitted with frame stream', function(done) {
-                wssocket.once('readable', function() {
-                    var chunk = wssocket.read();
+                wsstream.once('readable', function() {
+                    var chunk = wsstream.read();
                         
                     chunk.should.eql(new Buffer('Hello'));
                     done();
@@ -150,6 +119,52 @@ describe('WebSocketStream', function() {
                 msocket.push(new Buffer([0x01, 0x02, 0x48, 0x65]));
                 msocket.push(new Buffer([0x80, 0x03, 0x6c, 0x6c, 0x6f]));
             });
+
+            it('should be emitted on large frame', function(done) {
+                var body = crypto.randomBytes(65535);
+                    
+                var buffer = [];
+                wsstream.on('readable', function() {
+                    buffer.push(wsstream.read());
+                });
+                wsstream.on('end', function() {
+                    Buffer.concat(buffer).should.eql(body);
+                    done();
+                });
+
+                msocket.push(new Buffer([0x82, 0x7e, 0xff, 0xff]));
+                msocket.push(body.slice(0, 0xff));
+                msocket.push(body.slice(0xff));
+                msocket.push(null);
+            });
+
+            it('should be emitted on large masked frame', function(done) {
+                var head = new Buffer([0x82, 0xfe, 0xff, 0xff]);
+                var mask = new Buffer([0xa9, 0x56, 0x4d, 0xf0]);
+                var body = new Buffer(65535);
+                var data = crypto.randomBytes(65535);
+
+                // manuell mask
+                for (var i = 0; i < data.length; i++)
+                    body[i] = data[i] ^ mask[i % 4];
+
+                var buffer = [];
+                wsstream.on('readable', function() {
+                    var chunk = wsstream.read();
+                    buffer.push(chunk);
+                });
+                wsstream.on('end', function() {
+                    Buffer.concat(buffer).should.eql(data);
+                    done();
+                });
+
+                msocket.push(head);
+                msocket.push(mask);
+                msocket.push(body.slice(0, 0xff));
+                msocket.push(body.slice(0xff));
+                msocket.push(null);
+            });
+
         });
 
     });
