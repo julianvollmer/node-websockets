@@ -50,13 +50,16 @@ by using the HTML5 File API (move an image into the input field).
 
 Use npm for installation.
 
+**Note:** There is no mistake with "websocketss". The "websockets" slot is
+currently reserved...
+
 Example:
 
-    npm install websockets
+    npm install websocketss
 
 ### Modules
 
-Access following modules through `websockets` namespace:
+Access following modules through `websocketss` namespace:
 
 * [WebSocketServer]
 (https://github.com/bodokaiser/node-websockets/blob/master/doc/socket.md)
