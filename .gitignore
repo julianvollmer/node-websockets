@@ -41,6 +41,7 @@ Thumbs.db
 ###################
 node_modules
 
-# Cloud9 ide #
-##############
+# Ide generated files #
+#######################
+*.swp
 .c9revisions
