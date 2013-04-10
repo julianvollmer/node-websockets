@@ -46,25 +46,41 @@ describe('WebSocket', function() {
         });
 
         it('should send a close with status code', function(done) {
-            msocket.once('data', function(chunk) {
-                chunk[0].should.equal(0x88);
-                chunk[1].should.equal(0x02);
-                chunk[2].should.equal(0x03);
-                chunk[3].should.equal(0xe9);
-                done();
+            var counter = 0;
+            msocket.on('data', function(chunk) {
+                switch (counter) {
+                    case 0:
+                        chunk[0].should.equal(0x88);
+                        chunk[1].should.equal(0x02);
+                        break;
+                    case 1:
+                        chunk[0].should.equal(0x03);
+                        chunk[1].should.equal(0xe9);
+                        done();
+                        break;
+                }
+                counter++;
             });
 
             wssocket.close(1001);
         });
 
         it('should send a close with message', function(done) {
-            msocket.once('data', function(chunk) {
-                chunk[0].should.equal(0x88);
-                chunk[1].should.equal(0x03);
-                chunk[2].should.equal(0x48);
-                chunk[3].should.equal(0x65);
-                chunk[4].should.equal(0x79);
-                done();
+            var counter = 0;
+            msocket.on('data', function(chunk) {
+                switch (counter) {
+                    case 0:
+                        chunk[0].should.equal(0x88);
+                        chunk[1].should.equal(0x03);
+                        break;
+                    case 1:
+                        chunk[0].should.equal(0x48);
+                        chunk[1].should.equal(0x65);
+                        chunk[2].should.equal(0x79);
+                        done();
+                        break;
+                }
+                counter++;
             });
 
             wssocket.close('Hey');

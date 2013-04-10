@@ -24,14 +24,24 @@ describe('WebSocket', function() {
         });
 
         it('should send a small ping', function(done) {
-            msocket.once('data', function(chunk) {
-                chunk[0].should.equal(0x89);
-                chunk[1].should.equal(0x0b);
-                chunk.slice(2).should.eql(new Buffer('Hello World'));
-                done();
+            var message = new Buffer('Hello World');
+
+            var counter = 0;
+            msocket.on('data', function(chunk) {
+                switch (counter) {
+                    case 0:
+                        chunk[0].should.equal(0x89);
+                        chunk[1].should.equal(0x0b);
+                        break;
+                    case 1:
+                        chunk.should.eql(message);
+                        done();
+                        break;
+                }
+                counter++;
             });
 
-            wssocket.ping('Hello World');
+            wssocket.ping(message.toString());
         });
 
         it('should send a middle ping message', function(done) {
@@ -41,13 +51,21 @@ describe('WebSocket', function() {
             message += 'the there should be two length bytes ';
             message += 'which follow the two first head bytes';
 
-            msocket.once('data', function(chunk) {
-                chunk[0].should.equal(0x89);
-                chunk[1].should.equal(0x7e);
-                chunk[2].should.equal(0x00);
-                chunk[3].should.equal(0x93);
-                chunk.slice(4).should.eql(new Buffer(message));
-                done();
+            var counter = 0;
+            msocket.on('data', function(chunk) {
+                switch (counter) {
+                    case 0:
+                        chunk[0].should.equal(0x89);
+                        chunk[1].should.equal(0x7e);
+                        chunk[2].should.equal(0x00);
+                        chunk[3].should.equal(0x93);
+                        break;
+                    case 1:
+                        chunk.should.eql(new Buffer(message));
+                        done();
+                        break;
+                }
+                counter++;
             });
 
             wssocket.ping(message);

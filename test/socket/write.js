@@ -30,12 +30,15 @@ describe('WebSocket', function() {
                     case 0:
                         chunk[0].should.equal(0x02);
                         chunk[1].should.equal(0x03);
-                        chunk[2].should.equal(0x01);
-                        chunk[3].should.equal(0x02);
-                        chunk[4].should.equal(0x03);
-                        chunk.length.should.equal(5);
+                        chunk.length.should.equal(2);
                         break;
                     case 1:
+                        chunk[0].should.equal(0x01);
+                        chunk[1].should.equal(0x02);
+                        chunk[2].should.equal(0x03);
+                        chunk.length.should.equal(3);
+                        break;
+                    case 2:
                         chunk[0].should.equal(0x80);
                         chunk[1].should.equal(0x00);
                         chunk.length.should.equal(2);
@@ -57,28 +60,37 @@ describe('WebSocket', function() {
                     case 0:
                         chunk[0].should.equal(0x02);
                         chunk[1].should.equal(0x03);
-                        chunk[2].should.equal(0x01);
-                        chunk[3].should.equal(0x02);
-                        chunk[4].should.equal(0x03);
-                        chunk.length.should.equal(5);
+                        chunk.length.should.equal(2);
                         break;
                     case 1:
-                        chunk[0].should.equal(0x00);
-                        chunk[1].should.equal(0x03);
-                        chunk[2].should.equal(0x04);
-                        chunk[3].should.equal(0x05);
-                        chunk[4].should.equal(0x06);
-                        chunk.length.should.equal(5);
+                        chunk[0].should.equal(0x01);
+                        chunk[1].should.equal(0x02);
+                        chunk[2].should.equal(0x03);
+                        chunk.length.should.equal(3);
                         break;
                     case 2:
                         chunk[0].should.equal(0x00);
                         chunk[1].should.equal(0x03);
-                        chunk[2].should.equal(0x07);
-                        chunk[3].should.equal(0x08);
-                        chunk[4].should.equal(0x09);
-                        chunk.length.should.equal(5);
+                        chunk.length.should.equal(2);
                         break;
                     case 3:
+                        chunk[0].should.equal(0x04);
+                        chunk[1].should.equal(0x05);
+                        chunk[2].should.equal(0x06);
+                        chunk.length.should.equal(3);
+                        break;
+                    case 4:
+                        chunk[0].should.equal(0x00);
+                        chunk[1].should.equal(0x03);
+                        chunk.length.should.equal(2);
+                        break;
+                    case 5:
+                        chunk[0].should.equal(0x07);
+                        chunk[1].should.equal(0x08);
+                        chunk[2].should.equal(0x09);
+                        chunk.length.should.equal(3);
+                        break;
+                    case 6:
                         chunk[0].should.equal(0x80);
                         chunk[1].should.equal(0x00);
                         chunk.length.should.equal(2);

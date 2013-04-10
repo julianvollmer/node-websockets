@@ -15,17 +15,19 @@ describe('WebSocketOutgoing', function() {
     describe('#end([chunk])', function() {
 
         it('should send empty final frame', function(done) {
-            msocket.on('data', function(chunk) {
+            msocket.once('data', function(chunk) {
                 chunk[0].should.equal(0x82);
                 chunk[1].should.equal(0x00);
                 chunk.length.should.equal(2);
                 done();
             });
 
+            wsoutgoing.fin = true;
+            wsoutgoing.length = 0;
             wsoutgoing.end();
         });
 
-        it('should send fragment with final frame', function(done) {
+        it('should send frame part for part', function(done) {
             var messageOne = new Buffer('Hello');
             var messageTwo = new Buffer('World');
 
@@ -34,18 +36,13 @@ describe('WebSocketOutgoing', function() {
                 switch (counter) {
                     case 0:
                         chunk[0].should.equal(0x01);
-                        chunk[1].should.equal(0x05);
-                        chunk.slice(2).should.eql(messageOne);
+                        chunk[1].should.equal(0x0a);
                         break;
                     case 1:
-                        chunk[0].should.equal(0x00);
-                        chunk[1].should.equal(0x05);
-                        chunk.slice(2).should.eql(messageTwo);
+                        chunk.should.eql(messageOne);
                         break;
                     case 2:
-                        chunk[0].should.equal(0x80);
-                        chunk[1].should.equal(0x00);
-                        chunk.length.should.equal(2);
+                        chunk.should.eql(messageTwo);
                         done();
                         break;
                 }
@@ -53,6 +50,7 @@ describe('WebSocketOutgoing', function() {
             });
 
             wsoutgoing.opcode = 0x01;
+            wsoutgoing.length = 0x0a;
             wsoutgoing.write(messageOne);
             wsoutgoing.end(messageTwo);
         });
