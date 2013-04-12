@@ -30,6 +30,18 @@ describe('WebSocket', function() {
             msocket.push(new Buffer([0x88, 0x03, 0x48, 0x65, 0x79]));
         });
 
+        it('should be emitted with status code', function(done) {
+            wssocket.once('close', function(payload, code, message) {
+                payload[0].should.equal(0x03);
+                payload[1].should.equal(0xea);
+                payload.length.should.equal(2);
+                code.should.equal(1002);
+                done();
+            });
+
+            msocket.push(new Buffer([0x88, 0x02, 0x03, 0xea]));
+        });
+
     });
 
     describe('#close([message])', function() {

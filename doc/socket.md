@@ -110,12 +110,13 @@ test out latency or to check the connection.
 
 Example:
 
-    wssocket.once('close', function(message) {
-        console.log('connection was classed because of', message.toString());
+    wssocket.once('close', function(payload, code, message) {
+        console.log('connection was classed because of', message);
     });
 
 When we receive a close frame or the socket itself closes then we emit a
-`close` event.
+`close` event. If the close frame contains uses a status code it will be passed
+as `code` with the official description in `message`.
 
 ### Event: "stream:start"
 
