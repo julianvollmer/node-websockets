@@ -35,11 +35,22 @@ describe('WebSocket', function() {
     describe('#close([message])', function() {
 
         it('should send an empty close', function(done) {
-            msocket.once('data', function(chunk) {
-                chunk[0].should.equal(0x88);
-                chunk[1].should.equal(0x00);
-                chunk.length.should.equal(2);
-                done();
+            var counter = 0;
+            msocket.on('data', function(chunk) {
+                switch (counter) {
+                    case 0:
+                        chunk[0].should.equal(0x88);
+                        chunk[1].should.equal(0x02);
+                        chunk.length.should.equal(2);
+                        break;
+                    case 1:
+                        chunk[0].should.equal(0x03);
+                        chunk[1].should.equal(0xe8);
+                        chunk.length.should.equal(2);
+                        done();
+                        break;
+                }
+                counter++;
             });
 
             wssocket.close();
