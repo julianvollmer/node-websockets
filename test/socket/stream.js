@@ -71,7 +71,6 @@ describe('WebSocket', function() {
                 msocket.push(Buffer.concat([heads[1], payload.slice(0x400, 0x800)]));
                 msocket.push(Buffer.concat([heads[2], payload.slice(0x800, 0xc00)]));
                 msocket.push(Buffer.concat([heads[3], payload.slice(0xc00)]));
-                msocket.push(null);
             });
         });
 

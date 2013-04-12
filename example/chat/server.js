@@ -21,7 +21,6 @@ imageSocketServer.on('stream:start', function(wssocket) {
 imageSocketServer.on('stream:end', function(wssocket) {
     console.log('ending stream');
     wssocket.unpipe(imageSocketServer);
-    wssocket.write(new Buffer(0));
 });
 
 // informs about new clients connected
