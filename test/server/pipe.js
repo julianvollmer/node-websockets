@@ -19,11 +19,14 @@ describe('WebSocketServer', function() {
     describe('#wssocket.pipe(wsserver)', function() {
     
         it('should write incoming frame to all clients', function(done) {
+            var payload = crypto.randomBytes(65535);
+
             wsserver.once('stream:start', function(wssocket) {
                 wssocket.pipe(wsserver);
             });
             wsserver.once('stream:end', function(wssocket) {
                 wssocket.unpipe(wsserver);
+                wsserver.write(new Buffer(0));
             });
             
             var counterOne = 0;
@@ -34,9 +37,12 @@ describe('WebSocketServer', function() {
                         chunk[1].should.equal(0x7e);
                         chunk[2].should.equal(0xff);
                         chunk[3].should.equal(0xff);
-                        chunk.slice(4).should.eql(payload);
+                        chunk.length.should.equal(4);
                         break;
                     case 1:
+                        chunk.should.eql(payload);
+                        break;
+                    case 2:
                         chunk[0].should.equal(0x80);
                         chunk[1].should.equal(0x00);
                         chunk.length.should.equal(2);
@@ -53,9 +59,12 @@ describe('WebSocketServer', function() {
                         chunk[1].should.equal(0x7e);
                         chunk[2].should.equal(0xff);
                         chunk[3].should.equal(0xff);
-                        chunk.slice(4).should.eql(payload);
+                        chunk.length.should.equal(4);
                         break;
                     case 1:
+                        chunk.should.eql(payload);
+                        break;
+                    case 2:
                         chunk[0].should.equal(0x80);
                         chunk[1].should.equal(0x00);
                         chunk.length.should.equal(2);
@@ -65,7 +74,6 @@ describe('WebSocketServer', function() {
                 counterTwo++;
             });
 
-            var payload = crypto.randomBytes(65535);
             msocketOne.push(new Buffer([0x82, 0x7e, 0xff, 0xff]));
             msocketOne.push(payload);
         });

@@ -15,29 +15,46 @@ describe('WebSocket', function() {
         // the final frame is send before the other data
         // the source of this issue is that "done" on wsstream
         // is emitted before the actuall piping was done
-        xit('should write incoming data to socket', function(done) {
+        it('should write incoming data to socket', function(done) {
+            wssocket.once('stream:start', function() {
+                wssocket.pipe(wssocket);
+            });
+            wssocket.once('stream:end', function() {
+                wssocket.unpipe(wssocket);
+                wssocket.write(new Buffer(0));
+            });
+
             var counter = 0;
             msocket.on('data', function(chunk) {
                 switch (counter) {
                     case 0:
                         chunk[0].should.equal(0x02);
                         chunk[1].should.equal(0x01);
-                        chunk[2].should.equal(0x48);
-                        chunk.length.should.equal(3);
+                        chunk.length.should.equal(2);
                         break;
                     case 1:
-                        chunk[0].should.equal(0x00);
-                        chunk[1].should.equal(0x01);
-                        chunk[2].should.equal(0x65);
-                        chunk.length.should.equal(3);
+                        chunk[0].should.equal(0x48);
+                        chunk.length.should.equal(1);
                         break;
                     case 2:
                         chunk[0].should.equal(0x00);
                         chunk[1].should.equal(0x01);
-                        chunk[2].should.equal(0x79);
-                        chunk.length.should.equal(3);
+                        chunk.length.should.equal(2);
                         break;
                     case 3:
+                        chunk[0].should.equal(0x65);
+                        chunk.length.should.equal(1);
+                        break;
+                    case 4:
+                        chunk[0].should.equal(0x00);
+                        chunk[1].should.equal(0x01);
+                        chunk.length.should.equal(2);
+                        break;
+                    case 5:
+                        chunk[0].should.equal(0x79);
+                        chunk.length.should.equal(1);
+                        break;
+                    case 6:
                         chunk[0].should.equal(0x80);
                         chunk[1].should.equal(0x00);
                         chunk.length.should.equal(2);
@@ -45,13 +62,6 @@ describe('WebSocket', function() {
                         break;
                 }
                 counter++;
-            });
-
-            wssocket.once('stream:start', function() {
-                wssocket.pipe(wssocket);
-            });
-            wssocket.once('stream:end', function() {
-                wssocket.unpipe(wssocket);
             });
 
             msocket.push(new Buffer([0x02, 0x01, 0x48]));
