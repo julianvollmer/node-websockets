@@ -24,11 +24,20 @@ describe('WebSocket', function() {
         });
 
         it('should send a short text message', function(done) {
-            msocket.once('data', function(chunk) {
-                chunk[0].should.equal(0x81);
-                chunk[1].should.equal(0x0b);
-                chunk.slice(2).should.eql(new Buffer('Hello World'));
-                done();
+            var counter = 0;
+            msocket.on('data', function(chunk) {
+                switch (counter) {
+                    case 0:
+                        chunk[0].should.equal(0x81);
+                        chunk[1].should.equal(0x0b);
+                        chunk.length.should.equal(2);
+                        break;
+                    case 1:
+                        chunk.should.eql(new Buffer('Hello World'));
+                        done();
+                        break;
+                }
+                counter++;
             });
 
             wssocket.send('Hello World');
@@ -41,13 +50,22 @@ describe('WebSocket', function() {
             message += 'the there should be two length bytes ';
             message += 'which follow the two first head bytes';
 
-            msocket.once('data', function(chunk) {
-                chunk[0].should.equal(0x81);
-                chunk[1].should.equal(0x7e);
-                chunk[2].should.equal(0x00);
-                chunk[3].should.equal(0x93);
-                chunk.slice(4).should.eql(new Buffer(message));
-                done();
+            var counter = 0;
+            msocket.on('data', function(chunk) {
+                switch (counter) {
+                    case 0:
+                        chunk[0].should.equal(0x81);
+                        chunk[1].should.equal(0x7e);
+                        chunk[2].should.equal(0x00);
+                        chunk[3].should.equal(0x93);
+                        chunk.length.should.equal(4);
+                        break;
+                    case 1:
+                        chunk.should.eql(new Buffer(message));
+                        done();
+                        break;
+                }
+                counter++;
             });
 
             wssocket.send(message);

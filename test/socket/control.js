@@ -45,13 +45,21 @@ describe('WebSocket', function() {
         });
 
         it('should send back a pong frame with ping payload', function(done) {
-            msocket.once('data', function(chunk) {
-                chunk[0].should.equal(0x8a);
-                chunk[1].should.equal(0x03);
-                chunk[2].should.equal(0x59);
-                chunk[3].should.equal(0x61);
-                chunk[4].should.equal(0x70);
-                done();
+            var counter = 0;
+            msocket.on('data', function(chunk) {
+                switch (counter) {
+                    case 0:
+                        chunk[0].should.equal(0x8a);
+                        chunk[1].should.equal(0x03);
+                        break;
+                    case 1:
+                        chunk[0].should.equal(0x59);
+                        chunk[1].should.equal(0x61);
+                        chunk[2].should.equal(0x70);
+                        done();
+                        break;
+                }
+                counter++;
             });
             
             msocket.push(new Buffer([0x89, 0x03, 0x59, 0x61, 0x70]));

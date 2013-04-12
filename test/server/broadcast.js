@@ -16,21 +16,43 @@ describe('WebSocketServer', function() {
     describe('#broadcast(message)', function() {
 
         it('should send a text frame to both assigned sockets', function(done) {
-            msocketOne.once('data', function(chunk) {
-                chunk[0].should.equal(0x81);
-                chunk[1].should.equal(0x03);
-                chunk[2].should.equal(0x48);
-                chunk[3].should.equal(0x65);
-                chunk[4].should.equal(0x79);
+            var counterOne = 0;
+            msocketOne.on('data', function(chunk) {
+                switch (counterOne) {
+                    case 0:
+                        chunk[0].should.equal(0x81);
+                        chunk[1].should.equal(0x03);
+                        chunk.length.should.equal(2);
+                        break;
+                    case 1:
+                        chunk[0].should.equal(0x48);
+                        chunk[1].should.equal(0x65);
+                        chunk[2].should.equal(0x79);
+                        chunk.length.should.equal(3);
+                        break;
+                }
+                counterOne++;
             });
-            msocketTwo.once('data', function(chunk) {
-                chunk[0].should.equal(0x81);
-                chunk[1].should.equal(0x03);
-                chunk[2].should.equal(0x48);
-                chunk[3].should.equal(0x65);
-                chunk[4].should.equal(0x79);
-                done();
+
+            var counterTwo = 0;
+            msocketTwo.on('data', function(chunk) {
+                switch (counterTwo) {
+                    case 0:
+                        chunk[0].should.equal(0x81);
+                        chunk[1].should.equal(0x03);
+                        chunk.length.should.equal(2);
+                        break;
+                    case 1:
+                        chunk[0].should.equal(0x48);
+                        chunk[1].should.equal(0x65);
+                        chunk[2].should.equal(0x79);
+                        chunk.length.should.equal(3);
+                        done();
+                        break;
+                }
+                counterTwo++;
             });
+
             wsserver.broadcast('Hey');
         });
     
