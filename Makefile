@@ -9,6 +9,10 @@ test-parser:
 	./node_modules/.bin/mocha \
         $(MOCHA_FLAGS) test/parser/*.js
 
+test-native-parser:
+	./node_modules/.bin/mocha \
+        $(MOCHA_FLAGS) test/native-parser/*.js
+
 test-core:
 	./node_modules/.bin/mocha \
         $(MOCHA_FLAGS) test/core/*.js
