@@ -23,7 +23,10 @@ Example:
     * `timeout`, Number, Timeout in ms for idling sockets, Default: `600000`.
     * `maxConnections`, Number, Max amount of connections, Default: `10`.
 
-Returns an instance of `WebSocketServer`.
+Returns an instance of `WebSocketServer`. If you want to use a tls
+encrypted connection (wss:) than you only have to use the `https` module of
+node it automatically de- and encrypts everything in the background. See in the
+example how you set this up in detail.
 
 ### wsserver.write(chunk)
 
@@ -49,7 +52,8 @@ Example:
     
     wsserver.listen(server);
 
-Uses an instance of `http.Server` to bind to upgrade requests.
+Uses an instance of `http.Server` or `https.Server` to bind to upgrade 
+requests.
 
 ### wsserver.broadcast(head, message)
 

@@ -2,19 +2,22 @@ var fs = require('fs');
 var url = require('url');
 var util = require('util');
 var path = require('path');
-var http = require('http');
+var https = require('https');
 var websockets = require('../../lib');
 
 // create servers
-var httpServer = new http.Server();
+var httpsServer = new https.Server({
+    key: fs.readFileSync(path.join(__dirname + '/../keys/key.pem')),
+    cert: fs.readFileSync(path.join(__dirname + '/../keys/cert.pem'))
+});
 
 var imageSocketServer = new websockets.Server({ 
-    url: "ws://localhost:3000/images", 
+    url: "wss://localhost:3000/images", 
     opcode: 0x01, timeout: 0 
 });
 
 var messageSocketServer = new websockets.Server({ 
-    url: "ws://localhost:3000/messages", 
+    url: "wss://localhost:3000/messages", 
     timeout: 0 
 });
 
@@ -45,13 +48,13 @@ messageSocketServer.on('message', function(message, wsocket) {
     messageSocketServer.broadcast(message);
 });
 
-imageSocketServer.listen(httpServer);
-messageSocketServer.listen(httpServer);
+imageSocketServer.listen(httpsServer);
+messageSocketServer.listen(httpsServer);
 
 // server static files
-httpServer.on('request', function(request, response) {
+httpsServer.on('request', function(request, response) {
     fs.createReadStream(path.join(__dirname + '/index.html'))
         .pipe(response);
 });
 
-httpServer.listen(3000);
+httpsServer.listen(3000);

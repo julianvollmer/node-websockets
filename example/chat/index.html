@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>node-websockets chat example</title>
+        <meta charset="utf-8" />
+        <meta name="author" content="Bodo Kaiser" />
+        <style type="text/css">
+            body {
+                margin: 20px;
+            }
+
+            h1, h2 {
+                color: #666;
+                font-family: sans-serif;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            ul {
+                width: 300px;
+                margin: 60px auto;
+                color: #333;
+                font-size: 18px;
+                font-family: sans-serif;
+                list-style: none;
+            }
+
+            form {
+                position: fixed;
+                bottom: 40px;
+                left: 50%;
+                right: 50%;
+                width: 500px;
+                margin: 0 -250px;
+            }
+
+            input#input {
+                display: block;
+                width: 400px;
+                padding: 12px 4px;
+                font-size: 24px;
+                border: 1px solid #888;
+                border-radius: 4px;
+                outline: none;
+            }
+
+            button {
+                width: 200px;
+                padding: 6px 2px;
+                color: #FFF;
+                background: #444;
+                border: none;
+                border-radius: 4px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="header">
+            <h1>node-websockets</h1>
+            <h2>chat example</h2>
+        </div>
+        <div id="content">
+            <ul id="messages"></ul>
+            <form id="messager">
+                <input id="input" placeholder="type in your message" />
+            </form>
+        </div>
+        <script type="text/javascript">
+            var proto = (location.protocol == 'https:') ? 'wss:' : 'ws:';
+
+            var imageSocket = new WebSocket(proto + '//localhost:3000/images');
+            var messageSocket = new WebSocket(proto + '//localhost:3000/messages');
+
+            var input = document.getElementById('input');
+            var messager = document.getElementById('messager');
+            var messages = document.getElementById('messages');
+
+            messager.addEventListener('drop', function(e) {
+                e.preventDefault();
+
+                var files = e.dataTransfer.files;
+
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    
+                    if (!file.type.match(/image.*/))
+                        return;
+
+                    var reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        imageSocket.send(e.target.result);
+                    };
+
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            messager.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                messageSocket.send(input.value);
+
+                input.value = '';
+            });
+
+            imageSocket.addEventListener('message', function(message) {
+                var li = document.createElement('li');
+                var img = document.createElement('img');
+
+                img.src = message.data;
+
+                li.appendChild(img);
+                messages.appendChild(li);
+            });
+
+            messageSocket.addEventListener('message', function(message) {
+                var li = document.createElement('li');
+
+                li.innerText = message.data;
+
+                messages.appendChild(li);
+            });
+        </script>
+    </body>
+</html>
