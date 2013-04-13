@@ -43,6 +43,24 @@ describe('WebSocketParser (native)', function() {
             parser.calcHeadSize(head).should.equal(14);
         });
 
+        it('should throw error on buf.length < 2', function() {
+            (function() {
+                parser.calcHeadSize(new Buffer(1));
+            }).should.throwError();
+        });
+
+        it('should throw error if argument not buffer', function() {
+            (function() {
+                parser.calcHeadSize({});
+            }).should.throwError();
+            (function() {
+                parser.calcHeadSize([]);
+            }).should.throwError();
+            (function() {
+                parser.calcHeadSize('hello');
+            }).should.throwError();
+        });
+
     });
 
 });
