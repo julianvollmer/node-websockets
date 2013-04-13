@@ -85,8 +85,39 @@ Handle<Value> ReadHeadBytes(const Arguments &args) {
     bool rsv3 = !!(chunk[0] & 0x10);
     bool mask = !!(chunk[1] & 0x80);
 
+    int offset = 2;
     int opcode = chunk[0] & 0x0f;
-    int length = chunk[1] & 0x7f;
+    unsigned long length = chunk[1] & 0x7f;
+    
+    switch (length) {
+        case 126:
+            length = chunk[3];
+            length += chunk[2] << 8;
+            offset += 2;
+            break;
+        case 127:
+            length = chunk[9];
+            length += chunk[8] << 8;
+            length += chunk[7] << 16;
+            length += chunk[6] << 24;
+            offset += 8;
+            break;
+    }
+
+    if (length > 0xfffffff) {
+        ThrowException(
+                Exception::TypeError(
+                    String::New("Length bigger than UInt32BE.")));
+
+        return scope.Close(Undefined());
+    }
+
+    char masking[4];
+
+    if (mask) {
+        for (int i = 0; i < 4; i++)
+            masking[i] = chunk[offset + i];
+    }
 
     state->Set(String::New("fin"), Boolean::New(fin));
     state->Set(String::New("rsv1"), Boolean::New(rsv1));
@@ -95,6 +126,7 @@ Handle<Value> ReadHeadBytes(const Arguments &args) {
     state->Set(String::New("mask"), Boolean::New(mask));
     state->Set(String::New("opcode"), Number::New(opcode));
     state->Set(String::New("length"), Number::New(length));
+    //state->Set(String::New("masking"), node::Buffer::New(0));
 
     return scope.Close(state);
 }
