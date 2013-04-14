@@ -112,11 +112,16 @@ Handle<Value> ReadHeadBytes(const Arguments &args) {
         return scope.Close(Undefined());
     }
 
-    char masking[4];
+    Persistent<Object> maskingBuffer;
 
+    char masking[4];
     if (mask) {
         for (int i = 0; i < 4; i++)
             masking[i] = chunk[offset + i];
+
+        maskingBuffer = node::Buffer::New(masking, 4)->handle_;
+    } else {
+        maskingBuffer = node::Buffer::New(0)->handle_;
     }
 
     state->Set(String::New("fin"), Boolean::New(fin));
@@ -126,7 +131,7 @@ Handle<Value> ReadHeadBytes(const Arguments &args) {
     state->Set(String::New("mask"), Boolean::New(mask));
     state->Set(String::New("opcode"), Number::New(opcode));
     state->Set(String::New("length"), Number::New(length));
-    //state->Set(String::New("masking"), node::Buffer::New(0));
+    state->Set(String::New("masking"), maskingBuffer);
 
     return scope.Close(state);
 }
