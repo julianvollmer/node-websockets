@@ -5,12 +5,14 @@
 
 using namespace v8;
 
+typedef unsigned char byte;
+
 Handle<Value> CalcHeadSize(const Arguments &args) {
     HandleScope scope;
     
-    Local<Object> obj = args[0]->ToObject();
+    Local<Object> chunk = args[0]->ToObject();
 
-    if (!node::Buffer::HasInstance(obj)) {
+    if (!node::Buffer::HasInstance(chunk)) {
         ThrowException(
                 Exception::TypeError(
                     String::New("Argument must be a buffer.")));
@@ -18,7 +20,7 @@ Handle<Value> CalcHeadSize(const Arguments &args) {
         return scope.Close(Undefined());
     }
 
-    if (obj->GetIndexedPropertiesExternalArrayDataLength() < 2) {
+    if (node::Buffer::Length(chunk) < 2) {
         ThrowException(
                 Exception::TypeError(
                     String::New("Buffer must be at least two bytes big.")));
@@ -26,14 +28,13 @@ Handle<Value> CalcHeadSize(const Arguments &args) {
         return scope.Close(Undefined());
     }
 
-    unsigned char* data = static_cast<unsigned char*>(obj->GetIndexedPropertiesExternalArrayData());
+    int length = 2;
+    byte* head = (byte*) node::Buffer::Data(chunk);
 
-    unsigned int length = 2;
-
-    if (data[1] & 0x80)
+    if (head[1] & 0x80)
         length += 4;
 
-    switch (data[1] & 0x7f) {
+    switch (head[1] & 0x7f) {
         case 126:
             length += 2;
             break;
@@ -49,7 +50,7 @@ Handle<Value> ReadHeadBytes(const Arguments &args) {
     HandleScope scope;
     
     Local<Object> state = args[0]->ToObject();
-    Local<Object> head = args[1]->ToObject();
+    Local<Object> chunk = args[1]->ToObject();
 
     if (!state->IsObject()) {
         ThrowException(
@@ -59,7 +60,7 @@ Handle<Value> ReadHeadBytes(const Arguments &args) {
         return scope.Close(Undefined());
     }
 
-    if (!node::Buffer::HasInstance(head)) {
+    if (!node::Buffer::HasInstance(chunk)) {
         ThrowException(
                 Exception::TypeError(
                     String::New("Argument two must be a buffer.")));
@@ -67,7 +68,7 @@ Handle<Value> ReadHeadBytes(const Arguments &args) {
         return scope.Close(Undefined());
     }
 
-    if (head->GetIndexedPropertiesExternalArrayDataLength() < 2) {
+    if (node::Buffer::Length(chunk) < 2) {
         ThrowException(
                 Exception::TypeError(
                     String::New("Buffer must be at least two bytes big.")));
@@ -75,31 +76,29 @@ Handle<Value> ReadHeadBytes(const Arguments &args) {
         return scope.Close(Undefined());
     }
 
-    unsigned char* chunk = static_cast<unsigned char*>(
-            head->GetIndexedPropertiesExternalArrayData());
+    byte* head = (byte*) node::Buffer::Data(chunk);
 
-
-    bool fin = !!(chunk[0] & 0x80);
-    bool rsv1 = !!(chunk[0] & 0x40);
-    bool rsv2 = !!(chunk[0] & 0x20);
-    bool rsv3 = !!(chunk[0] & 0x10);
-    bool mask = !!(chunk[1] & 0x80);
+    bool fin = !!(head[0] & 0x80);
+    bool rsv1 = !!(head[0] & 0x40);
+    bool rsv2 = !!(head[0] & 0x20);
+    bool rsv3 = !!(head[0] & 0x10);
+    bool mask = !!(head[1] & 0x80);
 
     int offset = 2;
-    int opcode = chunk[0] & 0x0f;
-    unsigned long length = chunk[1] & 0x7f;
+    int opcode = head[0] & 0x0f;
+    unsigned long length = head[1] & 0x7f;
     
     switch (length) {
         case 126:
-            length = chunk[3];
-            length += chunk[2] << 8;
+            length = head[3];
+            length += head[2] << 8;
             offset += 2;
             break;
         case 127:
-            length = chunk[9];
-            length += chunk[8] << 8;
-            length += chunk[7] << 16;
-            length += chunk[6] << 24;
+            length = head[9];
+            length += head[8] << 8;
+            length += head[7] << 16;
+            length += head[6] << 24;
             offset += 8;
             break;
     }
@@ -117,7 +116,7 @@ Handle<Value> ReadHeadBytes(const Arguments &args) {
     char masking[4];
     if (mask) {
         for (int i = 0; i < 4; i++)
-            masking[i] = chunk[offset + i];
+            masking[i] = head[offset + i];
 
         maskingBuffer = node::Buffer::New(masking, 4)->handle_;
     } else {
@@ -136,12 +135,64 @@ Handle<Value> ReadHeadBytes(const Arguments &args) {
     return scope.Close(state);
 }
 
+Handle<Value> ReadBodyBytes(const Arguments &args) {
+    HandleScope scope;
+    
+    Local<Object> state = args[0]->ToObject();
+    Local<Object> chunk = args[1]->ToObject();
+
+    if (!state->IsObject() || state->IsArray()) {
+        ThrowException(
+            Exception::TypeError(
+                String::New("Argument one must be an object.")));
+
+        return scope.Close(Undefined());
+    }
+
+    if (!state->Has(String::New("index"))) {
+        ThrowException(
+            Exception::TypeError(
+                String::New("Argument one must have property index.")));
+
+        return scope.Close(Undefined());
+    }
+
+    if (!state->Has(String::New("length"))) {
+        ThrowException(
+            Exception::TypeError(
+                String::New("Argument one must have property length.")));
+
+        return scope.Close(Undefined());
+    }
+
+    if (!node::Buffer::HasInstance(chunk)) {
+        ThrowException(
+            Exception::TypeError(
+                String::New("Argument two must be a buffer.")));
+
+        return scope.Close(Undefined());
+    }
+
+    int index = state->Get(String::New("index"))
+        ->NumberValue();
+    
+    int length = state->Get(String::New("length"))
+        ->NumberValue();
+
+    byte* buf = (byte*) node::Buffer::Data(chunk);
+
+    return scope.Close(Undefined());
+}
+
 void init(Handle<Object> exports) {
     exports->Set(String::New("calcHeadSize"), 
             FunctionTemplate::New(CalcHeadSize)->GetFunction());
 
     exports->Set(String::New("readHeadBytes"),
             FunctionTemplate::New(ReadHeadBytes)->GetFunction());
+
+    exports->Set(String::New("readBodyBytes"),
+            FunctionTemplate::New(ReadBodyBytes)->GetFunction());
 }
 
 NODE_MODULE(parser, init);
