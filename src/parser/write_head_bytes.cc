@@ -6,8 +6,7 @@ Handle<Value> WriteHeadBytes(const Arguments &args) {
     Local<Object> state = args[0]->ToObject();
 
     if (!state->IsObject() || state->IsArray()) {
-        ThrowException(Exception::TypeError(
-                    String::New("Argument must be an object.")));
+        ThrowTypeError("Argument must be an object.");
 
         return scope.Close(Undefined());
     }

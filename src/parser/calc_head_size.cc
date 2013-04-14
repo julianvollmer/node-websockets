@@ -4,8 +4,7 @@ Handle<Value> CalcHeadSize(const Arguments &args) {
     HandleScope scope;
 
     if (!args[0]->IsObject() || args[0]->IsArray()) {
-        ThrowException(Exception::TypeError(
-                    String::New("Argument must be a either object or buffer.")));
+        ThrowTypeError("Argument must be either object or buffer.");
 
         return scope.Close(Undefined());
     }
@@ -14,8 +13,7 @@ Handle<Value> CalcHeadSize(const Arguments &args) {
 
     if (node::Buffer::HasInstance(object)) {
         if (node::Buffer::Length(object) < 2) {
-            ThrowException(Exception::TypeError(
-                        String::New("Buffer must have at least two bytes.")));
+            ThrowTypeError("Buffer must have at least two bytes.");
 
             return scope.Close(Undefined());
         }
@@ -25,8 +23,7 @@ Handle<Value> CalcHeadSize(const Arguments &args) {
 
     if (object->IsObject()) {
         if (!object->Has(String::New("length"))) {
-            ThrowException(Exception::TypeError(
-                        String::New("State must have property length.")));
+            ThrowTypeError("State must have property length.");
 
             return scope.Close(Undefined());
         }

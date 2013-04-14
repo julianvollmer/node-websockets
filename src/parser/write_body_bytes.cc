@@ -7,15 +7,13 @@ Handle<Value> WriteBodyBytes(const Arguments &args) {
     Local<Value> chunkVal = args[1];
 
     if (!stateVal->IsObject() || stateVal->IsArray()) {
-        ThrowException(Exception::TypeError(
-                    String::New("Argument one must be a object.")));
+        ThrowTypeError("Argument one must be a object.");
 
         scope.Close(Undefined());
     }
 
     if (!node::Buffer::HasInstance(chunkVal)) {
-        ThrowException(Exception::TypeError(
-                    String::New("Argument two must be a buffer.")));
+        ThrowTypeError("Argument two must be a buffer.");
 
         scope.Close(Undefined());
     }

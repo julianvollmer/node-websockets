@@ -3,34 +3,28 @@
 Handle<Value> ReadHeadBytes(const Arguments &args) {
     HandleScope scope;
     
-    Local<Object> state = args[0]->ToObject();
-    Local<Object> chunk = args[1]->ToObject();
+    Local<Value> stateVal = args[0];
+    Local<Value> chunkVal = args[1];
 
-    if (!state->IsObject()) {
-        ThrowException(
-                Exception::TypeError(
-                    String::New("Argument one must be an object.")));
+    if (!stateVal->IsObject()) {
+        ThrowTypeError("Argument one must be an object.");
 
         return scope.Close(Undefined());
     }
 
-    if (!node::Buffer::HasInstance(chunk)) {
-        ThrowException(
-                Exception::TypeError(
-                    String::New("Argument two must be a buffer.")));
+    if (!node::Buffer::HasInstance(chunkVal)) {
+        ThrowTypeError("Argument two must be a buffer.");
 
         return scope.Close(Undefined());
     }
 
-    if (node::Buffer::Length(chunk) < 2) {
-        ThrowException(
-                Exception::TypeError(
-                    String::New("Buffer must be at least two bytes big.")));
+    if (node::Buffer::Length(chunkVal) < 2) {
+        ThrowTypeError("Buffer must be at least two bytes big.");
 
         return scope.Close(Undefined());
     }
 
-    byte* head = (byte*) node::Buffer::Data(chunk);
+    byte* head = (byte*) node::Buffer::Data(chunkVal);
 
     bool fin = !!(head[0] & 0x80);
     bool rsv1 = !!(head[0] & 0x40);
@@ -58,25 +52,26 @@ Handle<Value> ReadHeadBytes(const Arguments &args) {
     }
 
     if (length > 0xfffffff) {
-        ThrowException(
-                Exception::TypeError(
-                    String::New("Length bigger than UInt32BE.")));
+        ThrowTypeError("Length bigger than UInt32BE.");
 
         return scope.Close(Undefined());
     }
 
     Persistent<Object> maskingBuffer;
 
-    char masking[4];
+    byte* masking = (byte*) malloc(4);
+
     if (mask) {
         for (int i = 0; i < 4; i++)
             masking[i] = head[offset + i];
 
-        maskingBuffer = node::Buffer::New(masking, 4)->handle_;
+        maskingBuffer = node::Buffer::New((char*) masking, 4)->handle_;
     } else {
         maskingBuffer = node::Buffer::New(0)->handle_;
     }
 
+    Local<Object> state = stateVal->ToObject();
+    
     state->Set(String::New("fin"), Boolean::New(fin));
     state->Set(String::New("rsv1"), Boolean::New(rsv1));
     state->Set(String::New("rsv2"), Boolean::New(rsv2));

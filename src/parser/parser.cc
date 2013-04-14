@@ -22,4 +22,12 @@ void init(Handle<Object> exports) {
             FunctionTemplate::New(WriteBodyBytes)->GetFunction());
 }
 
+/* WARNING: do not use the below helpers they do not work yet */
+inline Handle<Value> ThrowError(const char* message) {
+    return ThrowException(Exception::Error(String::New(message)));
+};
+inline Handle<Value> ThrowTypeError(const char* message) {
+    return ThrowException(Exception::TypeError(String::New(message)));
+};
+
 NODE_MODULE(parser, init)
