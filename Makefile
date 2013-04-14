@@ -5,9 +5,17 @@ test: test-parser test-core test-incoming test-outgoing \
 
 MOCHA_FLAGS = --require should
 
+native:
+	./node_modules/.bin/node-gyp \
+        configure build
+
 test-parser:
 	./node_modules/.bin/mocha \
         $(MOCHA_FLAGS) test/parser/*.js
+
+test-native-parser:
+	./node_modules/.bin/mocha \
+        $(MOCHA_FLAGS) test/native-parser/*.js
 
 test-core:
 	./node_modules/.bin/mocha \
