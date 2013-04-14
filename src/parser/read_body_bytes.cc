@@ -80,5 +80,5 @@ Handle<Value> ReadBodyBytes(const Arguments &args) {
 
     state->Set(String::New("index"), Number::New(index));
 
-    return scope.Close(node::Buffer::New((const char*)body, toRead)->handle_);
+    return scope.Close(node::Buffer::New((char*)body, toRead)->handle_);
 }
