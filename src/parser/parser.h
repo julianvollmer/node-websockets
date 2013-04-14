@@ -6,3 +6,6 @@ using namespace v8;
 
 /* is used to convert node::Buffer::Data */
 typedef unsigned char byte;
+
+int calcHeadSizeFromObject(Local<Object> object);
+int calcHeadSizeFromBuffer(Local<Object> buffer);
