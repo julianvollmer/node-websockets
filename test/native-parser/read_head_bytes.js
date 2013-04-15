@@ -87,12 +87,6 @@ describe('native WebSockeParser', function() {
             }).should.throwError();
         });
 
-        it('should set masking to empty buffer if not masked', function() {
-            parser.readHeadBytes(stateOne, new Buffer([0x00, 0x00]));
-
-            stateOne.masking.should.eql(new Buffer(0));
-        });
-
         it('should set masking to 0x09 0x2c 0x00 0xfe', function() {
             parser.readHeadBytes(stateOne, new Buffer([0x00, 0x80, 0x09, 0x2c, 
                     0x00, 0xfe]));

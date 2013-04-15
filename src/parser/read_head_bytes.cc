@@ -3,83 +3,85 @@
 Handle<Value> ReadHeadBytes(const Arguments &args) {
     HandleScope scope;
     
-    Local<Value> stateVal = args[0];
-    Local<Value> chunkVal = args[1];
+    Local<Value> chunk = args[1];
 
-    if (!stateVal->IsObject()) {
+    if (!args[0]->IsObject() || args[0]->IsArray()) {
         ThrowTypeError("Argument one must be an object.");
 
         return scope.Close(Undefined());
     }
 
-    if (!node::Buffer::HasInstance(chunkVal)) {
+    if (!node::Buffer::HasInstance(chunk)) {
         ThrowTypeError("Argument two must be a buffer.");
 
         return scope.Close(Undefined());
     }
 
-    if (node::Buffer::Length(chunkVal) < 2) {
+    if (node::Buffer::Length(chunk) < 2) {
         ThrowTypeError("Buffer must be at least two bytes big.");
 
         return scope.Close(Undefined());
     }
 
-    byte* head = (byte*) node::Buffer::Data(chunkVal);
+    frame_head_t* frame_head = (frame_head_t*) malloc(sizeof(frame_head_t));
 
-    bool fin = !!(head[0] & 0x80);
-    bool rsv1 = !!(head[0] & 0x40);
-    bool rsv2 = !!(head[0] & 0x20);
-    bool rsv3 = !!(head[0] & 0x10);
-    bool mask = !!(head[1] & 0x80);
+    read_head_bytes(frame_head, (bytes_t*) node::Buffer::Data(chunk));
 
-    int offset = 2;
-    int opcode = head[0] & 0x0f;
-    unsigned long length = head[1] & 0x7f;
-    
-    switch (length) {
-        case 126:
-            length = head[3];
-            length += head[2] << 8;
-            offset += 2;
-            break;
-        case 127:
-            length = head[9];
-            length += head[8] << 8;
-            length += head[7] << 16;
-            length += head[6] << 24;
-            offset += 8;
-            break;
-    }
-
-    if (length > 0xfffffff) {
+    if (frame_head->length > 0xfffffff) {
         ThrowTypeError("Length bigger than UInt32BE.");
 
         return scope.Close(Undefined());
     }
-
-    Persistent<Object> maskingBuffer;
-
-    byte* masking = (byte*) malloc(4);
-
-    if (mask) {
-        for (int i = 0; i < 4; i++)
-            masking[i] = head[offset + i];
-
-        maskingBuffer = node::Buffer::New((char*) masking, 4)->handle_;
-    } else {
-        maskingBuffer = node::Buffer::New(0)->handle_;
-    }
-
-    Local<Object> state = stateVal->ToObject();
     
-    state->Set(String::New("fin"), Boolean::New(fin));
-    state->Set(String::New("rsv1"), Boolean::New(rsv1));
-    state->Set(String::New("rsv2"), Boolean::New(rsv2));
-    state->Set(String::New("rsv3"), Boolean::New(rsv3));
-    state->Set(String::New("mask"), Boolean::New(mask));
-    state->Set(String::New("opcode"), Number::New(opcode));
-    state->Set(String::New("length"), Number::New(length));
-    state->Set(String::New("masking"), maskingBuffer);
+    Local<Object> state = args[0]->ToObject();
+
+    state->Set(String::New("fin"), Boolean::New(frame_head->fin));
+    state->Set(String::New("rsv1"), Boolean::New(frame_head->rsv1));
+    state->Set(String::New("rsv2"), Boolean::New(frame_head->rsv2));
+    state->Set(String::New("rsv3"), Boolean::New(frame_head->rsv3));
+    state->Set(String::New("mask"), Boolean::New(frame_head->mask));
+    state->Set(String::New("opcode"), Number::New(frame_head->opcode));
+    state->Set(String::New("length"), Number::New(frame_head->length));
+    
+    if (frame_head->mask)
+        state->Set(String::New("masking"), 
+                node::Buffer::New((char*) frame_head->masking, 4)->handle_);
 
     return scope.Close(state);
-}
+};
+
+int read_head_bytes(frame_head_t* frame_head,  bytes_t* head_bytes) {
+
+    frame_head->fin = !!(head_bytes[0] & 0x80);
+    frame_head->rsv1 = !!(head_bytes[0] & 0x40);
+    frame_head->rsv2 = !!(head_bytes[0] & 0x20);
+    frame_head->rsv3 = !!(head_bytes[0] & 0x10);
+    frame_head->mask = !!(head_bytes[1] & 0x80);
+
+    frame_head->opcode = head_bytes[0] & 0x0f;
+    frame_head->length = head_bytes[1] & 0x7f;
+
+    int offset = 2;
+    
+    switch (frame_head->length) {
+        case 126:
+            frame_head->length = head_bytes[3];
+            frame_head->length += head_bytes[2] << 8;
+            offset += 2;
+            break;
+        case 127:
+            frame_head->length = head_bytes[9];
+            frame_head->length += head_bytes[8] << 8;
+            frame_head->length += head_bytes[7] << 16;
+            frame_head->length += head_bytes[6] << 24;
+            offset += 8;
+            break;
+    }
+    
+    if (frame_head->mask) {
+        for (int i = 0; i < 4; i++)
+            frame_head->masking[i] = head_bytes[offset + i];
+    }
+
+    return 0;
+};
