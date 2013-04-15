@@ -49,21 +49,21 @@ Handle<Value> WriteHeadBytes(const Arguments &args) {
 
     byte* masking = (byte*) malloc(4);
 
-    if (mask) {
+    if (isMasking(maskingValue)) {
+        mask = true;
+        masking = (byte*) node::Buffer::Data(maskingValue);
+
+        headBytes[1] = headBytes[1] | 0x80;
+
+        for (int i = 0; i < 4; i++)
+            headBytes[headSize - 4 + i] = masking[i];
+    } else if (mask) {
         srand(time(NULL));
         unsigned int random = rand();
         masking[0] = headBytes[headSize - 1] = (byte) (random);
         masking[1] = headBytes[headSize - 2] = (byte) (random >> 8);
         masking[2] = headBytes[headSize - 3] = (byte) (random >> 16);
         masking[3] = headBytes[headSize - 4] = (byte) (random >> 24);
-    } else if (isMasking(maskingValue)) {
-        mask = true;
-        masking = (byte*) node::Buffer::Data(maskingValue->ToObject());
-
-        headBytes[1] = headBytes[1] | 0x80;
-
-        for (int i = 0; i < 4; i++)
-            headBytes[headSize - 4 + i] = masking[i];
     }
 
     state->Set(String::New("mask"), Boolean::New(mask));
