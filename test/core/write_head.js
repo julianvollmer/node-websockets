@@ -51,7 +51,7 @@ describe('WebSocketCore', function() {
 
         it('should set masking to 0x7e 0xdf 0x20 0xf5', function() {
             var masking = new Buffer([0x7e, 0xdf, 0x20, 0xf5]);
-            wscore.writeHead({ masking: masking });
+            wscore.writeHead({ mask: true, masking: masking });
             wscore._frameWriteState.mask.should.be.true;
             wscore._frameWriteState.masking.should.eql(masking);
         });

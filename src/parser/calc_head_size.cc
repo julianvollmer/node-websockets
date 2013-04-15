@@ -1,4 +1,8 @@
 #include "parser.h"
+#include <iostream>
+
+#ifndef NODE_WEBSOCKETS_PARSER_CALC_HEAD_SIZE
+#define NODE_WEBSOCKETS_PARSER_CALC_HEAD_SIZE
 
 Handle<Value> CalcHeadSize(const Arguments &args) {
     HandleScope scope;
@@ -58,14 +62,12 @@ int calcHeadSizeFromObject(Local<Object> state) {
     int length = state->Get(String::New("length"))
         ->NumberValue();
 
-    Local<Value> masking = state->Get(String::New("masking"));
-
     if (length > 125 && length < 0x10000)
         size += 2;
     else if (length > 0xffff)
         size += 8;
 
-    if (mask || isMasking(masking))
+    if (mask)
         size += 4;
 
     return size;
@@ -90,3 +92,5 @@ int calcHeadSizeFromBuffer(Local<Object> chunk) {
 
     return length;
 };
+
+#endif

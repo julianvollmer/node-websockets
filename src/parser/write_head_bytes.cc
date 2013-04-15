@@ -1,4 +1,6 @@
 #include "parser.h"
+#include "calc_head_size.cc"
+#include <iostream>
 
 Handle<Value> WriteHeadBytes(const Arguments &args) {
     HandleScope scope;
@@ -11,17 +13,10 @@ Handle<Value> WriteHeadBytes(const Arguments &args) {
         return scope.Close(Undefined());
     }
 
-    bool fin = state->Get(String::New("fin"))
-        ->BooleanValue();
-
-    bool mask = state->Get(String::New("mask"))
-        ->BooleanValue();
-
-    int opcode = state->Get(String::New("opcode"))
-        ->NumberValue();
-
-    int length = state->Get(String::New("length"))
-        ->NumberValue();
+    bool fin = state->Get(String::New("fin"))->BooleanValue();
+    bool mask = state->Get(String::New("mask"))->BooleanValue();
+    int opcode = state->Get(String::New("opcode"))->NumberValue();
+    int length = state->Get(String::New("length"))->NumberValue();
 
     Local<Value> maskingValue = state->Get(String::New("masking"));
 
@@ -49,7 +44,7 @@ Handle<Value> WriteHeadBytes(const Arguments &args) {
 
     byte* masking = (byte*) malloc(4);
 
-    if (isMasking(maskingValue)) {
+    if (mask && maskingValue->BooleanValue()) {
         mask = true;
         masking = (byte*) node::Buffer::Data(maskingValue);
 
