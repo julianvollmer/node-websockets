@@ -32,6 +32,21 @@ describe('WebSocket', function() {
                 done();
             });
 
+            msocket.push(new Buffer([0x02, 0x01, 0x48, 0x00, 0x01, 0x65, 0x80, 0x01, 0x79]));
+        });
+
+        xit('should be emitted on end of frame stream', function(done) {
+            wssocket.once('stream:start', function() {
+                wssocket.on('readable', function() {
+                    console.log('readable', wssocket.read());
+                });
+            });
+            
+            wssocket.once('stream:end', function() {
+                wssocket.read().should.eql(new Buffer('Hey'));
+                done();
+            });
+
             msocket.push(new Buffer([0x02, 0x01, 0x48]));
             msocket.push(new Buffer([0x00, 0x01, 0x65]));
             msocket.push(new Buffer([0x80, 0x01, 0x79]));
