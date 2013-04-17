@@ -35,13 +35,7 @@ describe('WebSocket', function() {
             msocket.push(new Buffer([0x02, 0x01, 0x48, 0x00, 0x01, 0x65, 0x80, 0x01, 0x79]));
         });
 
-        xit('should be emitted on end of frame stream', function(done) {
-            wssocket.once('stream:start', function() {
-                wssocket.on('readable', function() {
-                    console.log('readable', wssocket.read());
-                });
-            });
-            
+        it('should be emitted on end of frame stream', function(done) {
             wssocket.once('stream:end', function() {
                 wssocket.read().should.eql(new Buffer('Hey'));
                 done();
@@ -52,7 +46,7 @@ describe('WebSocket', function() {
             msocket.push(new Buffer([0x80, 0x01, 0x79]));
         });
 
-        xit('should be emitted on very large frame stream', function(done) {
+        it('should be emitted on very large frame stream', function(done) {
             var heads = [];
             var buffer = [];
             heads[0] = new Buffer([0x02, 0x7e, 0x04, 0x00]);
