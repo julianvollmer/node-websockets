@@ -13,7 +13,7 @@ describe('WebSocket', function() {
     describe('#write([chunk])', function() {
 
         it('should stream an empty binary', function(done) {
-            msocket.on('data', function(chunk) {
+            msocket.once('data', function(chunk) {
                 chunk[0].should.equal(0x82);
                 chunk[1].should.equal(0x00);
                 chunk.length.should.equal(2);
